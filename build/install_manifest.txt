@@ -1,0 +1,2 @@
+/home/toby/Pelagos/Projects/Hipfort_Course/build/bin/memcpy_bench
+/home/toby/Pelagos/Projects/Hipfort_Course/build/bin/tensoradd_simple

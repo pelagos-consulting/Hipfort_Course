@@ -15,9 +15,18 @@ program tensoradd
     ! Tensor index
     integer :: i
 
-    ! Define the tensors to use
-    ! Memory will be allocated on the stack
-    real :: A_h(N), B_h(N), C_h(N)
+    ! For error handling
+    integer :: ierr
+
+    ! Define allocatable arrays
+    real, allocatable, dimension(:) :: A_h, B_h, C_h
+
+    ! Allocate arrays on the heap and check for errors
+    allocate(A_h(N), B_h(N), C_h(N), stat=ierr)
+    if (ierr /= 0) then
+        write(*,*) 'Error, array allocation failed with error code = ', ierr
+        stop 
+    end if
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
@@ -28,12 +37,6 @@ program tensoradd
     do i=1,N
         C_h(i) = A_h(i) + B_h(i)
     end do
-
-    ! Could also do it this way
-    C_h(:) = A_h(:) + B_h(:)
-
-    ! Or even this way
-    C_h = A_h + B_h
 
     ! Check the answer
     do i=1,N
@@ -54,6 +57,9 @@ program tensoradd
     end do
 
     write(*,*) 'Tensor addition validated successfully.'
+
+    ! Always free heap memory when you no longer need it
+    deallocate(A_h, B_h, C_h)
     
 end program tensoradd
 
