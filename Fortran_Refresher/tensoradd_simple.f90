@@ -10,6 +10,11 @@ program tensoradd
     ! Number of elements in the tensors
     integer, parameter :: N=16
 
+    ! Epsilon multiplier
+    ! How many floating point spacings
+    ! Should the computed solution be from the answer
+    real :: eps_mult = 2.0
+
     ! Declare the tensors to use
     ! Memory for these will be allocated on the stack
     real :: A_h(N), B_h(N), C_h(N)
@@ -48,8 +53,8 @@ program tensoradd
         ! Get upper and lower bounds on the computed solution
         ! the spacing function gets the floating point spacing
         ! from one number to the next
-        upper = scratch + 2.0*spacing(abs(scratch))
-        lower = scratch - 2.0*spacing(abs(scratch))
+        upper = scratch + eps_mult*spacing(abs(scratch))
+        lower = scratch - eps_mult*spacing(abs(scratch))
 
         ! Check to see if the number is in floating point range of the answer
         if  ( .not. ((lower <= C_h(i)) .and. (C_h(i) <= upper))) then

@@ -4,6 +4,21 @@ module tensor_lib
 
     implicit none
 
+    ! Interface to a C kernel function
+    ! to compute the tensor addition at a single index i
+    interface
+        ! A "C" function  is a subroutine with void return type
+        subroutine launch_kernel(A, B, C, i, N) bind(C)
+            use iso_c_binding
+            implicit none
+            ! Fortran passes by reference as the default
+            ! Must have the "value" option present to pass by value
+            ! Otherwise launch_kernel will receive pointers of type void**
+            type(c_ptr), value :: A, B, C
+            integer, value :: i, N
+        end subroutine
+    end interface
+
     ! Have we already allocated memory?
     logical :: allocd = .false.
 

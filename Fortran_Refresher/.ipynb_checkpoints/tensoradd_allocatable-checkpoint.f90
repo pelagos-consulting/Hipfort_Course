@@ -1,5 +1,7 @@
 
 program tensoradd
+    !! Program to compute a 1D tensor addition
+    !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
@@ -8,6 +10,15 @@ program tensoradd
 
     ! Number of elements in the tensors
     integer, parameter :: N=16
+
+    ! Epsilon multiplier
+    ! How many floating point spacings
+    ! Should the computed solution be from the answer
+    real :: eps_mult = 2.0
+
+    ! Define allocatable arrays for the tensors
+    ! Memory for these will be allocated on the heap
+    real, allocatable, dimension(:) :: A_h, B_h, C_h
 
     ! Upper and lower bounds for testing purposes
     real :: scratch, upper, lower
@@ -18,10 +29,7 @@ program tensoradd
     ! Was the experiment successful?
     logical :: success = .true.
 
-    ! Define allocatable arrays
-    real, allocatable, dimension(:) :: A_h, B_h, C_h
-
-    ! Allocate arrays on the heap and check for errors
+    ! Allocate tensors on the heap and check for errors
     allocate(A_h(N), B_h(N), C_h(N), stat=ierr)
     if (ierr /= 0) then
         write(*,*) 'Error, array allocation failed with error code = ', ierr
@@ -46,8 +54,8 @@ program tensoradd
         ! Get upper and lower bounds on the computed solution
         ! the spacing function gets the floating point spacing
         ! from one number to the next
-        upper = scratch + 2.0*spacing(abs(scratch))
-        lower = scratch - 2.0*spacing(abs(scratch))
+        upper = scratch + eps_mult*spacing(abs(scratch))
+        lower = scratch - eps_mult*spacing(abs(scratch))
 
         ! Check to see if the number is in floating point range of the answer
         if  ( .not. ((lower <= C_h(i)) .and. (C_h(i) <= upper))) then

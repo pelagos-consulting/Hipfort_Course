@@ -7,7 +7,9 @@ program tensoradd
     ! use tensor_lib, init_mem => alloc_mem
     
     use tensor_lib, only : check, alloc_mem => init_mem, &
-        free_mem, kernel, A_h, B_h, C_h
+        free_mem, launch_kernel, A_h, B_h, C_h
+    
+    use iso_c_binding
 
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
@@ -21,7 +23,7 @@ program tensoradd
     ! How many floating point spacings
     ! Should the computed solution be from the answer
     real :: eps_mult = 2.0
-
+    
     ! Index into tensors
     integer :: i
 
@@ -36,9 +38,11 @@ program tensoradd
     call random_number(A_h)
     call random_number(B_h)
 
-    ! Run the kernel function over each element of the array
+    ! Run the C kernel function over each element of the array
     do i=1,N
-        call kernel(i)
+        call launch_kernel( &
+            c_loc(A_h(1)), c_loc(B_h(1)), c_loc(C_h(1)), &
+            i, N)
     end do
 
     ! Check the answer

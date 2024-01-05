@@ -1,10 +1,6 @@
-
-!> Kernel function to compute an addition between tensors A and B
-! the result is placed into C
-!> Execute a tensor addition kernel at a single point in A, B, C
-
-
 program tensoradd
+    !! Program to compute a 1D tensor addition
+    !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
     ! The "only" helps to know where things came from
     ! can use the "=>" operator to use things in modules as something else
@@ -21,11 +17,16 @@ program tensoradd
     ! Number of elements in the tensors
     integer, parameter :: N=16
 
+    ! Epsilon multiplier
+    ! How many floating point spacings
+    ! Should the computed solution be from the answer
+    real :: eps_mult = 2.0
+
     ! Index into tensors
     integer :: i
 
     ! Outcome of the check
-    logical :: outcome
+    logical :: success
 
     ! Allocate memory 
     call alloc_mem(N)
@@ -41,7 +42,7 @@ program tensoradd
     end do
 
     ! Check the answer
-    outcome = check(2.0)
+    success = check(eps_mult)
 
     ! Release resources
     call free_mem
