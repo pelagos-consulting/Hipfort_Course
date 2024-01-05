@@ -1,29 +1,13 @@
-
-!> Kernel function to compute an addition between tensors A and B
-! the result is placed into C
-!> Execute a tensor addition kernel at a single point in A, B, C
-subroutine kernel(A, B, C, i, N)
-    
-    ! Input memory allocations
-    real, pointer, dimension(:), intent(inout) :: A, B, C
-    
-    ! Index into the arrays
-    integer, intent(in) :: i
-
-    ! Kernel math with bounds checking
-    if (i<=N) then
-        C(i) = A(i) + B(i)
-    end if
-
-end subroutine kernel
-
 program tensoradd
+    !! Program to compute a 1D tensor addition
+    !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
     ! The "only" helps to know where things came from
     ! can use the "=>" operator to use things in modules as something else
     ! use tensor_lib, init_mem => alloc_mem
     
-    use tensor_lib, only : init_mem => alloc_mem, free_mem, check, A_h, B_h, C_h
+    use tensor_lib, only : check, alloc_mem => init_mem, &
+        free_mem, kernel, A_h, B_h, C_h
 
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
@@ -37,7 +21,7 @@ program tensoradd
     integer :: i
 
     ! Outcome of the check
-    logical :: outcome
+    logical :: success
 
     ! Allocate memory 
     call alloc_mem(N)
@@ -49,14 +33,14 @@ program tensoradd
 
     ! Run the kernel function over each element of the array
     do i=1,N
-        call kernel(A_h, B_h, C_h, i, N)
+        call kernel(i)
     end do
 
     ! Check the answer
-    outcome = check(2.0)
+    success = check(2.0)
 
     ! Release resources
     call free_mem
 
-end program vecadd
+end program tensoradd
 

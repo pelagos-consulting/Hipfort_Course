@@ -1,15 +1,15 @@
-!> Check to see if a tensor addition operation was successful
 logical function check(A, B, C, N, eps_mult)
-    
-    ! Pointers to memory passed in
-    real, dimension(:), pointer :: A, B, C
+    !! Function to check to if a tensor addition operation was successful
 
-    ! N is the total number of elements
-    integer :: N
+    real, pointer, dimension(:), intent(in) :: A, B, C
+        !! Pointers to memory passed in
 
-    ! Epsilon multiplier, how many floating point spacings
-    ! can the computed answer be from our benchmark answer?
-    real :: eps_mult
+    integer, intent(in) :: N
+        !! N is the total number of elements
+
+    real, intent(in) :: eps_mult
+        !! Epsilon multiplier, how many floating point spacings
+        !! can the computed answer be from our benchmark answer?
 
     ! Scratch variables
     real :: scratch, upper, lower
@@ -22,21 +22,44 @@ logical function check(A, B, C, N, eps_mult)
 
     ! Loop over all indices and check tensor addition
     do i=1, N
-        scratch = a(i) + b(i)
+        scratch = A(i) + B(i)
         ! Spacing is an intrinsic function to get the spacing from
         ! one floating point representation to the next
         upper = scratch + eps_mult*abs(spacing(scratch))
         lower = scratch - eps_mult*abs(spacing(scratch))
-        if (.not. ( (lower<=c(i)) .and. (c(i)<=upper) ) ) then
+        if (.not. ( (lower<=C(i)) .and. (C(i)<=upper) ) ) then
             write(*,*) "Error, tensor addition did not work at index = ", i
             check = .false.
-            exit 
+            return
         end if
     end do
+
+    ! We got to here because we didn't return on failure
+    write(*,*) 'Tensor addition passed validation.'
     
 end function check
 
+
+!> A kernel to perform tensor addition at a single point in A, B, C
+subroutine kernel(A, B, C, i, N)
+    !! Kernel to compute tensor addition at a single index i in the vector
+
+    real, pointer, dimension(:), intent(in) :: A, B, C
+        !! Pointers to memory allocations
+
+    integer, intent(in) :: i, N
+        !! Index into the arrays and total length
+
+    ! Kernel math with bounds checking
+    if (i<=N) then
+        C(i) = A(i) + B(i)
+    end if
+end subroutine kernel
+
+
 program tensoradd
+    !! Program to compute a 1D tensor addition
+    !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
@@ -44,8 +67,27 @@ program tensoradd
 
     implicit none
 
+    ! Declare the external subroutine "kernel" and function "check" 
+    ! to the program via an interface, this is usually not required, 
+    ! but must be done because subroutine and function take pointer arguments
+    interface
+        subroutine kernel(A, B, C, i, N)
+            real, pointer, dimension(:), intent(in) :: A, B, C
+            integer, intent(in) :: i, N
+        end subroutine kernel
+
+        logical function check(A, B, C, N, eps_mult)
+            real, pointer, dimension(:), intent(in) :: A, B, C
+            integer, intent(in) :: N
+            real, intent(in) :: eps_mult
+        end function check
+    end interface
+
     ! Number of elements in the tensors
     integer, parameter :: N=16
+
+    ! Define pointers to memory, initialise to null() for safety
+    real, pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
 
     ! Upper and lower bounds for testing purposes
     real :: scratch, upper, lower
@@ -53,13 +95,10 @@ program tensoradd
     ! Tensor index and error handling
     integer :: i, ierr
 
-    ! Outcome of the check
-    logical :: outcome = .false.
+    ! Was the experiment successful?
+    logical :: success = .true.
 
-    ! Define pointers to memory
-    real, pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
-
-    ! Allocate memory for pointers on the heap and check for errors
+    ! Allocate arrays on the heap and check for errors
     allocate(A_h(N), B_h(N), C_h(N), stat=ierr)
     if (ierr /= 0) then
         write(*,*) 'Error, array allocation failed with error code = ', ierr
@@ -71,33 +110,22 @@ program tensoradd
     call random_number(A_h)
     call random_number(B_h)
 
-    ! Run the tensor addition kernel on each element of the array
+    ! Call the tensor addition kernel for each element of the array
     do i=1,N
         call kernel(A_h, B_h, C_h, i, N)
     end do
 
-    ! Call a function to check the answer
-    outcome = check(A_h, B_h, C_h, N, 2.0)
+    ! Call the check function to check the answer
+    success = check(A_h, B_h, C_h, N, 2.0)
 
     ! Always free heap memory when you no longer need it
     deallocate(A_h, B_h, C_h)
 
     contains
-    
-        !> Execute a tensor addition kernel at a single point in A, B, C
-        subroutine kernel(A, B, C, i, N)
 
-            ! Input memory allocations
-            real, pointer, dimension(:), intent(inout) :: A, B, C
-    
-            ! Index into the arrays
-            integer, intent(in) :: i, N
+    ! The subroutine "kernel" and the checking function "check"
+    ! could also have gone here after the "contains" statement.
+    ! Then the interface would not be required
 
-            ! Kernel math with bounds checking
-            if (i<=N) then
-                C(i) = A(i) + B(i)
-            end if
-        end subroutine kernel
-    
 end program tensoradd
 

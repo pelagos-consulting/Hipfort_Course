@@ -12,11 +12,11 @@ program tensoradd
     ! Upper and lower bounds for testing purposes
     real :: scratch, upper, lower
 
-    ! Tensor index
-    integer :: i
+    ! Tensor index and error handling
+    integer :: i, ierr
 
-    ! For error handling
-    integer :: ierr
+    ! Was the experiment successful?
+    logical :: success = .true.
 
     ! Define allocatable arrays
     real, allocatable, dimension(:) :: A_h, B_h, C_h
@@ -51,12 +51,15 @@ program tensoradd
 
         ! Check to see if the number is in floating point range of the answer
         if  ( .not. ((lower <= C_h(i)) .and. (C_h(i) <= upper))) then
-            write(*,*) 'Error, calculated answer at index i = ', i, ' was not in range' 
+            write(*,*) 'Error, calculated answer at index i = ', i, ' was not in range'
+            success = .false.
         end if
 
     end do
 
-    write(*,*) 'Tensor addition validated successfully.'
+    if (success) then
+        write(*,*) 'Tensor addition validated successfully.'
+    end if
 
     ! Always free heap memory when you no longer need it
     deallocate(A_h, B_h, C_h)

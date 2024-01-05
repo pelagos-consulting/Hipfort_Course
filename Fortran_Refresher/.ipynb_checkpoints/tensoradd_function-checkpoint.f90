@@ -1,15 +1,15 @@
-!> Check to see if a tensor addition operation was successful
+!> Function to check to if a tensor addition operation was successful
 logical function check(A, B, C, N, eps_mult)
     
     ! Pointers to memory passed in
-    real, dimension(:), pointer :: A, B, C
+    real, pointer, dimension(:), intent(in) :: A, B, C
 
     ! N is the total number of elements
-    integer :: N
+    integer, intent(in) :: N
 
     ! Epsilon multiplier, how many floating point spacings
     ! can the computed answer be from our benchmark answer?
-    real :: eps_mult
+    real, intent(in) :: eps_mult
 
     ! Scratch variables
     real :: scratch, upper, lower
@@ -22,19 +22,39 @@ logical function check(A, B, C, N, eps_mult)
 
     ! Loop over all indices and check tensor addition
     do i=1, N
-        scratch = a(i) + b(i)
+        scratch = A(i) + B(i)
         ! Spacing is an intrinsic function to get the spacing from
         ! one floating point representation to the next
         upper = scratch + eps_mult*abs(spacing(scratch))
         lower = scratch - eps_mult*abs(spacing(scratch))
-        if (.not. ( (lower<=c(i)) .and. (c(i)<=upper) ) ) then
+        if (.not. ( (lower<=C(i)) .and. (C(i)<=upper) ) ) then
             write(*,*) "Error, tensor addition did not work at index = ", i
             check = .false.
-            exit 
+            return
         end if
     end do
+
+    ! We got to here because we didn't return on failure
+    write(*,*) 'Tensor addition passed validation.'
     
 end function check
+
+
+!> A kernel to perform tensor addition at a single point in A, B, C
+subroutine kernel(A, B, C, i, N)
+
+    ! Input memory allocations
+    real, pointer, dimension(:), intent(in) :: A, B, C
+    
+    ! Index into the arrays
+    integer, intent(in) :: i, N
+
+    ! Kernel math with bounds checking
+    if (i<=N) then
+        C(i) = A(i) + B(i)
+    end if
+end subroutine kernel
+
 
 program tensoradd
 
@@ -43,6 +63,22 @@ program tensoradd
     ! on the first letter of variable names
 
     implicit none
+
+    ! Declare the external subroutine "kernel" and function "check" 
+    ! to the program via an interface, this is usually not required, 
+    ! but must be done because subroutine and function take pointer arguments
+    interface
+        subroutine kernel(A, B, C, i, N)
+            real, pointer, dimension(:), intent(in) :: A, B, C
+            integer, intent(in) :: i, N
+        end subroutine kernel
+
+        logical function check(A, B, C, N, eps_mult)
+            real, pointer, dimension(:), intent(in) :: A, B, C
+            integer, intent(in) :: N
+            real, intent(in) :: eps_mult
+        end function check
+    end interface
 
     ! Number of elements in the tensors
     integer, parameter :: N=16
@@ -83,21 +119,10 @@ program tensoradd
     deallocate(A_h, B_h, C_h)
 
     contains
-    
-        !> Execute a tensor addition kernel at a single point in A, B, C
-        subroutine kernel(A, B, C, i, N)
 
-            ! Input memory allocations
-            real, pointer, dimension(:), intent(inout) :: A, B, C
-    
-            ! Index into the arrays
-            integer, intent(in) :: i, N
+    ! The subroutine "kernel" and the checking function "check"
+    ! could also have gone here after the "contains" statement.
+    ! Then the interface would not be required
 
-            ! Kernel math with bounds checking
-            if (i<=N) then
-                C(i) = A(i) + B(i)
-            end if
-        end subroutine kernel
-    
 end program tensoradd
 

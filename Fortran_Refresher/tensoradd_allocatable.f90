@@ -1,5 +1,7 @@
 
 program tensoradd
+    !! Program to compute a 1D tensor addition
+    !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
@@ -9,19 +11,20 @@ program tensoradd
     ! Number of elements in the tensors
     integer, parameter :: N=16
 
+    ! Define allocatable arrays for the tensors
+    ! Memory for these will be allocated on the heap
+    real, allocatable, dimension(:) :: A_h, B_h, C_h
+
     ! Upper and lower bounds for testing purposes
     real :: scratch, upper, lower
 
-    ! Tensor index
-    integer :: i
+    ! Tensor index and error handling
+    integer :: i, ierr
 
-    ! For error handling
-    integer :: ierr
+    ! Was the experiment successful?
+    logical :: success = .true.
 
-    ! Define allocatable arrays
-    real, allocatable, dimension(:) :: A_h, B_h, C_h
-
-    ! Allocate arrays on the heap and check for errors
+    ! Allocate tensors on the heap and check for errors
     allocate(A_h(N), B_h(N), C_h(N), stat=ierr)
     if (ierr /= 0) then
         write(*,*) 'Error, array allocation failed with error code = ', ierr
@@ -51,12 +54,15 @@ program tensoradd
 
         ! Check to see if the number is in floating point range of the answer
         if  ( .not. ((lower <= C_h(i)) .and. (C_h(i) <= upper))) then
-            write(*,*) 'Error, calculated answer at index i = ', i, ' was not in range' 
+            write(*,*) 'Error, calculated answer at index i = ', i, ' was not in range'
+            success = .false.
         end if
 
     end do
 
-    write(*,*) 'Tensor addition validated successfully.'
+    if (success) then
+        write(*,*) 'Tensor addition validated successfully.'
+    end if
 
     ! Always free heap memory when you no longer need it
     deallocate(A_h, B_h, C_h)
