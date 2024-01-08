@@ -30,8 +30,7 @@ add_executable (tensoradd_ckernel
     ${CMAKE_CURRENT_SOURCE_DIR}/tensor_lib.f90
     ${CMAKE_CURRENT_SOURCE_DIR}/kernels.cpp)
 target_link_libraries(tensoradd_ckernel
-                      hip::device
-                      gfortran)
+                      hip::device)
 install(TARGETS tensoradd_ckernel DESTINATION bin)
 
 

@@ -7,13 +7,16 @@ module tensor_lib
     ! Interface to a C kernel function
     ! to compute the tensor addition at a single index i
     interface
-        ! A "C" function  is a subroutine with void return type
-        subroutine launch_kernel(A, B, C, i, N) bind(C)
+        ! Fortran interprets a C function with void return type
+        ! as a subroutine 
+        ! This is the fortran interface to the C function
+        subroutine ckernel(A, B, C, i, N) bind(C)
             use iso_c_binding
             implicit none
             ! Fortran passes by reference as the default
             ! Must have the "value" option present to pass by value
-            ! Otherwise launch_kernel will receive pointers of type void**
+            ! Otherwise ckernel will receive pointers of type void**
+            ! instead of void*
             type(c_ptr), value :: A, B, C
             integer, value :: i, N
         end subroutine
@@ -63,7 +66,7 @@ contains
             upper = scratch + eps_mult*abs(spacing(scratch))
             lower = scratch - eps_mult*abs(spacing(scratch))
             if (.not. ( (lower<=C_h(i)) .and. (C_h(i)<=upper) ) ) then
-                write(*,*) "Error, tensor addition did not work at index = ", i
+                write(*,*) "Error, tensor addition did not work at index = ", i, ", value was: ", C_h(i), ", but should be:", scratch
                 check = .false.
                 return
             end if
@@ -103,7 +106,7 @@ contains
     end subroutine init_mem
 
     subroutine kernel(i)
-        !! Kernel to compute tensor addition at index i
+        !! Fortran kernel to compute tensor addition at index i
     
         integer, intent(in) :: i
             !! Index to compute the kernel at
@@ -122,6 +125,7 @@ contains
         integer :: ierr
 
         ! Deallocate all memory
+        
         deallocate(A_h, B_h, C_h, stat=ierr)
 
         if (ierr/= 0) then
