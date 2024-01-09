@@ -1,14 +1,14 @@
 #include <cstdio>
 
-typedef float ftype;
+typedef float float_type;
 
 extern "C" {
 
     // C kernel to compute the tensor addition at a single point
     void ckernel(
-        ftype* A, 
-        ftype* B, 
-        ftype* C,
+        float_type* A, 
+        float_type* B, 
+        float_type* C,
         int i,
         int N) {
 
@@ -22,5 +22,4 @@ extern "C" {
             C[i] = A[i] + B[i];        
         }
     }
-
 }

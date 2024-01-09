@@ -18,7 +18,7 @@ module tensor_lib
             ! Otherwise ckernel will receive pointers of type void**
             ! instead of void*
             type(c_ptr), value :: A, B, C
-            integer, value :: i, N
+            integer(c_int), value :: i, N
         end subroutine
     end interface
 
@@ -127,6 +127,11 @@ contains
         ! Deallocate all memory
         
         deallocate(A_h, B_h, C_h, stat=ierr)
+
+        ! Repoint pointers at null for safety
+        A_h => null()
+        B_h => null()
+        C_h => null()
 
         if (ierr/= 0) then
             write(*,*) 'De-allocating memory failed with error code = ', ierr
