@@ -20,15 +20,16 @@ install(TARGETS tensoradd_function DESTINATION bin)
 
 add_executable (tensoradd_module 
     ${CMAKE_CURRENT_SOURCE_DIR}/tensoradd_module.f90 
-    ${CMAKE_CURRENT_SOURCE_DIR}/tensor_lib.f90 )
+    ${CMAKE_CURRENT_SOURCE_DIR}/tensor_lib.f90 
+    ${CMAKE_CURRENT_SOURCE_DIR}/c_functions.cpp)
 target_link_libraries(tensoradd_module
                       hip::device)
 install(TARGETS tensoradd_module DESTINATION bin)
 
 add_executable (tensoradd_ckernel 
     ${CMAKE_CURRENT_SOURCE_DIR}/tensoradd_ckernel.f90 
-    ${CMAKE_CURRENT_SOURCE_DIR}/tensor_lib.f90
-    ${CMAKE_CURRENT_SOURCE_DIR}/kernels.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/tensor_lib_c.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/c_functions.cpp)
 target_link_libraries(tensoradd_ckernel
                       hip::device)
 install(TARGETS tensoradd_ckernel DESTINATION bin)

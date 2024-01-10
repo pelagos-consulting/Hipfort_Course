@@ -1,26 +1,8 @@
 module tensor_lib
     !! Library module to work with tensors
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
-
+    
     implicit none
-
-    ! Interface to a C kernel function
-    ! to compute the tensor addition at a single index i
-    interface
-        ! Fortran interprets a C function with void return type
-        ! as a subroutine 
-        ! This is the fortran interface to the C function
-        subroutine ckernel(A, B, C, i, N) bind(C)
-            use iso_c_binding
-            implicit none
-            ! Fortran passes by reference as the default
-            ! Must have the "value" option present to pass by value
-            ! Otherwise ckernel will receive pointers of type void**
-            ! instead of void*
-            type(c_ptr), value :: A, B, C
-            integer(c_int), value :: i, N
-        end subroutine
-    end interface
 
     ! Have we already allocated memory?
     logical :: allocd = .false.
@@ -66,7 +48,8 @@ contains
             upper = scratch + eps_mult*abs(spacing(scratch))
             lower = scratch - eps_mult*abs(spacing(scratch))
             if (.not. ( (lower<=C_h(i)) .and. (C_h(i)<=upper) ) ) then
-                write(*,*) "Error, tensor addition did not work at index = ", i, ", value was: ", C_h(i), ", but should be:", scratch
+                write(*,*) "Error, tensor addition did not work at index = ", i, &
+                    ", value was: ", C_h(i), ", but should be:", scratch
                 check = .false.
                 return
             end if
@@ -78,6 +61,7 @@ contains
     end function check
 
     subroutine init_mem(N_in)
+    
         !! Allocates memory for the tensors
     
         integer, intent(in) :: N_in
@@ -91,8 +75,8 @@ contains
             call free_mem
         end if
 
-        ! Allocate memory for all arrays
-        allocate(A_h(N), B_h(N), C_h(N), stat=ierr)
+        ! Allocate memory for all arrays using a Fortran call
+        allocate(A_h(1:N), B_h(1:N), C_h(1:N), stat=ierr)
 
         if (ierr/=0) then 
             write(*,*) 'Allocating memory failed with error code = ', ierr
@@ -119,24 +103,25 @@ contains
     end subroutine kernel
 
     subroutine free_mem
+    
         !! Free all memory allocated for the module
 
         ! Error handling
         integer :: ierr
 
         ! Deallocate all memory
-        
+
+        ! De-allocate memory using a Fortran call
         deallocate(A_h, B_h, C_h, stat=ierr)
+        if (ierr/= 0) then
+            write(*,*) 'De-allocating memory failed with error code = ', ierr
+            stop
+        end if
 
         ! Repoint pointers at null for safety
         A_h => null()
         B_h => null()
         C_h => null()
-
-        if (ierr/= 0) then
-            write(*,*) 'De-allocating memory failed with error code = ', ierr
-            stop
-        end if
 
         allocd = .false.
 

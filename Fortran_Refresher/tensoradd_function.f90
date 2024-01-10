@@ -89,9 +89,6 @@ program tensoradd
     ! Define pointers to memory, initialise to null() for safety
     real, pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
 
-    ! Upper and lower bounds for testing purposes
-    real :: scratch, upper, lower
-
     ! Tensor index and error handling
     integer :: i, ierr
 

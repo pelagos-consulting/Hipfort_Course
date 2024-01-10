@@ -1,8 +1,45 @@
 module tensor_lib
     !! Library module to work with tensors
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
+
+    use iso_fortran_env
+    use iso_c_binding
     
     implicit none
+
+    ! Interface to C kernel functions
+    interface
+    
+        ! Fortran interprets a C function with void return type
+        ! as a subroutine 
+        ! This is the fortran interface to the C function
+        subroutine c_kernel(A, B, C, i, N) bind(C)
+            use iso_c_binding
+            ! Fortran passes by reference as the default
+            ! Must have the "value" option present to pass by value
+            ! Otherwise ckernel will receive pointers of type void**
+            ! instead of void*
+            type(c_ptr), value :: A, B, C
+            integer(c_int), value :: i, N
+        end subroutine
+
+        ! C function to allocate memory
+        type(c_ptr) function c_alloc(nbytes) bind(C)
+            use iso_c_binding
+            ! Make sure we have the value option set
+            ! to pass by value
+            integer(c_size_t), intent(in), value :: nbytes
+        end function c_alloc
+
+        ! C function to free memory 
+        subroutine c_free(ptr) bind(C)
+            use iso_c_binding
+            ! Make sure we have the value option set
+            ! to pass by value
+            type(c_ptr), intent(in), value :: ptr
+        end subroutine c_free
+        
+    end interface
 
     ! Have we already allocated memory?
     logical :: allocd = .false.
@@ -13,11 +50,12 @@ module tensor_lib
     ! Pointers to memory on the host
     real, pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
 
-    ! Declare private variables that belong only to the module
+    ! Declare private variables functions and subroutines
+    ! that belong only to the module
     private :: allocd, N
        
     ! Declare variables, functions, and subroutines that are public
-    public :: init_mem, free_mem, check, A_h, B_h, C_h
+    public :: init_mem, free_mem, check, c_kernel, A_h, B_h, C_h
 
 contains 
 
@@ -62,26 +100,32 @@ contains
 
     subroutine init_mem(N_in)
     
-        !! Allocates memory for the tensors
+        !! Allocates memory for the tensors using calls to 
+        !! C functions
     
         integer, intent(in) :: N_in
             !! Data type for the number of elements
 
-        ! Checking errors on the allocation
-        integer :: ierr
+        ! Temporary pointer
+        type(c_ptr) :: temp_cptr
+
+        ! Variable just for getting the type
+        real :: temp_real
 
         ! Free memory first if already allocated
         if (allocd) then
             call free_mem
         end if
 
-        ! Allocate memory for all arrays using a Fortran call
-        allocate(A_h(1:N), B_h(1:N), C_h(1:N), stat=ierr)
+        ! Allocate memory for arrays using C functions
+        temp_cptr = c_alloc(int(N*sizeof(temp_real), c_size_t))
+        call c_f_pointer(temp_cptr, A_h, [N])
+        
+        temp_cptr = c_alloc(int(N*sizeof(temp_real), c_size_t))
+        call c_f_pointer(temp_cptr, B_h, [N])
 
-        if (ierr/=0) then 
-            write(*,*) 'Allocating memory failed with error code = ', ierr
-            stop 
-        end if
+        temp_cptr = c_alloc(int(N*sizeof(temp_real), c_size_t))
+        call c_f_pointer(temp_cptr, C_h, [N])
         
         ! Assign private variables if everything worked
         N = N_in
@@ -106,17 +150,10 @@ contains
     
         !! Free all memory allocated for the module
 
-        ! Error handling
-        integer :: ierr
-
-        ! Deallocate all memory
-
-        ! De-allocate memory using a Fortran call
-        deallocate(A_h, B_h, C_h, stat=ierr)
-        if (ierr/= 0) then
-            write(*,*) 'De-allocating memory failed with error code = ', ierr
-            stop
-        end if
+        ! De-allocate memory using calls to C functions
+        call c_free(c_loc(A_h))
+        call c_free(c_loc(B_h))
+        call c_free(c_loc(C_h))
 
         ! Repoint pointers at null for safety
         A_h => null()

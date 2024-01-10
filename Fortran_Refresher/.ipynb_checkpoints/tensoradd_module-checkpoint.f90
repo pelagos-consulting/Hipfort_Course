@@ -7,7 +7,7 @@ program tensoradd
     ! use tensor_lib, init_mem => alloc_mem
     
     use tensor_lib, only : check, alloc_mem => init_mem, &
-        free_mem, kernel, A_h, B_h, C_h
+        free_mem, kernel, A_h, B_h
 
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
