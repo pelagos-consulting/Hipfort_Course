@@ -114,10 +114,8 @@ contains
             stop
         end if
 
-        ! Repoint pointers at null for safety
-        A_h => null()
-        B_h => null()
-        C_h => null()
+        ! Repoint pointers at null() for safety
+        nullify(A_h, B_h, C_h)
 
         allocd = .false.
 

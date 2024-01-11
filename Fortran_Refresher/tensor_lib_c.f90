@@ -162,9 +162,7 @@ contains
         call c_free(c_loc(C_h))
 
         ! Repoint pointers at null for safety
-        A_h => null()
-        B_h => null()
-        C_h => null()
+        nullify(A_h, B_h, C_h)
 
         allocd = .false.
 
