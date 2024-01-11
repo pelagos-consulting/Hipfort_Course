@@ -77,11 +77,6 @@ contains
 
         ! Allocate memory for all arrays using a Fortran call
         allocate(A_h(1:N), B_h(1:N), C_h(1:N), stat=ierr)
-
-        if (ierr/=0) then 
-            write(*,*) 'Allocating memory failed with error code = ', ierr
-            stop 
-        end if
         
         ! Assign private variables if everything worked
         N = N_in
@@ -113,6 +108,7 @@ contains
 
         ! De-allocate memory using a Fortran call
         deallocate(A_h, B_h, C_h, stat=ierr)
+        
         if (ierr/= 0) then
             write(*,*) 'De-allocating memory failed with error code = ', ierr
             stop

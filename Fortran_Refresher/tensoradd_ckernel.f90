@@ -7,7 +7,7 @@ program tensoradd
     ! use tensor_lib, init_mem => alloc_mem
     
     use tensor_lib, only : check, alloc_mem => init_mem, &
-        free_mem, c_kernel, A_h, B_h, C_h
+        free_mem, kernel, A_h, B_h
     
     use iso_c_binding
 
@@ -40,14 +40,7 @@ program tensoradd
 
     ! Run the C kernel function over each element of the array
     do i=1,N
-        call c_kernel( &
-            c_loc(A_h(1)), & 
-            c_loc(B_h(1)), &
-            c_loc(C_h(1)), &
-            ! Need to convert between Fortran indexing and C indexing 
-            i-1, &
-            N)
-        
+        call kernel(i)
     end do
 
     ! Check the answer

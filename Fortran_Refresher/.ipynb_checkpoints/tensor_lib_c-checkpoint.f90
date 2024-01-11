@@ -55,7 +55,7 @@ module tensor_lib
     private :: allocd, N
        
     ! Declare variables, functions, and subroutines that are public
-    public :: init_mem, free_mem, check, c_kernel, A_h, B_h, C_h
+    public :: init_mem, free_mem, check, kernel, A_h, B_h, C_h
 
 contains 
 
@@ -139,10 +139,16 @@ contains
         integer, intent(in) :: i
             !! Index to compute the kernel at
 
-        ! Kernel math with bounds checking
-        if (i<=N) then
-            C_h(i) = A_h(i) + B_h(i)
-        end if
+        ! Run the C kernel function at element i in the array
+        call c_kernel( &
+            ! Get the pointer addresses
+            c_loc(A_h(1)), & 
+            c_loc(B_h(1)), &
+            c_loc(C_h(1)), &
+            ! Make sure the datatypes are correct
+            int(i, c_int), &
+            int(N, c_int) &
+        )
         
     end subroutine kernel
 
