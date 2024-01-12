@@ -14,6 +14,8 @@ project(hipfort_course VERSION 1.0.0
 	DESCRIPTION "Example codes to accompany a course in hipfort"
 	LANGUAGES Fortran HIP CXX)
 
+# hardcode C++ compiler to hipcc -- interpret .cpp extension as hip language
+
 # Default Fortran compiler flags
 # Fortran compiler flags
 if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU" )
@@ -32,6 +34,12 @@ find_package(hip REQUIRED)
 find_package(hipfort REQUIRED)
 
 # ----- end dependencies ----- #
+
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+    message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()
 
 # Example Codes
 add_subdirectory(${CMAKE_SOURCE_DIR}/Memory_Management/memcpy_benchmark)

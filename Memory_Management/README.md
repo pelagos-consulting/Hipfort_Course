@@ -6,3 +6,8 @@ How to use:
 * Shared memory
 * Pinned memory
 * Managed memory
+
+
+## Included Examples
+
+### memcpy_bench
