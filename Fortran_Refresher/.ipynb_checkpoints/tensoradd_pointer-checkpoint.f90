@@ -31,6 +31,7 @@ program tensoradd
 
     ! Allocate arrays on the heap and check for errors
     allocate(A_h(N), B_h(N), C_h(N), stat=ierr)
+    
     if (ierr /= 0) then
         write(*,*) 'Error, array allocation failed with error code = ', ierr
         stop 
@@ -43,6 +44,7 @@ program tensoradd
 
     ! Compute the tensor addition one element at a time
     do i=1,N
+        ! Kernel math
         C_h(i) = A_h(i) + B_h(i)
     end do
 
@@ -53,7 +55,7 @@ program tensoradd
         scratch = A_h(i) + B_h(i)
 
         ! Get upper and lower bounds on the computed solution
-        ! the spacing function gets the floating point spacing
+        ! the spacing intrinsic function gets the floating point spacing
         ! from one number to the next
         upper = scratch + eps_mult*spacing(abs(scratch))
         lower = scratch - eps_mult*spacing(abs(scratch))
@@ -67,7 +69,7 @@ program tensoradd
     end do
 
     if (success) then
-        write(*,*) 'Tensor addition validated successfully.'
+        write(*,*) 'Tensor addition passed validation.'
     end if
 
     ! Always free heap memory when you no longer need it

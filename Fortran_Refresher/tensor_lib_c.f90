@@ -55,7 +55,7 @@ module tensor_lib
     private :: allocd, N
        
     ! Declare variables, functions, and subroutines that are public
-    public :: init_mem, free_mem, check, kernel, A_h, B_h, C_h
+    public :: init_mem, free_mem, check, launch_kernel, A_h, B_h, C_h
 
 contains 
 
@@ -94,7 +94,7 @@ contains
         end do
 
         ! We got to here because we didn't return on failure
-        write(*,*) 'Tensor addition validated successfully.'
+        write(*,*) 'Tensor addition passed validation.'
         
     end function check
 
@@ -118,14 +118,14 @@ contains
         end if
 
         ! Allocate memory for arrays using C functions
-        temp_cptr = c_alloc(int(N*sizeof(temp_real), c_size_t))
-        call c_f_pointer(temp_cptr, A_h, [N])
+        temp_cptr = c_alloc(int(N_in*sizeof(temp_real), c_size_t))
+        call c_f_pointer(temp_cptr, A_h, [N_in])
         
-        temp_cptr = c_alloc(int(N*sizeof(temp_real), c_size_t))
-        call c_f_pointer(temp_cptr, B_h, [N])
+        temp_cptr = c_alloc(int(N_in*sizeof(temp_real), c_size_t))
+        call c_f_pointer(temp_cptr, B_h, [N_in])
 
-        temp_cptr = c_alloc(int(N*sizeof(temp_real), c_size_t))
-        call c_f_pointer(temp_cptr, C_h, [N])
+        temp_cptr = c_alloc(int(N_in*sizeof(temp_real), c_size_t))
+        call c_f_pointer(temp_cptr, C_h, [N_in])
         
         ! Assign private variables if everything worked
         N = N_in
@@ -133,24 +133,31 @@ contains
 
     end subroutine init_mem
 
-    subroutine kernel(i)
-        !! Fortran kernel to compute tensor addition at index i
+    subroutine launch_kernel
+        !! Fortran kernel to compute tensor addition 
+        !! at every index i in the tensor space
     
-        integer, intent(in) :: i
-            !! Index to compute the kernel at
+        integer :: i
+            !! Index along a dimension
 
-        ! Run the C kernel function at element i in the array
-        call c_kernel( &
-            ! Get the pointer addresses
-            c_loc(A_h(1)), & 
-            c_loc(B_h(1)), &
-            c_loc(C_h(1)), &
-            ! Make sure the datatypes are correct
-            int(i, c_int), &
-            int(N, c_int) &
-        )
+        do i=1,N
+
+            ! Run the C kernel function at element i in the array
+            call c_kernel( &
+                ! Get the pointer addresses
+                c_loc(A_h(1)), & 
+                c_loc(B_h(1)), &
+                c_loc(C_h(1)), &
+                ! Make sure the datatypes are correct
+                ! and indices are translated from 
+                ! Fortran to C
+                int(i-1, c_int), &
+                int(N, c_int) &
+            )
+
+        end do
         
-    end subroutine kernel
+    end subroutine launch_kernel
 
     subroutine free_mem
     
@@ -164,7 +171,9 @@ contains
         ! Repoint pointers at null for safety
         nullify(A_h, B_h, C_h)
 
+        ! Set private variables
         allocd = .false.
+        N = 0
 
     end subroutine free_mem
 

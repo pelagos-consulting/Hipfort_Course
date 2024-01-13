@@ -56,7 +56,7 @@ contains
         end do
 
         ! We got to here because we didn't return on failure
-        write(*,*) 'Tensor addition validated successfully.'
+        write(*,*) 'Tensor addition passed validation.'
         
     end function check
 
@@ -76,8 +76,13 @@ contains
         end if
 
         ! Allocate memory for all arrays using a Fortran call
-        allocate(A_h(1:N), B_h(1:N), C_h(1:N), stat=ierr)
-        
+        allocate(A_h(1:N_in), B_h(1:N_in), C_h(1:N_in), stat=ierr)
+
+        if (ierr /= 0) then
+            write(*,*) 'Error, array allocation failed with error code = ', ierr
+            stop 
+        end if
+
         ! Assign private variables if everything worked
         N = N_in
         allocd = .true.
@@ -89,13 +94,25 @@ contains
     
         integer, intent(in) :: i
             !! Index to compute the kernel at
+            !! All other variables are defined in the module
 
         ! Kernel math with bounds checking
         if (i<=N) then
             C_h(i) = A_h(i) + B_h(i)
         end if
-        
+    
     end subroutine kernel
+
+    subroutine launch_kernel
+    
+        ! Run the kernel over every element 
+        ! of the tensor space
+        integer :: i
+        do i=1,N
+            call kernel(i)
+        end do
+        
+    end subroutine launch_kernel
 
     subroutine free_mem
     
@@ -117,7 +134,9 @@ contains
         ! Repoint pointers at null() for safety
         nullify(A_h, B_h, C_h)
 
+        ! Set private variables
         allocd = .false.
+        N = 0
 
     end subroutine free_mem
 

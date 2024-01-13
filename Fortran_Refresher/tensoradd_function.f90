@@ -41,20 +41,24 @@ end function check
 
 
 !> A kernel to perform tensor addition at a single point in A, B, C
-subroutine kernel(A, B, C, i, N)
-    !! Kernel to compute tensor addition at a single index i in the vector
+subroutine launch_kernel(A, B, C, N)
+    !! Run a tensor addition kernel over the elements of A, B, and C
 
     real, pointer, dimension(:), intent(in) :: A, B, C
         !! Pointers to memory allocations
 
-    integer, intent(in) :: i, N
-        !! Index into the arrays and total length
+    integer, intent(in) :: N
+        !! Total length of the tensors
 
-    ! Kernel math with bounds checking
-    if (i<=N) then
+    integer :: i
+        !! Index into tensors
+
+    ! Now run the kernel math at every point in the array
+    do i=1,N
         C(i) = A(i) + B(i)
-    end if
-end subroutine kernel
+    end do
+    
+end subroutine launch_kernel
 
 
 program tensoradd
@@ -71,10 +75,10 @@ program tensoradd
     ! to the program via an interface, this is usually not required, 
     ! but must be done because subroutine and function take pointer arguments
     interface
-        subroutine kernel(A, B, C, i, N)
+        subroutine launch_kernel(A, B, C, N)
             real, pointer, dimension(:), intent(in) :: A, B, C
-            integer, intent(in) :: i, N
-        end subroutine kernel
+            integer, intent(in) :: N
+        end subroutine launch_kernel
 
         logical function check(A, B, C, N, eps_mult)
             real, pointer, dimension(:), intent(in) :: A, B, C
@@ -90,7 +94,7 @@ program tensoradd
     real, pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
 
     ! Tensor index and error handling
-    integer :: i, ierr
+    integer :: ierr
 
     ! Was the experiment successful?
     logical :: success = .true.
@@ -108,9 +112,7 @@ program tensoradd
     call random_number(B_h)
 
     ! Call the tensor addition kernel for each element of the array
-    do i=1,N
-        call kernel(A_h, B_h, C_h, i, N)
-    end do
+    call launch_kernel(A_h, B_h, C_h, N)
 
     ! Call the check function to check the answer
     success = check(A_h, B_h, C_h, N, 2.0)
@@ -120,7 +122,7 @@ program tensoradd
 
     contains
 
-    ! The subroutine "kernel" and the checking function "check"
+    ! The subroutine "launch_kernel" and the checking function "check"
     ! could also have gone here after the "contains" statement.
     ! Then the interface would not be required
 

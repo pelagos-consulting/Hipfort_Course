@@ -1,3 +1,4 @@
+
 program tensoradd
     !! Program to compute a 1D tensor addition
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
@@ -7,9 +8,7 @@ program tensoradd
     ! use tensor_lib, init_mem => alloc_mem
     
     use tensor_lib, only : check, alloc_mem => init_mem, &
-        free_mem, kernel, A_h, B_h
-    
-    use iso_c_binding
+        free_mem, launch_kernel, A_h, B_h
 
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
@@ -23,9 +22,6 @@ program tensoradd
     ! How many floating point spacings
     ! Should the computed solution be from the answer
     real :: eps_mult = 2.0
-    
-    ! Index into tensors
-    integer :: i
 
     ! Outcome of the check
     logical :: success
@@ -38,10 +34,8 @@ program tensoradd
     call random_number(A_h)
     call random_number(B_h)
 
-    ! Run the C kernel function over each element of the array
-    do i=1,N
-        call kernel(i)
-    end do
+    ! Launch the kernel function
+    call launch_kernel
 
     ! Check the answer
     success = check(eps_mult)

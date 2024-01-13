@@ -31,6 +31,7 @@ program tensoradd
 
     ! Allocate tensors on the heap and check for errors
     allocate(A_h(N), B_h(N), C_h(N), stat=ierr)
+    
     if (ierr /= 0) then
         write(*,*) 'Error, array allocation failed with error code = ', ierr
         stop 
@@ -43,6 +44,7 @@ program tensoradd
 
     ! Run the tensor addition one element at a time
     do i=1,N
+        ! Kernel math
         C_h(i) = A_h(i) + B_h(i)
     end do
 
@@ -59,7 +61,8 @@ program tensoradd
 
         ! Check to see if the number is in floating point range of the answer
         if  ( .not. ((lower <= C_h(i)) .and. (C_h(i) <= upper))) then
-            write(*,*) 'Error, calculated answer at index i = ', i, ' was not in range'
+            write(*,*) 'Error, calculated answer at index i = ', &
+                i, ' was not in range'
             success = .false.
         end if
 
@@ -71,6 +74,7 @@ program tensoradd
 
     ! Always free heap memory when you no longer need it
     deallocate(A_h, B_h, C_h)
+
     
 end program tensoradd
 

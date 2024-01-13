@@ -35,13 +35,14 @@ program tensoradd
 
     ! Run the tensor addition one element at a time
     do i=1,N
+        ! Kernel math
         C_h(i) = A_h(i) + B_h(i)
     end do
 
-    ! Could also do it this way, (best practice)
+    ! Could also do it this way, (Fortran best practice)
     C_h(:) = A_h(:) + B_h(:)
 
-    ! Or even this way (not best practice)
+    ! Or even this way (not Fortran best practice)
     C_h = A_h + B_h
 
     ! Check the answer
@@ -51,7 +52,7 @@ program tensoradd
         scratch = A_h(i) + B_h(i)
 
         ! Get upper and lower bounds on the computed solution
-        ! the spacing function gets the floating point spacing
+        ! the "spacing" intrinsic function gets the floating point spacing
         ! from one number to the next
         upper = scratch + eps_mult*spacing(abs(scratch))
         lower = scratch - eps_mult*spacing(abs(scratch))
@@ -65,7 +66,7 @@ program tensoradd
     end do
 
     if (success) then
-        write(*,*) 'Tensor addition validated successfully.'
+        write(*,*) 'Tensor addition passed validation.'
     end if
     
 end program tensoradd
