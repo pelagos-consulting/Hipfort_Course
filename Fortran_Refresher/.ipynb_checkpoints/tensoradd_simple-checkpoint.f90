@@ -59,7 +59,9 @@ program tensoradd
 
         ! Check to see if the number is in floating point range of the answer
         if  ( .not. ((lower <= C_h(i)) .and. (C_h(i) <= upper))) then
-            write(*,*) 'Error, calculated answer at index i = ', i, ' was not in range'
+            ! Demonstrate line continuation
+            write(*,*) 'Error, calculated answer at index i = ', &
+                i, ' was not in range'
             success = .false.
         end if
 
