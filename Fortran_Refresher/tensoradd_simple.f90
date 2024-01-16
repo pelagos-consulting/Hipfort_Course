@@ -34,15 +34,24 @@ program tensoradd
     call random_number(B_h)
 
     ! Run the tensor addition one element at a time
+    ! using a deterministic loop
     do i=1,N
         ! Kernel math
         C_h(i) = A_h(i) + B_h(i)
     end do
 
-    ! Could also do it this way, (Fortran best practice)
+    ! Do the operation again using a non-deterministic loop
+    i=1
+    do while (i<=N)
+        ! Kernel math
+        C_h(i) = A_h(i) + B_h(i)
+        i = i + 1
+    end do
+
+    ! Could also do it this way, (best practice)
     C_h(:) = A_h(:) + B_h(:)
 
-    ! Or even this way (not Fortran best practice)
+    ! Or even this way (not best practice)
     C_h = A_h + B_h
 
     ! Check the answer
