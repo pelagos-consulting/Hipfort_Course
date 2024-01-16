@@ -1,3 +1,4 @@
+
 logical function check(A, B, C, N, eps_mult)
     !! Function to check to if a tensor addition operation was successful
 
@@ -65,6 +66,9 @@ program tensoradd
     !! Program to compute a 1D tensor addition
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
+    ! Add this to use the standard fortran environment module
+    use iso_fortran_env
+
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
     ! on the first letter of variable names
@@ -99,8 +103,9 @@ program tensoradd
     ! Was the experiment successful?
     logical :: success = .true.
 
-    ! Allocate arrays on the heap and check for errors
+    ! Allocate tensors on the heap and check for errors
     allocate(A_h(N), B_h(N), C_h(N), stat=ierr)
+    
     if (ierr /= 0) then
         write(*,*) 'Error, array allocation failed with error code = ', ierr
         stop 

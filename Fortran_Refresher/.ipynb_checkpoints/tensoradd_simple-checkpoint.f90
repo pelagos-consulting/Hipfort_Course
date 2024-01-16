@@ -2,6 +2,9 @@ program tensoradd
     !! Program to compute a 1D tensor addition
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
+    ! Add this to use the standard fortran environment module
+    use iso_fortran_env
+
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
     ! on the first letter of variable names
@@ -23,6 +26,9 @@ program tensoradd
 
     ! Was the experiment successful?
     logical :: success = .true.
+
+    ! Base filename
+    character(len=10) :: bname = 'array_'
 
     ! Declare the tensors to use
     ! Memory for these will be allocated on the stack
@@ -69,7 +75,7 @@ program tensoradd
         ! Check to see if the number is in floating point range of the answer
         if  ( .not. ((lower <= C_h(i)) .and. (C_h(i) <= upper))) then
             ! Demonstrate line continuation
-            write(*,*) 'Error, calculated answer at index i = ', &
+            write(error_unit,*) 'Error, calculated answer at index i = ', &
                 i, ' was not in range'
             success = .false.
         end if
@@ -77,7 +83,26 @@ program tensoradd
     end do
 
     if (success) then
-        write(*,*) 'Tensor addition passed validation.'
+        print *, 'Tensor addition passed validation.'
+
+        ! Open the files for writing
+        open(10, file=trim(bname)//'A_h.dat', &
+            form='unformatted', status='new', access='stream')
+        open(11, file=trim(bname)//'B_h.dat', &
+            form='unformatted', status='new', access='stream')
+        open(12, file=trim(bname)//'C_h.dat', &
+            form='unformatted', status='new', access='stream')
+
+        ! Write the contents of the arrays to the open files 
+        write(10) A_h(:)
+        write(11) B_h(:)
+        write(12) C_h(:)
+
+        ! Close the files
+        close(10)
+        close(11)
+        close(12)
+        
     end if
     
 end program tensoradd
