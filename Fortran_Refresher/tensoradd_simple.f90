@@ -15,10 +15,6 @@ program tensoradd
     ! Should the computed solution be from the answer
     real :: eps_mult = 2.0
 
-    ! Declare the tensors to use
-    ! Memory for these will be allocated on the stack
-    real :: A_h(N), B_h(N), C_h(N)
-
     ! Upper and lower bounds for testing purposes
     real :: scratch, upper, lower
 
@@ -27,6 +23,10 @@ program tensoradd
 
     ! Was the experiment successful?
     logical :: success = .true.
+
+    ! Declare the tensors to use
+    ! Memory for these will be allocated on the stack
+    real :: A_h(0:N), B_h(0:N), C_h(0:N)
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
