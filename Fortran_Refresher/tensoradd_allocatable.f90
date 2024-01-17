@@ -75,6 +75,7 @@ program tensoradd
 
     if (success) then
         print *, 'Tensor addition passed validation.'
+    end if
 
     ! Always free heap memory when you no longer need it
     deallocate(A_h, B_h, C_h)

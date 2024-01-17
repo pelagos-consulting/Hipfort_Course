@@ -43,11 +43,13 @@ program tensoradd
         stop 
     end if
 
-    ! Demonstrate pointer remapping. 
-    D_h(1:N/2, 1:N/2) => A_h
-
-    ! D_h can access the memory of A_h
-    ! but in a two-dimensional way
+    ! Demonstrate pointer remapping.
+    ! Point a 4x4 2D pointer at the allocated memory
+    D_h(1:(N/4), 1:(N/4)) => A_h    
+    
+    ! Point a 2D pointer of size 2x2 
+    ! at the last 4 elements of A_h
+    D_h(1:2, 1:2) => A_h((N-4):N)
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
@@ -86,6 +88,8 @@ program tensoradd
 
     ! Always free heap memory when you no longer need it
     deallocate(A_h, B_h, C_h)
+
+    deallocate(D_h)
     
 end program tensoradd
 
