@@ -3,6 +3,9 @@ program tensoradd
     !! Program to compute a 1D tensor addition
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
+    ! Add this to use the standard fortran environment module
+    use iso_fortran_env
+
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
     ! on the first letter of variable names
@@ -20,6 +23,9 @@ program tensoradd
     ! Define pointers to memory, initialise to null() for safety
     real, pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
 
+    ! Demonstrate pointer remapping with D_h
+    real, pointer, dimension(:,:) :: D_h
+
     ! Upper and lower bounds for testing purposes
     real :: scratch, upper, lower
 
@@ -29,13 +35,19 @@ program tensoradd
     ! Was the experiment successful?
     logical :: success = .true.
 
-    ! Allocate arrays on the heap and check for errors
+    ! Allocate tensors on the heap and check for errors
     allocate(A_h(N), B_h(N), C_h(N), stat=ierr)
     
     if (ierr /= 0) then
         write(*,*) 'Error, array allocation failed with error code = ', ierr
         stop 
     end if
+
+    ! Demonstrate pointer remapping. 
+    D_h(1:N/2, 1:N/2) => A_h
+
+    ! D_h can access the memory of A_h
+    ! but in a two-dimensional way
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"

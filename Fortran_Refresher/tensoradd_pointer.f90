@@ -23,6 +23,9 @@ program tensoradd
     ! Define pointers to memory, initialise to null() for safety
     real, pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
 
+    ! Demonstrate pointer remapping with D_h
+    real, pointer, dimension(:,:) :: D_h
+
     ! Upper and lower bounds for testing purposes
     real :: scratch, upper, lower
 
@@ -39,6 +42,12 @@ program tensoradd
         write(*,*) 'Error, array allocation failed with error code = ', ierr
         stop 
     end if
+
+    ! Demonstrate pointer remapping. 
+    D_h(1:N/2, 1:N/2) => A_h
+
+    ! D_h can access the memory of A_h
+    ! but in a two-dimensional way
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"

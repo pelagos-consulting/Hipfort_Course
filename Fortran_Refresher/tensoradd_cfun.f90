@@ -3,6 +3,9 @@ program tensoradd
     !! Program to compute a 1D tensor addition
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
+    ! Add this to use the standard fortran environment module
+    use iso_fortran_env
+
     ! The "only" helps to know where things came from
     ! can use the "=>" operator to use things in modules as something else
     ! use tensor_lib, init_mem => alloc_mem

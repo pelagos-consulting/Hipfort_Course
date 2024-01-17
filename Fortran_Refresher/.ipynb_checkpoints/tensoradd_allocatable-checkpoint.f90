@@ -3,6 +3,9 @@ program tensoradd
     !! Program to compute a 1D tensor addition
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
+    ! Add this to use the standard Fortran environment module
+    use iso_fortran_env
+
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
     ! on the first letter of variable names
@@ -50,18 +53,20 @@ program tensoradd
 
     ! Check the answer
     do i=1,N
-        ! The computed solution
+
+        ! Compute the answer on the CPU
         scratch = A_h(i) + B_h(i)
 
         ! Get upper and lower bounds on the computed solution
-        ! the spacing function gets the floating point spacing
+        ! the "spacing" built-in function gets the floating point spacing
         ! from one number to the next
         upper = scratch + eps_mult*spacing(abs(scratch))
         lower = scratch - eps_mult*spacing(abs(scratch))
 
         ! Check to see if the number is in floating point range of the answer
         if  ( .not. ((lower <= C_h(i)) .and. (C_h(i) <= upper))) then
-            write(*,*) 'Error, calculated answer at index i = ', &
+            ! Demonstrate line continuation
+            write(error_unit,*) 'Error, calculated answer at index i = ', &
                 i, ' was not in range'
             success = .false.
         end if
@@ -69,8 +74,7 @@ program tensoradd
     end do
 
     if (success) then
-        write(*,*) 'Tensor addition validated successfully.'
-    end if
+        print *, 'Tensor addition passed validation.'
 
     ! Always free heap memory when you no longer need it
     deallocate(A_h, B_h, C_h)
