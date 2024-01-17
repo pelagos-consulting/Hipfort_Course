@@ -41,11 +41,13 @@ logical function check(A, B, C, N, eps_mult)
 end function check
 
 
-!> A kernel to perform tensor addition at a single point in A, B, C
+! Run kernel math to perform tensor addition at 
+! every point in input tensors A and B. 
+! Put the result in C
 subroutine launch_kernel(A, B, C, N)
     !! Run a tensor addition kernel over the elements of A, B, and C
 
-    real, pointer, dimension(:), intent(in) :: A, B, C
+    real, pointer, dimension(:), intent(inout) :: A, B, C
         !! Pointers to memory allocations
 
     integer, intent(in) :: N
@@ -94,6 +96,11 @@ program tensoradd
     ! Number of elements in the tensors
     integer, parameter :: N=16
 
+    ! Epsilon multiplier
+    ! How many floating point spacings
+    ! Should the computed solution be from the answer
+    real :: eps_mult = 2.0
+
     ! Define pointers to memory, initialise to null() for safety
     real, pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
 
@@ -120,7 +127,7 @@ program tensoradd
     call launch_kernel(A_h, B_h, C_h, N)
 
     ! Call the check function to check the answer
-    success = check(A_h, B_h, C_h, N, 2.0)
+    success = check(A_h, B_h, C_h, N, eps_mult)
 
     ! Always free heap memory when you no longer need it
     deallocate(A_h, B_h, C_h)
