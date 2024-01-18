@@ -21,7 +21,7 @@ module tensor_lib
 
 contains 
 
-    logical function check(eps_mult)
+    function check(eps_mult) result(success)
         !! Function to check tensor addition
 
         real, intent(in) :: eps_mult
@@ -34,13 +34,14 @@ contains
         ! Loop index
         integer  :: i
 
+        ! Set the outcome as positive until proven otherwise
+        logical :: success
+        success = .true.
+
         if (.not. allocd) then
             write(*,*) 'Memory has not been allocated, stopping'
             stop
         end if
-
-        ! Set the outcome as positive until proven otherwise
-        check = .true.
 
         ! Loop over all indices and check tensor addition
         do i=1, N
@@ -50,7 +51,7 @@ contains
             if (.not. ( (lower<=C_h(i)) .and. (C_h(i)<=upper) ) ) then
                 write(*,*) "Error, tensor addition did not work at index = ", i, &
                     ", value was: ", C_h(i), ", but should be:", scratch
-                check = .false.
+                success = .false.
                 return
             end if
         end do

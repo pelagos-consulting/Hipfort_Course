@@ -1,5 +1,5 @@
 
-logical function check(A, B, C, N, eps_mult)
+function check(A, B, C, N, eps_mult) result(success)
     !! Function to check to if a tensor addition operation was successful
 
     real, pointer, dimension(:), intent(in) :: A, B, C
@@ -19,7 +19,8 @@ logical function check(A, B, C, N, eps_mult)
     integer  :: i
 
     ! Set the return type of the function
-    check = .true.
+    logical :: success
+    success = .true.
 
     ! Loop over all indices and check tensor addition
     do i=1, N
@@ -30,7 +31,7 @@ logical function check(A, B, C, N, eps_mult)
         lower = scratch - eps_mult*abs(spacing(scratch))
         if (.not. ( (lower<=C(i)) .and. (C(i)<=upper) ) ) then
             write(*,*) "Error, tensor addition did not work at index = ", i
-            check = .false.
+            success = .false.
             return
         end if
     end do
@@ -86,10 +87,11 @@ program tensoradd
             integer, intent(in) :: N
         end subroutine launch_kernel
 
-        logical function check(A, B, C, N, eps_mult)
+        function check(A, B, C, N, eps_mult) result(success)
             real, pointer, dimension(:), intent(in) :: A, B, C
             integer, intent(in) :: N
             real, intent(in) :: eps_mult
+            logical :: success
         end function check
     end interface
 
