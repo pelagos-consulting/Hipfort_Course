@@ -2,33 +2,37 @@ module tensor_lib
     !! Library module to work with tensors
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
-    use iso_fortran_env
+    ! Module to help us working with C code
     use iso_c_binding
-    
+
+    ! Use the ISO Fortran environment module
+    use iso_fortran_env
+
     implicit none
 
     ! Interface to C kernel functions
     interface
     
-        ! Fortran interprets a C function with void return type
+        ! Fortran regards a C function with void return type
         ! as a subroutine 
         ! This is the fortran interface to the C function
-        subroutine c_kernel(A, B, C, i, N) bind(C)
+        subroutine launch_c_kernel(A, B, C, N) bind(C)
             use iso_c_binding
             ! Fortran passes by reference as the default
             ! Must have the "value" option present to pass by value
             ! Otherwise ckernel will receive pointers of type void**
             ! instead of void*
             type(c_ptr), value :: A, B, C
-            integer(c_int), value :: i, N
+            integer(c_int), value :: N
         end subroutine
 
         ! C function to allocate memory
-        type(c_ptr) function c_alloc(nbytes) bind(C)
+        function c_alloc(nbytes) result(ptr) bind(C)
             use iso_c_binding
             ! Make sure we have the value option set
             ! to pass by value
             integer(c_size_t), intent(in), value :: nbytes
+            type(c_ptr) :: ptr
         end function c_alloc
 
         ! C function to free memory 
@@ -48,14 +52,11 @@ module tensor_lib
     integer :: N
 
     ! Pointers to memory on the host
-    real, pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
+    real(kind=real32), pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
 
     ! Declare private variables functions and subroutines
     ! that belong only to the module
     private :: allocd, N
-       
-    ! Declare variables, functions, and subroutines that are public
-    public :: init_mem, free_mem, check, launch_kernel, A_h, B_h, C_h
 
 contains 
 
@@ -67,7 +68,7 @@ contains
             !! can the computed answer be from our benchmark answer
 
         ! Scratch variables
-        real :: scratch, upper, lower
+        real(kind=real32) :: scratch, upper, lower
 
         ! Loop index
         integer  :: i
@@ -111,7 +112,7 @@ contains
         type(c_ptr) :: temp_cptr
 
         ! Variable just for getting the type
-        real :: temp_real
+        real(kind=real32) :: temp_real
 
         ! Free memory first if already allocated
         if (allocd) then
@@ -120,12 +121,15 @@ contains
 
         ! Allocate memory for arrays using C functions
         temp_cptr = c_alloc(int(N_in*sizeof(temp_real), c_size_t))
+        ! Translate the C pointer to a Fortran pointer
         call c_f_pointer(temp_cptr, A_h, [N_in])
         
         temp_cptr = c_alloc(int(N_in*sizeof(temp_real), c_size_t))
+        ! Translate the C pointer to a Fortran pointer
         call c_f_pointer(temp_cptr, B_h, [N_in])
 
         temp_cptr = c_alloc(int(N_in*sizeof(temp_real), c_size_t))
+        ! Translate the C pointer to a Fortran pointer
         call c_f_pointer(temp_cptr, C_h, [N_in])
         
         ! Assign private variables if everything worked
@@ -135,28 +139,15 @@ contains
     end subroutine init_mem
 
     subroutine launch_kernel
-        !! Fortran kernel to compute tensor addition 
-        !! at every index i in the tensor space
-    
-        integer :: i
-            !! Index along a dimension
+        !! Call the C kernel launcher to execute the c_kernel
+        !! Function at every point 
 
-        do i=1,N
-
-            ! Run the C kernel function at element i in the array
-            call c_kernel( &
-                ! Get the pointer addresses
-                c_loc(A_h(1)), & 
-                c_loc(B_h(1)), &
-                c_loc(C_h(1)), &
-                ! Make sure the datatypes are correct
-                ! and indices are translated from 
-                ! Fortran to C
-                int(i-1, c_int), &
-                int(N, c_int) &
-            )
-
-        end do
+        call launch_c_kernel( &
+            c_loc(A_h), &
+            c_loc(B_h), &
+            c_loc(C_h), &
+            int(N, c_int) &
+        )
         
     end subroutine launch_kernel
 

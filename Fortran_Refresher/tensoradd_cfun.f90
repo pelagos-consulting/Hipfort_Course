@@ -1,4 +1,3 @@
-
 program tensoradd
     !! Program to compute a 1D tensor addition
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
@@ -9,7 +8,6 @@ program tensoradd
     ! The "only" helps to know where things came from
     ! can use the "=>" operator to use things in modules as something else
     ! use tensor_lib, init_mem => alloc_mem
-    
     use tensor_lib, only : check, alloc_mem => init_mem, &
         free_mem, launch_kernel, A_h, B_h
 
@@ -37,7 +35,7 @@ program tensoradd
     call random_number(A_h)
     call random_number(B_h)
 
-    ! Launch the kernel function
+    ! Ru
     call launch_kernel
 
     ! Check the answer

@@ -1,6 +1,8 @@
 module tensor_lib
     !! Library module to work with tensors
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
+
+    use iso_fortran_env
     
     implicit none
 
@@ -13,11 +15,9 @@ module tensor_lib
     ! Pointers to memory on the host
     real, pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
 
-    ! Declare private variables that belong only to the module
-    private :: allocd, N
-       
-    ! Declare variables, functions, and subroutines that are public
-    public :: init_mem, free_mem, check, A_h, B_h, C_h
+    ! Declare private anything that we would not like 
+    ! to make public
+    private :: allocd, N, kernel
 
 contains 
 
