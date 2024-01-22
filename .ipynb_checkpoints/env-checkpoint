@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Get the directory that this file is located in
+COURSE_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# Set the installation directory
+INSTALL_DIR=$COURSE_DIR
+
+# Set the runtime directory
+RUN_DIR=$INSTALL_DIR/install/bin
+
+# Change the path
+export PATH=$PATH:$RUN_DIR

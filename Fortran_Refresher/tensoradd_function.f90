@@ -83,7 +83,7 @@ program tensoradd
     ! but must be done because subroutine and function take pointer arguments
     interface
         subroutine launch_kernel(A, B, C, N)
-            real, pointer, dimension(:), intent(in) :: A, B, C
+            real, pointer, dimension(:), intent(inout) :: A, B, C
             integer, intent(in) :: N
         end subroutine launch_kernel
 
