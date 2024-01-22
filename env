@@ -4,10 +4,10 @@
 COURSE_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Set the installation directory
-INSTALL_DIR=$COURSE_DIR
+INSTALL_DIR=$COURSE_DIR/install
 
 # Set the runtime directory
-RUN_DIR=$INSTALL_DIR/install/bin
+RUN_DIR=$INSTALL_DIR/bin
 
 # Change the path
 export PATH=$PATH:$RUN_DIR
