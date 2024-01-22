@@ -33,3 +33,6 @@
 
 # The build directory if present
 build/
+
+# The install directory if present
+install/
