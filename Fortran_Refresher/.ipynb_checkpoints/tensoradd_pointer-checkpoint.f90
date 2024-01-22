@@ -88,8 +88,6 @@ program tensoradd
 
     ! Always free heap memory when you no longer need it
     deallocate(A_h, B_h, C_h)
-
-    deallocate(D_h)
     
 end program tensoradd
 

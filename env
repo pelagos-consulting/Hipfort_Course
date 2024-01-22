@@ -11,3 +11,9 @@ RUN_DIR=$INSTALL_DIR/bin
 
 # Change the path
 export PATH=$PATH:$RUN_DIR
+
+# Set Fortran compiler
+export FC=hipfc 
+
+# Set the build type, options are DEBUG, COVERAGE, PROFILE, RELEASE
+export BUILD_TYPE=RELEASE
