@@ -34,9 +34,13 @@ target_link_libraries(tensoradd_cfun
                       hip::device)
 install(TARGETS tensoradd_cfun DESTINATION bin)
 
+add_executable (chessboard_answer 
+    ${CMAKE_CURRENT_SOURCE_DIR}/chessboard_answer.f90) 
+install(TARGETS chessboard_answer DESTINATION bin)
 
-
-
+add_executable (chessboard 
+    ${CMAKE_CURRENT_SOURCE_DIR}/chessboard.f90) 
+install(TARGETS chessboard DESTINATION bin)
 
 
 

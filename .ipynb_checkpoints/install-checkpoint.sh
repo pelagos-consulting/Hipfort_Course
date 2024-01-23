@@ -1,15 +1,17 @@
 #!/bin/bash
 
-# Source this file to get the installation directory
-source ./env
+# Get the location of this file
+script_path=$(dirname "$0")
+
+source $script_path/env
 
 # Make the directory to build in
 mkdir -p build
 cd build
 
 # Run cmake
-cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR/ -DCMAKE_BUILD_TYPE=$RELEASE $COURSE_DIR/
+cmake -DCMAKE_INSTALL_MESSAGE=LAZY -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_RULE_MESSAGES=OFF -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR/ -DCMAKE_BUILD_TYPE=$RELEASE $COURSE_DIR/
 
-make clean
+#make clean
 make install
 
