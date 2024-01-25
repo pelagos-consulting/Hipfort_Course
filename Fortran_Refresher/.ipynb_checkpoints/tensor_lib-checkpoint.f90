@@ -15,7 +15,8 @@ module tensor_lib
     ! Pointers to memory on the host
     real, pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
 
-    ! Declare private variables that belong only to the module
+    ! Declare private anything that we would not like 
+    ! to make public
     private :: allocd, N, kernel
 
 contains 

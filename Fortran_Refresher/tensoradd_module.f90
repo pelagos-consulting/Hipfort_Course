@@ -35,7 +35,7 @@ program tensoradd
     call random_number(A_h)
     call random_number(B_h)
 
-    ! Ru
+    ! Launch the kernel
     call launch_kernel
 
     ! Check the answer

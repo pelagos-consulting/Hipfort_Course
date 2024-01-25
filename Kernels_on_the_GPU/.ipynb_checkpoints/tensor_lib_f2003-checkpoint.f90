@@ -32,40 +32,49 @@ module tensor_lib
     end interface
 
     type :: tensor_gpu
+        !! Object to represent a Tensor allocated on the GPU
+    
         contains
+            ! Is this tensor allocated?
             logical :: allocd
+            ! Pointer to the memory
             type(c_ptr) :: mem
+            ! Number of bytes in the allocation
             integer(c_size_t) :: nbytes
-            ! Upload functions
-            procedure :: ur32_2D => upload_real32_2D
-            ! Download functions
-            procedure :: dr32_2D => download_real32_2D
+            ! Upload procedures
+            procedure :: ur32_2D => upload_real32_2D_tensor
+            ! Download procedures
+            procedure :: dr32_2D => download_real32_2D_tensor
+            ! Allocation and de-allocation processures
             procedure :: alloc => allocate_tensor
             procedure :: free => deallocate_tensor
-            generic :: upload => ur32_2D !, can specify more functions here
-            generic :: download => dr32_2D !, can specify more functions here
-            ! Cleanup
-            final :: destructor => dealloc
+            ! Generic procedures to have polymorphism
+            generic :: upload => ur32_2D !, can specify more comma-separated functions here
+            generic :: download => dr32_2D !, can specify more comma-separated functions here
+            ! Final is a cleanup function when the object goes out of scope
+            final :: destructor => deallocate_tensor
     end type 
 
-    ! Have we already allocated memory and acquired the GPU?
+    ! Have we already allocated memory?
     logical :: allocd = .false.
-    logical :: acquired = .false.
 
-    ! Number of elements in each dimension
-    integer :: M, N, device_id
+    ! Number of elements in each dimension of the tensors
+    integer :: M, N
 
-    ! Pointers to memory on the compute device
-    type(c_ptr) :: A_d=c_null_ptr, B_d=c_null_ptr, C_d=c_null_ptr
+    ! Tensors that live on the GPU
+    class(tensor_gpu) :: A_d, B_d, C_d
 
     ! Declare private variables functions and subroutines
     ! that belong only to the module
-    private :: allocd, M, N, upload, download
+    private :: allocd, M, N
+    
 
 contains 
 
+    ! Functions for the tensor_gpu class
+
     subroutine allocate_tensor(this, nbytes)
-        !! Allocate memory for the tensor on the GPU
+        !! Allocate memory on the GPU
         
         ! Import the Hip modules
         use hipfort
@@ -103,7 +112,7 @@ contains
         
     end subroutine deallocate_tensor
 
-    subroutine upload_real32_2D(this, A)
+    subroutine upload_real32_2D_tensor(this, A)
         use iso_fortran_env
         use hipfort
         use hipfort_check
@@ -119,7 +128,8 @@ contains
         nbytes = sizeof(A)
 
         if (nbytes<=this%nbytes) then
-            hipCheck(hipmemcpy(this%mem, c_loc(A), nbytes, hipmemcpyhosttodevice))
+            hipCheck(hipmemcpy(this%mem, c_loc(A), &
+                nbytes, hipmemcpyhosttodevice))
         else
             write(error_unit, *) 'Error, memory upload failed because it was too big for the allocation'
             stop 1
@@ -127,7 +137,7 @@ contains
 
     end subroutine upload_real32_2D
 
-    subroutine download_real32_2D(this, A)
+    subroutine download_real32_2D_tensor(this, A)
         use iso_fortran_env
         use hipfort
         use hipfort_check
@@ -145,8 +155,7 @@ contains
         ! Copy the minimum of the contents of the array or the GPU allocation
         hipCheck(hipmemcpy(c_loc(A), this%mem, nbytes, hipmemcpydevicetohost))
 
-    end subroutine upload_real32_2D
-
+    end subroutine download_real32_2D
 
     subroutine get_gpu(dev_id)
 
@@ -186,9 +195,40 @@ contains
 
     end subroutine get_gpu
 
-    function check(eps_mult) result(success)
-        !! Function to check tensor addition
+    subroutine init_mem(M_in, N_in)
+    
+        !! Allocate memory for the tensors 
+        integer, intent(in) :: M_in, N_in
+            !! Data type for the number of elements
 
+        ! Number of bytes in the allocation
+        integer(c_size_t) :: nbytes
+
+        ! Variable just for getting the type
+        real(kind=real32) :: temp_real
+
+        ! Number of bytes to allocate
+        nbytes = M_in*N_in*sizeof(temp_real)
+
+        ! Free memory first if already allocated
+        if (allocd) then
+            call free_mem
+        end if
+
+        ! Allocate all tensors
+        A_d%allocate(nbytes)
+        B_d%allocate(nbytes)
+        C_d%allocate(nbytes)
+        
+        ! Assign private variables if everything worked
+        M = M_in
+        N = N_in
+        allocd = .true.
+
+    end subroutine init_mem
+
+    function check(eps_mult) result(success)
+        !! Function to check the outcome of tensor addition
         real, intent(in) :: eps_mult
             !! Epsilon multiplier, how many floating point spacings
             !! can the computed answer be from our benchmark answer
@@ -196,8 +236,11 @@ contains
         ! Scratch variables
         real(kind=real32) :: scratch, upper, lower
 
-        ! Loop index
-        integer  :: i
+        ! Temporary arrays on the host
+        real(kind=real32), dimension(:,:), allocatable :: A, B, C
+
+        ! Loop indices and error code
+        integer  :: i, j, ierr
 
         ! Set the outcome as positive until proven otherwise
         logical :: success
@@ -208,59 +251,49 @@ contains
             stop
         end if
 
+        ! Allocate host memory
+        allocate(A(M,N), B(M,N), C(M,N), stat=ierr)
+
+        if (ierr /= 0) then
+            write(*,*) 'Error, array allocation failed with error code = ', ierr 
+            stop 
+        end if
+
+        ! Download tensors into host memory
+        A_d%download(A)
+        B_d%download(B)
+        C_d%download(C)
+
         ! Loop over all indices and check tensor addition
-        do i=1, N
-            scratch = A_h(i) + B_h(i)
-            upper = scratch + eps_mult*abs(spacing(scratch))
-            lower = scratch - eps_mult*abs(spacing(scratch))
-            if (.not. ( (lower<=C_h(i)) .and. (C_h(i)<=upper) ) ) then
-                write(*,*) "Error, tensor addition did not work at index = ", i, &
-                    ", value was: ", C_h(i), ", but should be:", scratch
-                success = .false.
-                return
-            end if
+        do j=1, M
+            do i=1, N
+                scratch = A(i,j) + B(i,j)
+                upper = scratch + eps_mult*abs(spacing(scratch))
+                lower = scratch - eps_mult*abs(spacing(scratch))
+                if (.not. ( (lower<=C(i,j) .and. (C(i,j)<=upper) ) ) then
+                    write(*,*) "Error, tensor addition did not work at index = (", i, ", ", j &
+                        "), value was: ", C(i,j), ", but should be:", scratch
+                    success = .false.
+                    return
+                end if
+            end do
         end do
 
         ! We got to here because we didn't return on failure
         write(*,*) 'Tensor addition passed validation.'
+
+        ! Free temporary arrays
+        deallocate(A,B,C)
         
     end function check
 
-    subroutine init_mem(M_in, N_in)
-    
-        !! Allocates memory for the tensors on the GPU
-    
-        integer, intent(in) :: M_in, N_in
-            !! Data type for the number of elements
-
-        ! Variable just for getting the type
-        real(kind=real32) :: temp_real
-
-        ! Free memory first if already allocated
-        if (allocd) then
-            call free_mem
-        end if
-
-        ! Allocate memory on the compute device 
-        hipCheck(hipmalloc(A_d, int(M_in*N_in*sizeof(temp_real), c_size_t)))
-        hipCheck(hipmalloc(A_d, int(M_in*N_in*sizeof(temp_real), c_size_t)))
-        hipCheck(hipmalloc(A_d, int(M_in*N_in*sizeof(temp_real), c_size_t)))
-        
-        ! Assign private variables if everything worked
-        M = M_in
-        N = N_in
-        allocd = .true.
-
-    end subroutine init_mem
-
     subroutine launch_kernel
-        !! Call the C kernel launcher to execute the c_kernel
-        !! Function at every point 
-
+        !! Call the function to execute the HIP kernel
         call launch_kernel_hip( &
-            c_loc(A_h), &
-            c_loc(B_h), &
-            c_loc(C_h), &
+            A_d%mem, &
+            B_d%mem, &
+            C_d%mem, &
+            int(M, c_int), &
             int(N, c_int) &
         )
         
@@ -271,14 +304,9 @@ contains
         !! Free all memory allocated for the module
 
         ! De-allocate memory using calls to C functions
-        call hipCheck(hipfree(A_d))
-        call hipCheck(hipfree(B_d))
-        call hipCheck(hipfree(C_d))
-
-        ! Set all pointers to null
-        A_d = c_null_ptr
-        B_d = c_null_ptr
-        C_d = c_null_ptr
+        A_d%free
+        B_d%free
+        C_d%free
 
         ! Set private variables
         allocd = .false.
