@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 
 # Get the directory that this file is located in
 COURSE_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -18,9 +18,8 @@ export HIP_PLATFORM="amd"
 # Set Fortran compiler
 export FC=hipfc 
 
-# Set the C/C++ compiler
+# Set CXX compiler
 export CXX=hipcc
-export CC=hipcc
 
 # Set the build type, options are DEBUG, COVERAGE, PROFILE, RELEASE
 export BUILD_TYPE=RELEASE

@@ -269,6 +269,10 @@ contains
     end subroutine free_mem
 
     subroutine reset_gpu
+
+        use hipfort
+        use hipfort_check
+    
         ! Release all resources on the gpu
         if (acquired) then
             call hipCheck(hipdevicereset())

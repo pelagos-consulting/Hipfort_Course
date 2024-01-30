@@ -25,6 +25,17 @@ if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU" )
     set( CMAKE_Fortran_FLAGS_RELEASE "-O3" )
 endif()
 
+# Not sure if this is necessary
+if(DEFINED ENV{HIP_PLATFORM})
+    if(ENV{HIP_PLATFORM} STREQUAL "nvidia")
+        add_definitions(-D__HIP_PLATFORM_NVIDIA__)
+    else()
+        add_definitions(-D__HIP_PLATFORM_AMD__)
+    endif()
+else()
+    add_definitions(-D__HIP_PLATFORM_AMD__)   
+endif()
+
 # ------ dependencies ------ #
 # HIP
 find_package(hip REQUIRED)
