@@ -45,7 +45,7 @@ module tensor_lib
     integer :: M, N
 
     ! Memory allocations (tensors) that reside on the GPU
-    type(c_ptr) :: A_d, B_d, C_d
+    real(kind=c_float), dimension(:,:), pointer :: A_d, B_d, C_d
 
     ! Memory allocations (tensors) that reside on the host
     real(kind=c_float), dimension(:,:), pointer :: A_h, B_h, C_h
@@ -56,7 +56,7 @@ module tensor_lib
     
 contains 
 
-    subroutine upload_2D(dev_ptr, host_array)
+    subroutine upload_2D(dev_ptr, host_ptr)
         use iso_fortran_env
         use hipfort
         use hipfort_check
@@ -65,22 +65,28 @@ contains
         !! Upload a 2D array from the host to the GPU
     
         ! Source array on the host
-        real(kind=c_float), dimension(:,:), pointer, intent(in) :: host_array
+        real(kind=c_float), dimension(:,:), pointer, intent(in) :: host_ptr
 
-        ! Destination allocation on the GPU
-        type(c_ptr), intent(in) :: dev_ptr
+        ! Destination array on the GPU
+        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: dev_ptr
 
-        ! Get the number of bytes in the input array
-        integer(c_size_t) :: nbytes
-        nbytes = sizeof(host_array)
+        ! Memory safety check
+        if (sizeof(dev_ptr) /= sizeof(host_ptr)) then
+            write(error_unit, *) "Error, GPU memory is not of the same size as host memory."
+            stop
+        end if
 
-        ! Upload memory (potentially unsafe because there are no checks)
-        call hipCheck(hipmemcpy(dev_ptr, c_loc(host_array), &
-            nbytes, hipmemcpyhosttodevice))
+        ! Upload memory, (f2008+ interface)
+        call hipCheck(hipmemcpy(dev_ptr, host_ptr, &
+            sizeof(host_ptr), hipmemcpyhosttodevice))
+
+        ! Could also have done this (f2003+ interface)
+        !call hipCheck(hipmemcpy_r4_2_c_size_t(dev_ptr, host_ptr, &
+        !    sizeof(host_ptr), hipmemcpyhosttodevice))
 
     end subroutine upload_2D
 
-    subroutine download_2D(host_array, dev_ptr)
+    subroutine download_2D(host_ptr, dev_ptr)
         use iso_fortran_env
         use hipfort
         use hipfort_check
@@ -89,19 +95,25 @@ contains
         !! Download a 2D array from the GPU to the host
 
         ! Destination array on the host
-        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: host_array
+        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: host_ptr
 
-        ! Source allocation on the GPU
-        type(c_ptr), intent(in) :: dev_ptr
+        ! Source array on the GPU
+        real(kind=c_float), dimension(:,:), pointer, intent(in) :: dev_ptr
 
-        ! Use the host array as the standard
-        ! of how many bytes to copy
-        integer(c_size_t) :: nbytes
-        nbytes = sizeof(host_array)
+        ! Memory safety check
+        if (sizeof(dev_ptr) /= sizeof(host_ptr)) then
+            write(error_unit, *) "Error, host memory is not of the same size as GPU memory."
+            stop
+        end if
 
-        ! Copy nbytes from GPU to host
-        call hipCheck(hipmemcpy(c_loc(host_array), dev_ptr, &
-            nbytes, hipmemcpydevicetohost))
+        ! Copy from the GPU to the host, (f2008+ interface)
+        call hipCheck(hipmemcpy(host_ptr, dev_ptr, &
+            sizeof(host_ptr), hipmemcpydevicetohost))
+
+        ! Could have also done this, (f2003+ interface)
+        !call hipCheck(hipmemcpy_r4_2_c_size_t(host_ptr, dev_ptr, &
+        !    sizeof(host_ptr), hipmemcpydevicetohost))
+
 
     end subroutine download_2D
 
@@ -172,10 +184,15 @@ contains
             call free_mem
         end if
 
-        ! Allocate all tensors
-        call hipCheck(hipmalloc(A_d, nbytes))
-        call hipCheck(hipmalloc(B_d, nbytes))
-        call hipCheck(hipmalloc(C_d, nbytes))
+        ! Allocate all tensors (f2008+ interface)
+        call hipCheck(hipmalloc(A_d, M_in, N_in))
+        call hipCheck(hipmalloc(B_d, M_in, N_in))
+        call hipCheck(hipmalloc(C_d, M_in, N_in))
+
+        ! Could have also done this (f2003+ interface)
+        !call hipCheck(hipmalloc_r4_2_c_size_t(A_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+        !call hipCheck(hipmalloc_r4_2_c_size_t(B_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+        !call hipCheck(hipmalloc_r4_2_c_size_t(C_d, int(M_in, c_size_t), int(N_in, c_size_t)))
 
         ! Allocate host memory
         allocate(A_h(M_in,N_in), B_h(M_in,N_in), C_h(M_in,N_in), stat=ierr)
@@ -237,9 +254,9 @@ contains
     subroutine launch_kernel
         !! Call the C function that launches a HIP kernel
         call launch_kernel_hip( &
-            A_d, &
-            B_d, &
-            C_d, &
+            c_loc(A_d), &
+            c_loc(B_d), &
+            c_loc(C_d), &
             int(M, c_int), &
             int(N, c_int) &
         )
@@ -253,13 +270,21 @@ contains
     
         !! Free all memory allocated for the module
 
-        ! Free all tensors on the GPU
+        ! Free all tensors on the GPU (f2008+ interface)
         call hipCheck(hipfree(A_d))
         call hipCheck(hipfree(B_d))
         call hipCheck(hipfree(C_d))
+        
+        ! Could have also done this, (f2003+ interface)
+        !call hipCheck(hipfree_r4_2(A_d))
+        !call hipCheck(hipfree_r4_2(B_d))
+        !call hipCheck(hipfree_r4_2(C_d))
 
         ! Deallocate all arrays on the host
         deallocate(A_h, B_h, C_h)
+
+        ! Nullify all pointers
+        nullify(A_d, B_d, C_d, A_h, B_h, C_h)
 
         ! Set private variables
         allocd = .false.

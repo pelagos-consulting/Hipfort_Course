@@ -48,7 +48,7 @@ module tensor_lib
     type(c_ptr) :: A_d, B_d, C_d
 
     ! Memory allocations (tensors) that reside on the host
-    real(kind=real32), dimension(:,:), pointer :: A_h, B_h, C_h
+    real(kind=c_float), dimension(:,:), pointer :: A_h, B_h, C_h
 
     ! Declare private any variables, functions, and subroutines
     ! that belong only to the module
@@ -65,7 +65,7 @@ contains
         !! Upload a 2D array from the host to the GPU
     
         ! Source array on the host
-        real(kind=real32), dimension(:,:), pointer, intent(in) :: host_array
+        real(kind=c_float), dimension(:,:), pointer, intent(in) :: host_array
 
         ! Destination allocation on the GPU
         type(c_ptr), intent(in) :: dev_ptr
@@ -89,7 +89,7 @@ contains
         !! Download a 2D array from the GPU to the host
 
         ! Destination array on the host
-        real(kind=real32), dimension(:,:), pointer, intent(inout) :: host_array
+        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: host_array
 
         ! Source allocation on the GPU
         type(c_ptr), intent(in) :: dev_ptr
@@ -162,7 +162,7 @@ contains
         integer(c_size_t) :: nbytes
 
         ! Variable just for getting the type
-        real(kind=real32) :: temp_real
+        real(kind=c_float) :: temp_real
 
         ! Number of bytes to allocate
         nbytes = M_in*N_in*sizeof(temp_real)
@@ -200,7 +200,7 @@ contains
             !! can the computed answer be from our benchmark answer
 
         ! Scratch variables
-        real(kind=real32) :: scratch, upper, lower
+        real(kind=c_float) :: scratch, upper, lower
 
         ! Loop indices and error code
         integer  :: i, j

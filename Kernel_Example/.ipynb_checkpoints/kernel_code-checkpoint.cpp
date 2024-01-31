@@ -10,7 +10,9 @@
 typedef float float_type;
 
 void hipCheck(hipError_t error_code, std::string error_msg) {
-
+    // Function to check a HIP return code
+    // and query the result
+    
     if (error_code != hipSuccess) {
         std::string error_string(hipGetErrorString(error_code));
         std::cerr << "Error, HIP call failed at " << error_msg << ".\n";
@@ -19,6 +21,7 @@ void hipCheck(hipError_t error_code, std::string error_msg) {
     }
 }
 
+// Macro to call hipCheck
 #define HIPCHECK(code) \
 {\
     std::string fname(__FILE__);\
@@ -26,6 +29,7 @@ void hipCheck(hipError_t error_code, std::string error_msg) {
     hipCheck(code, fname + ":" + lineno);\
 }
 
+// Kernel to perform 2D tensor addition
 __global__ void tensoradd_2D (
 	    // Memory allocations
         float_type* A, 
@@ -60,7 +64,7 @@ __global__ void tensoradd_2D (
     }
 }
 
-// C function to call the kernel
+// C function to call the tensoradd_2D kernel
 extern "C" {
 
     void launch_kernel_hip(
