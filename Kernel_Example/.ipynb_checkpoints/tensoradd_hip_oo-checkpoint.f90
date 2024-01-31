@@ -1,5 +1,6 @@
 program tensoradd
-    !! Program to compute a 1D tensor addition
+    !! Program to compute 2D tensor addition 
+    !! with GPU allocations wrapped in a Fortran object-oriented type
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
     ! Add this to use the standard fortran environment module
@@ -10,6 +11,8 @@ program tensoradd
 
     ! GPU functionality 
     use hip_utils, only : init_gpu, reset_gpu
+
+    ! Use the tensor type defined in tensor_hip.f90
     use tensor_hip, only : tensor_gpu => tensor
 
     ! Maths check
@@ -48,7 +51,7 @@ program tensoradd
     ! Outcome of the check
     logical :: success
 
-    ! Pointers to arrays on the host
+    ! Fortran pointers to memory allocations on the host
     real(kind=c_float), dimension(:,:), pointer :: A_h, B_h, C_h
 
     ! Tensors on the GPU
@@ -60,17 +63,20 @@ program tensoradd
     ! Allocate memory on host 
     allocate(A_h(M,N), B_h(M, N), C_h(M,N))
 
-    ! Allocate tensors on the GPU
+    ! Allocate memory for tensors, 
+    ! see tensor_hip.f90 for 
+    ! definition of generic procedures 
     call A_d%malloc(sizeof(A_h))
     call B_d%malloc(sizeof(B_h))
     call C_d%malloc(sizeof(C_h))
 
-    ! Fill arrays with random numbers using the
+    ! Fill host allocations with random numbers using the
     ! Fortran intrinsic function "random_number"
     call random_number(A_h)
     call random_number(B_h)
 
-    ! Copy memory from the host to the GPU 
+    ! Copy memory from the host 
+    ! to the tensors on the GPU
     call A_d%copy_from(c_loc(A_h), sizeof(A_h))
     call B_d%copy_from(c_loc(B_h), sizeof(B_h))
 
@@ -97,6 +103,7 @@ program tensoradd
     ! Free tensors on the GPU
     ! this step is not necessary because 
     ! the tensor type has a destructor
+    ! that is called when the tensor is out of scope
     call A_d%free
     call B_d%free
     call C_d%free
