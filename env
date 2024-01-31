@@ -18,5 +18,8 @@ export HIP_PLATFORM="amd"
 # Set Fortran compiler
 export FC=hipfc 
 
+# Set the C++ compiler
+export CXX=hipcc
+
 # Set the build type, options are DEBUG, COVERAGE, PROFILE, RELEASE
 export BUILD_TYPE=DEBUG
