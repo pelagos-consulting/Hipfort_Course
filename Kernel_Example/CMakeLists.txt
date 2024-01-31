@@ -1,5 +1,5 @@
 add_executable (tensoradd_hip_cptr
-    ${CMAKE_CURRENT_SOURCE_DIR}/tensoradd_hip_cptr.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/tensoradd.f90
     ${CMAKE_CURRENT_SOURCE_DIR}/kernel_code.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tensor_lib_hip_cptr.f90
     )

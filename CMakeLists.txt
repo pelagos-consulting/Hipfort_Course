@@ -26,15 +26,15 @@ if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU" )
 endif()
 
 # Not sure if this is necessary
-if(DEFINED ENV{HIP_PLATFORM})
-    if(ENV{HIP_PLATFORM} STREQUAL "nvidia")
-        add_definitions(-D__HIP_PLATFORM_NVIDIA__)
-    else()
-        add_definitions(-D__HIP_PLATFORM_AMD__)
-    endif()
-else()
-    add_definitions(-D__HIP_PLATFORM_AMD__)   
-endif()
+#if(DEFINED ENV{HIP_PLATFORM})
+#    if(ENV{HIP_PLATFORM} STREQUAL "nvidia")
+#        add_definitions(-D__HIP_PLATFORM_NVIDIA__)
+#    else()
+#        add_definitions(-D__HIP_PLATFORM_AMD__)
+#    endif()
+#else()
+#    add_definitions(-D__HIP_PLATFORM_AMD__)   
+#endif()
 
 # ------ dependencies ------ #
 # HIP
