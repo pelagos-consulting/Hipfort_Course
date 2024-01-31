@@ -32,6 +32,34 @@ module tensor_lib
         
     end interface
 
+    type :: tensor_gpu
+        !! Object to represent a Tensor allocated on the GPU
+
+        ! Is this tensor allocated?
+        logical :: allocd
+        ! Pointer to the memory
+        type(c_ptr) :: mem
+        ! Number of bytes in the allocation
+        integer(c_size_t) :: nbytes
+    
+        contains
+
+            ! Upload procedures
+            procedure :: fh_cptr => copy_from_host_cptr_tensor
+            procedure :: fh_fptr_c_float_2D => copy_from_host_c_float_fptr_2D_tensor
+            ! Download procedures
+            procedure :: th_cptr => copy_to_host_cptr_tensor
+            procedure :: th_fptr_c_float_2D => copy_to_host_c_float_fptr_2D_tensor
+            ! Allocation and de-allocation processures
+            procedure :: alloc => allocate_tensor
+            procedure :: free => deallocate_tensor
+            ! Generic procedures to have polymorphism
+            generic :: copy_from => fh_cptr, fh_fptr_c_float_2D !, can specify more comma-separated functions here
+            generic :: copy_to => th_cptr, th_fptr_c_float_2D !, can specify more comma-separated functions here
+            ! Final is a cleanup function when the object goes out of scope
+            final :: destroy_tensor
+    end type 
+
     ! Have we already allocated memory?
     logical :: allocd = .false.
 
@@ -44,8 +72,8 @@ module tensor_lib
     ! Number of elements in each dimension of the tensors
     integer :: M, N
 
-    ! Memory allocations (tensors) that reside on the GPU
-    real(kind=c_float), dimension(:,:), pointer :: A_d, B_d, C_d
+    ! Tensors that reside on the GPU
+    type(tensor_gpu) :: A_d, B_d, C_d
 
     ! Memory allocations (tensors) that reside on the host
     real(kind=c_float), dimension(:,:), pointer :: A_h, B_h, C_h
@@ -56,65 +84,140 @@ module tensor_lib
     
 contains 
 
-    subroutine upload_2D(dev_fptr, host_fptr)
+    ! Functions for the tensor_gpu class
+    subroutine destroy_tensor(this)
+        type(tensor_gpu), intent(inout) :: this
+        call deallocate_tensor(this)
+    end subroutine destroy_tensor
+
+    subroutine allocate_tensor(this, nbytes)
+        !! Allocate memory for a tensor on the GPU
+        
+        ! Import the Hip modules
+        use hipfort
+        use hipfort_check
+    
+        class(tensor_gpu), intent(inout) :: this
+        integer(c_size_t) :: nbytes
+
+        ! Check to make sure we are not already allocated
+        if (this%allocd) then
+            call deallocate_tensor(this)
+        end if
+
+        ! Now allocate memory for the tensor on the GPU
+        call hipCheck(hipmalloc(this%mem, nbytes))
+
+        ! Set the allocated flag
+        this%allocd = .true.
+
+        ! Set the number of bytes in the allocation
+        this%nbytes = nbytes
+        
+    end subroutine allocate_tensor
+
+    subroutine deallocate_tensor(this)
+
+        ! Import the Hip modules
+        use hipfort
+        use hipfort_check
+    
+        !! De-allocate memory for the tensor on the GPU
+        class(tensor_gpu), intent(inout) :: this
+
+        ! Free the memory if necessary
+        if (this%allocd) then
+            call hipCheck(hipfree(this%mem))
+        endif
+
+        ! Unset the allocated flag
+        this%allocd = .false.
+
+        ! Set the number of allocated bytes to 0
+        this%nbytes = 0
+        
+    end subroutine deallocate_tensor
+
+    subroutine copy_from_host_cptr_tensor(this, host_cptr, nbytes)
+        use iso_c_binding
         use iso_fortran_env
         use hipfort
         use hipfort_check
-        use iso_c_binding
-    
-        !! Upload a 2D array from the host to the GPU
-    
-        ! Source array on the host
-        real(kind=c_float), dimension(:,:), pointer, intent(in) :: host_fptr
 
-        ! Destination array on the GPU
-        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: dev_fptr
+        ! The tensor_gpu object
+        class(tensor_gpu), intent(inout) :: this
 
-        ! Memory safety check
-        if (sizeof(dev_fptr) /= sizeof(host_fptr)) then
-            write(error_unit, *) "Error with upload_2D, GPU memory allocation is not the same size as host memory allocation."
+        ! Pointer to host memory
+        type(c_ptr), intent(in) :: host_cptr
+        
+        ! Number of bytes in the host memory
+        integer(c_size_t), intent(in) :: nbytes
+
+        ! Necessary checks
+        if (.not. this%allocd) then
+            write(error_unit, *) "Error, memory for tensor was not allocated on the GPU."
             stop
         end if
 
-        ! Upload memory
-        call hipCheck(hipmemcpy(dev_fptr, host_fptr, &
-            size(host_fptr), hipmemcpyhosttodevice))
+        if (nbytes/=this%nbytes) then
+            write(error_unit, *) "Error, number of bytes uploaded =", nbytes, &
+                " is not equal to the number of bytes allocated =", this%nbytes
+            stop
+        end if
 
-        ! Could also have done this instead
-        !call hipCheck(hipmemcpy_r4_2_c_size_t(dev_fptr, host_fptr, &
-        !    int(size(host_fptr), c_size_t), hipmemcpyhosttodevice))
+        ! Now perform the copy
+        call hipCheck(hipmemcpy(this%mem, host_cptr, &
+                nbytes, hipmemcpyhosttodevice))
 
-    end subroutine upload_2D
+    end subroutine copy_from_host_cptr_tensor
 
-    subroutine download_2D(host_fptr, dev_fptr)
+    subroutine copy_to_host_cptr_tensor(this, host_cptr, nbytes)
+        use iso_c_binding
         use iso_fortran_env
         use hipfort
         use hipfort_check
-        use iso_c_binding
 
-        !! Download a 2D array from the GPU to the host
+        ! The tensor_gpu object
+        class(tensor_gpu), intent(inout) :: this
 
-        ! Destination array on the host
-        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: host_fptr
+        ! Pointer to host memory
+        type(c_ptr), intent(in) :: host_cptr
+        
+        ! Number of bytes in the host memory
+        integer(c_size_t), intent(in) :: nbytes
 
-        ! Source array on the GPU
-        real(kind=c_float), dimension(:,:), pointer, intent(in) :: dev_fptr
-
-        ! Memory safety check
-        if (sizeof(dev_fptr) /= sizeof(host_fptr)) then
-            write(error_unit, *) "Error with download_2D, host memory allocation is not the same size as GPU memory allocation."
+        ! Necessary checks
+        if (.not. this%allocd) then
+            write(error_unit, *) "Error, memory for tensor was not allocated on the GPU."
             stop
         end if
 
-        ! Copy from the GPU to the host.
-        call hipCheck(hipmemcpy(host_fptr, dev_fptr, &
-            size(host_fptr), hipmemcpydevicetohost))
+        if (nbytes/=this%nbytes) then
+            write(error_unit, *) "Error, number of bytes uploaded =", nbytes, &
+                " is not equal to the number of bytes allocated =", this%nbytes
+            stop
+        end if
 
-        ! Could have also done this instead.
-        !call hipCheck(hipmemcpy_r4_2_c_size_t(host_fptr, dev_fptr, &
-        !    int(size(host_fptr), c_size_t), hipmemcpydevicetohost))
+        ! Now perform the copy
+        call hipCheck(hipmemcpy(host_cptr, this%mem, &
+                nbytes, hipmemcpydevicetohost))
 
-    end subroutine download_2D
+    end subroutine copy_to_host_cptr_tensor
+
+    subroutine copy_from_host_c_float_fptr_2D_tensor(this, host_fptr)
+        use iso_c_binding
+        class(tensor_gpu), intent(inout) :: this
+        real(kind=c_float), dimension(:,:), intent(in), pointer :: host_fptr
+        call copy_from_host_cptr_tensor(this, c_loc(host_fptr), sizeof(host_fptr))
+    end subroutine copy_from_host_c_float_fptr_2D_tensor
+
+    subroutine copy_to_host_c_float_fptr_2D_tensor(this, host_fptr)
+        use iso_c_binding
+        class(tensor_gpu), intent(inout) :: this
+        real(kind=c_float), dimension(:,:), intent(inout), pointer :: host_fptr
+        call copy_to_host_cptr_tensor(this, c_loc(host_fptr), sizeof(host_fptr))
+    end subroutine copy_to_host_c_float_fptr_2D_tensor
+
 
     subroutine init_gpu(dev_id)
         use hipfort
@@ -169,29 +272,10 @@ contains
         ! For error handling
         integer :: ierr
 
-        ! Number of bytes in the allocation
-        integer(c_size_t) :: nbytes
-
-        ! Variable just for getting the type
-        real(kind=c_float) :: temp_real
-
-        ! Number of bytes to allocate
-        nbytes = M_in*N_in*sizeof(temp_real)
-
         ! Free memory first if already allocated
         if (allocd) then
             call free_mem
         end if
-
-        ! Allocate all tensors.
-        call hipCheck(hipmalloc(A_d, M_in, N_in))
-        call hipCheck(hipmalloc(B_d, M_in, N_in))
-        call hipCheck(hipmalloc(C_d, M_in, N_in))
-
-        ! Could have also done this instead.
-        !call hipCheck(hipmalloc_r4_2_c_size_t(A_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-        !call hipCheck(hipmalloc_r4_2_c_size_t(B_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-        !call hipCheck(hipmalloc_r4_2_c_size_t(C_d, int(M_in, c_size_t), int(N_in, c_size_t)))
 
         ! Allocate host memory
         allocate(A_h(M_in,N_in), B_h(M_in,N_in), C_h(M_in,N_in), stat=ierr)
@@ -200,7 +284,12 @@ contains
             write(*,*) 'Error, array allocation failed with error code = ', ierr 
             stop 
         end if
-        
+
+        ! Allocate all tensors on the GPU
+        call A_d%alloc(sizeof(A_h))
+        call B_d%alloc(sizeof(B_h))
+        call C_d%alloc(sizeof(C_h))
+
         ! Assign private variables if everything worked
         M = M_in
         N = N_in
@@ -251,12 +340,11 @@ contains
     end function check
 
     subroutine launch_kernel
-    
-        !! Call the C function that launches a HIP kernel
+        !! Call the function to execute the HIP kernel
         call launch_kernel_hip( &
-            c_loc(A_d), &
-            c_loc(B_d), &
-            c_loc(C_d), &
+            A_d%mem, &
+            B_d%mem, &
+            C_d%mem, &
             int(M, c_int), &
             int(N, c_int) &
         )
@@ -264,27 +352,19 @@ contains
     end subroutine launch_kernel
 
     subroutine free_mem
-
-        use hipfort
-        use hipfort_check
     
         !! Free all memory allocated for the module
 
-        ! Free all tensors on the GPU. 
-        call hipCheck(hipfree(A_d))
-        call hipCheck(hipfree(B_d))
-        call hipCheck(hipfree(C_d))
-        
-        ! Could have also done this instead
-        !call hipCheck(hipfree_r4_2(A_d))
-        !call hipCheck(hipfree_r4_2(B_d))
-        !call hipCheck(hipfree_r4_2(C_d))
+        ! De-allocate memory using calls to C functions
+        call A_d%free
+        call B_d%free
+        call C_d%free
 
         ! Deallocate all tensors on the host
         deallocate(A_h, B_h, C_h)
 
-        ! Nullify all pointers
-        nullify(A_d, B_d, C_d, A_h, B_h, C_h)
+        ! Nullify all host pointers
+        nullify(A_h, B_h, C_h)
 
         ! Set private variables
         allocd = .false.

@@ -56,7 +56,7 @@ module tensor_lib
     
 contains 
 
-    subroutine upload_2D(dev_ptr, host_ptr)
+    subroutine upload_2D(dev_fptr, host_fptr)
         use iso_fortran_env
         use hipfort
         use hipfort_check
@@ -65,28 +65,28 @@ contains
         !! Upload a 2D array from the host to the GPU
     
         ! Source array on the host
-        real(kind=c_float), dimension(:,:), pointer, intent(in) :: host_ptr
+        real(kind=c_float), dimension(:,:), pointer, intent(in) :: host_fptr
 
         ! Destination array on the GPU
-        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: dev_ptr
+        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: dev_fptr
 
         ! Memory safety check
-        if (sizeof(dev_ptr) /= sizeof(host_ptr)) then
-            write(error_unit, *) "Error, GPU memory is not of the same size as host memory."
+        if (sizeof(dev_fptr) /= sizeof(host_fptr)) then
+            write(error_unit, *) "Error with upload_2D, GPU memory allocation is not the same size as host memory allocation."
             stop
         end if
 
         ! Upload memory
-        !call hipCheck(hipmemcpy(dev_ptr, host_ptr, &
-        !    size(host_ptr), hipmemcpyhosttodevice))
+        call hipCheck(hipmemcpy(dev_fptr, host_fptr, &
+            size(host_fptr), hipmemcpyhosttodevice))
 
         ! Could also have done this instead
-        call hipCheck(hipmemcpy_r4_2_c_size_t(dev_ptr, host_ptr, &
-            int(size(host_ptr), c_size_t), hipmemcpyhosttodevice))
+        !call hipCheck(hipmemcpy_r4_2_c_size_t(dev_fptr, host_fptr, &
+        !    int(size(host_fptr), c_size_t), hipmemcpyhosttodevice))
 
     end subroutine upload_2D
 
-    subroutine download_2D(host_ptr, dev_ptr)
+    subroutine download_2D(host_fptr, dev_fptr)
         use iso_fortran_env
         use hipfort
         use hipfort_check
@@ -95,25 +95,24 @@ contains
         !! Download a 2D array from the GPU to the host
 
         ! Destination array on the host
-        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: host_ptr
+        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: host_fptr
 
         ! Source array on the GPU
-        real(kind=c_float), dimension(:,:), pointer, intent(in) :: dev_ptr
+        real(kind=c_float), dimension(:,:), pointer, intent(in) :: dev_fptr
 
         ! Memory safety check
-        if (sizeof(dev_ptr) /= sizeof(host_ptr)) then
-            write(error_unit, *) "Error, host memory is not of the same size as GPU memory."
+        if (sizeof(dev_fptr) /= sizeof(host_fptr)) then
+            write(error_unit, *) "Error with download_2D, host memory allocation is not the same size as GPU memory allocation."
             stop
         end if
 
         ! Copy from the GPU to the host.
-        !call hipCheck(hipmemcpy(host_ptr, dev_ptr, &
-        !    size(host_ptr), hipmemcpydevicetohost))
+        call hipCheck(hipmemcpy(host_fptr, dev_fptr, &
+            size(host_fptr), hipmemcpydevicetohost))
 
         ! Could have also done this instead.
-        call hipCheck(hipmemcpy_r4_2_c_size_t(host_ptr, dev_ptr, &
-            int(size(host_ptr), c_size_t), hipmemcpydevicetohost))
-
+        !call hipCheck(hipmemcpy_r4_2_c_size_t(host_fptr, dev_fptr, &
+        !    int(size(host_fptr), c_size_t), hipmemcpydevicetohost))
 
     end subroutine download_2D
 
@@ -185,14 +184,14 @@ contains
         end if
 
         ! Allocate all tensors.
-        !call hipCheck(hipmalloc(A_d, M_in, N_in))
-        !call hipCheck(hipmalloc(B_d, M_in, N_in))
-        !call hipCheck(hipmalloc(C_d, M_in, N_in))
+        call hipCheck(hipmalloc(A_d, M_in, N_in))
+        call hipCheck(hipmalloc(B_d, M_in, N_in))
+        call hipCheck(hipmalloc(C_d, M_in, N_in))
 
         ! Could have also done this instead.
-        call hipCheck(hipmalloc_r4_2_c_size_t(A_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-        call hipCheck(hipmalloc_r4_2_c_size_t(B_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-        call hipCheck(hipmalloc_r4_2_c_size_t(C_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+        !call hipCheck(hipmalloc_r4_2_c_size_t(A_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+        !call hipCheck(hipmalloc_r4_2_c_size_t(B_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+        !call hipCheck(hipmalloc_r4_2_c_size_t(C_d, int(M_in, c_size_t), int(N_in, c_size_t)))
 
         ! Allocate host memory
         allocate(A_h(M_in,N_in), B_h(M_in,N_in), C_h(M_in,N_in), stat=ierr)
@@ -272,16 +271,16 @@ contains
         !! Free all memory allocated for the module
 
         ! Free all tensors on the GPU. 
-        !call hipCheck(hipfree(A_d))
-        !call hipCheck(hipfree(B_d))
-        !call hipCheck(hipfree(C_d))
+        call hipCheck(hipfree(A_d))
+        call hipCheck(hipfree(B_d))
+        call hipCheck(hipfree(C_d))
         
         ! Could have also done this instead
-        call hipCheck(hipfree_r4_2(A_d))
-        call hipCheck(hipfree_r4_2(B_d))
-        call hipCheck(hipfree_r4_2(C_d))
+        !call hipCheck(hipfree_r4_2(A_d))
+        !call hipCheck(hipfree_r4_2(B_d))
+        !call hipCheck(hipfree_r4_2(C_d))
 
-        ! Deallocate all arrays on the host
+        ! Deallocate all tensors on the host
         deallocate(A_h, B_h, C_h)
 
         ! Nullify all pointers

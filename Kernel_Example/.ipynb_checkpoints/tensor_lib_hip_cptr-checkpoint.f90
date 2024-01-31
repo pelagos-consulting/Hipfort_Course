@@ -56,7 +56,7 @@ module tensor_lib
     
 contains 
 
-    subroutine upload_2D(dev_ptr, host_array)
+    subroutine upload_2D(dev_cptr, host_fptr)
         use iso_fortran_env
         use hipfort
         use hipfort_check
@@ -65,22 +65,22 @@ contains
         !! Upload a 2D array from the host to the GPU
     
         ! Source array on the host
-        real(kind=c_float), dimension(:,:), pointer, intent(in) :: host_array
+        real(kind=c_float), dimension(:,:), pointer, intent(in) :: host_fptr
 
         ! Destination allocation on the GPU
-        type(c_ptr), intent(in) :: dev_ptr
+        type(c_ptr), intent(in) :: dev_cptr
 
         ! Get the number of bytes in the input array
         integer(c_size_t) :: nbytes
-        nbytes = sizeof(host_array)
+        nbytes = sizeof(host_fptr)
 
         ! Upload memory (potentially unsafe because there are no checks)
-        call hipCheck(hipmemcpy(dev_ptr, c_loc(host_array), &
+        call hipCheck(hipmemcpy(dev_cptr, c_loc(host_fptr), &
             nbytes, hipmemcpyhosttodevice))
 
     end subroutine upload_2D
 
-    subroutine download_2D(host_array, dev_ptr)
+    subroutine download_2D(host_fptr, dev_cptr)
         use iso_fortran_env
         use hipfort
         use hipfort_check
@@ -89,18 +89,18 @@ contains
         !! Download a 2D array from the GPU to the host
 
         ! Destination array on the host
-        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: host_array
+        real(kind=c_float), dimension(:,:), pointer, intent(inout) :: host_fptr
 
         ! Source allocation on the GPU
-        type(c_ptr), intent(in) :: dev_ptr
+        type(c_ptr), intent(in) :: dev_cptr
 
         ! Use the host array as the standard
         ! of how many bytes to copy
         integer(c_size_t) :: nbytes
-        nbytes = sizeof(host_array)
+        nbytes = sizeof(host_fptr)
 
         ! Copy nbytes from GPU to host
-        call hipCheck(hipmemcpy(c_loc(host_array), dev_ptr, &
+        call hipCheck(hipmemcpy(c_loc(host_fptr), dev_cptr, &
             nbytes, hipmemcpydevicetohost))
 
     end subroutine download_2D
@@ -235,6 +235,7 @@ contains
     end function check
 
     subroutine launch_kernel
+    
         !! Call the C function that launches a HIP kernel
         call launch_kernel_hip( &
             A_d, &
@@ -258,8 +259,16 @@ contains
         call hipCheck(hipfree(B_d))
         call hipCheck(hipfree(C_d))
 
-        ! Deallocate all arrays on the host
+        ! Deallocate all tensors on the host
         deallocate(A_h, B_h, C_h)
+
+        ! Nullify all pointers
+        nullify(A_h, B_h, C_h)
+
+    	! This is how to set C pointers to null.
+        A_d = c_null_ptr
+        B_d = c_null_ptr
+        C_d = c_null_ptr
 
         ! Set private variables
         allocd = .false.
