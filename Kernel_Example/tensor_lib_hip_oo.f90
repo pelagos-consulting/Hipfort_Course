@@ -33,7 +33,7 @@ module tensor_lib
     end interface
 
     type :: tensor_gpu
-        !! Object to represent a Tensor allocated on the GPU
+        !! Object to represent a tensor allocated on the GPU
 
         ! Is this tensor allocated?
         logical :: allocd
@@ -85,11 +85,6 @@ module tensor_lib
 contains 
 
     ! Functions for the tensor_gpu class
-    subroutine destroy_tensor(this)
-        type(tensor_gpu), intent(inout) :: this
-        call deallocate_tensor(this)
-    end subroutine destroy_tensor
-
     subroutine allocate_tensor(this, nbytes)
         !! Allocate memory for a tensor on the GPU
         
@@ -118,6 +113,8 @@ contains
 
     subroutine deallocate_tensor(this)
 
+        !! De-allocate all memory allocations
+
         ! Import the Hip modules
         use hipfort
         use hipfort_check
@@ -138,6 +135,12 @@ contains
         
     end subroutine deallocate_tensor
 
+    subroutine destroy_tensor(this)
+        !! Destructor
+        type(tensor_gpu), intent(inout) :: this
+        call this%free
+    end subroutine destroy_tensor
+
     subroutine copy_from_host_cptr_tensor(this, host_cptr, nbytes)
         use iso_c_binding
         use iso_fortran_env
@@ -150,7 +153,7 @@ contains
         ! Pointer to host memory
         type(c_ptr), intent(in) :: host_cptr
         
-        ! Number of bytes in the host memory
+        ! Number of bytes in host memory
         integer(c_size_t), intent(in) :: nbytes
 
         ! Necessary checks
@@ -205,6 +208,7 @@ contains
     end subroutine copy_to_host_cptr_tensor
 
     subroutine copy_from_host_c_float_fptr_2D_tensor(this, host_fptr)
+        !! Copy from a pointer to 2D c_floats
         use iso_c_binding
         class(tensor_gpu), intent(inout) :: this
         real(kind=c_float), dimension(:,:), intent(in), pointer :: host_fptr
@@ -212,6 +216,7 @@ contains
     end subroutine copy_from_host_c_float_fptr_2D_tensor
 
     subroutine copy_to_host_c_float_fptr_2D_tensor(this, host_fptr)
+        !! Copy to a pointer to 2D c_floats
         use iso_c_binding
         class(tensor_gpu), intent(inout) :: this
         real(kind=c_float), dimension(:,:), intent(inout), pointer :: host_fptr
@@ -355,7 +360,7 @@ contains
     
         !! Free all memory allocated for the module
 
-        ! De-allocate memory using calls to C functions
+        ! De-allocate memory
         call A_d%free
         call B_d%free
         call C_d%free
