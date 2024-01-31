@@ -37,4 +37,4 @@ find_package(hipfort REQUIRED)
 # Example Codes
 add_subdirectory(${CMAKE_SOURCE_DIR}/Memory_Management/memcpy_benchmark)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Fortran_Refresher)
-add_subdirectory(${CMAKE_SOURCE_DIR}/Kernel_Example)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Hipfort_Example)

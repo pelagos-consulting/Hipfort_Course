@@ -1,8 +1,10 @@
 program tensoradd
-    !! Program to compute a 2D tensor addition
+    !! Program to compute 2D tensor addition
+    !! Using Fortran pointers as the handle 
+    !! for GPU allocations
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
-    ! Add this to use the standard fortran environment module
+    ! Add this to use the standard Fortran environment module
     use iso_fortran_env
 
     ! C interopability 
@@ -12,7 +14,7 @@ program tensoradd
     use hipfort
     use hipfort_check
 
-    ! GPU functionality 
+    ! GPU handling 
     use hip_utils, only : init_gpu, reset_gpu
 
     ! Maths check
@@ -45,7 +47,7 @@ program tensoradd
 
     ! Epsilon multiplier
     ! How many floating point spacings
-    ! Should the computed solution be from the answer
+    ! should the computed solution be from the answer
     real :: eps_mult = 2.0
 
     ! Outcome of the check
@@ -79,7 +81,7 @@ program tensoradd
     call random_number(B_h)
 
     ! Copy memory from the host to the GPU
-    ! Note that size is in elements, not bytes
+    ! Note that size for the copy is in elements, not bytes
     call hipCheck(hipmemcpy(A_d, A_h, size(A_h), hipmemcpyhosttodevice))
     call hipCheck(hipmemcpy(B_d, B_h, size(B_h), hipmemcpyhosttodevice))
 
@@ -98,7 +100,7 @@ program tensoradd
         int(N, c_int) &
     )
 
-    ! Copy from the GPU to the host
+    ! Copy from the GPU result back to the host
     call hipCheck(hipmemcpy(C_h, C_d, size(C_d), hipmemcpydevicetohost))
 
     ! Could have also done this instead for the copy
@@ -118,7 +120,8 @@ program tensoradd
     call hipCheck(hipfree(B_d))
     call hipCheck(hipfree(C_d))
 
-    ! Nullify all Fortran pointers once we are done with them
+    ! It is best practice to nullify all pointers 
+    ! once we are done with them 
     nullify(A_h, B_h, C_h, A_d, B_d, C_d)
 
     ! Make sure all resources on the GPU are released

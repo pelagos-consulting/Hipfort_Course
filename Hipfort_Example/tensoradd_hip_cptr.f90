@@ -1,8 +1,10 @@
 program tensoradd
-    !! Program to compute a 1D tensor addition
+    !! Program to compute 2D tensor addition
+    !! Using C pointers type(c_ptr) as the handle 
+    !! for GPU allocations
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
-    ! Add this to use the standard fortran environment module
+    ! Add this to use the standard Fortran environment module
     use iso_fortran_env
 
     ! C interopability 
@@ -12,7 +14,7 @@ program tensoradd
     use hipfort
     use hipfort_check
 
-    ! GPU functionality 
+    ! GPU handling 
     use hip_utils, only : init_gpu, reset_gpu
 
     ! Maths check
@@ -96,14 +98,18 @@ program tensoradd
 
     ! Free host arrays
     deallocate(A_h, B_h, C_h)
-    nullify(A_h, B_h, C_h)
+    
 
     ! Free allocations on the GPU
     call hipCheck(hipfree(A_d))
     call hipCheck(hipfree(B_d))
     call hipCheck(hipfree(C_d))
 
-    ! Set C pointers to null for safety (best practice)
+    ! It is best practice to nullify all pointers 
+    ! once we are done with them 
+    nullify(A_h, B_h, C_h)
+
+    ! Set C pointers to null as well
     A_d = c_null_ptr
     B_d = c_null_ptr
     C_d = c_null_ptr
