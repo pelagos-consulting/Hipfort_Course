@@ -76,13 +76,13 @@ contains
             stop
         end if
 
-        ! Upload memory, (f2008+ interface)
-        call hipCheck(hipmemcpy(dev_ptr, host_ptr, &
-            sizeof(host_ptr), hipmemcpyhosttodevice))
+        ! Upload memory
+        !call hipCheck(hipmemcpy(dev_ptr, host_ptr, &
+        !    size(host_ptr), hipmemcpyhosttodevice))
 
-        ! Could also have done this (f2003+ interface)
-        !call hipCheck(hipmemcpy_r4_2_c_size_t(dev_ptr, host_ptr, &
-        !    sizeof(host_ptr), hipmemcpyhosttodevice))
+        ! Could also have done this instead
+        call hipCheck(hipmemcpy_r4_2_c_size_t(dev_ptr, host_ptr, &
+            int(size(host_ptr), c_size_t), hipmemcpyhosttodevice))
 
     end subroutine upload_2D
 
@@ -106,13 +106,13 @@ contains
             stop
         end if
 
-        ! Copy from the GPU to the host, (f2008+ interface)
-        call hipCheck(hipmemcpy(host_ptr, dev_ptr, &
-            sizeof(host_ptr), hipmemcpydevicetohost))
+        ! Copy from the GPU to the host.
+        !call hipCheck(hipmemcpy(host_ptr, dev_ptr, &
+        !    size(host_ptr), hipmemcpydevicetohost))
 
-        ! Could have also done this, (f2003+ interface)
-        !call hipCheck(hipmemcpy_r4_2_c_size_t(host_ptr, dev_ptr, &
-        !    sizeof(host_ptr), hipmemcpydevicetohost))
+        ! Could have also done this instead.
+        call hipCheck(hipmemcpy_r4_2_c_size_t(host_ptr, dev_ptr, &
+            int(size(host_ptr), c_size_t), hipmemcpydevicetohost))
 
 
     end subroutine download_2D
@@ -184,15 +184,15 @@ contains
             call free_mem
         end if
 
-        ! Allocate all tensors (f2008+ interface)
-        call hipCheck(hipmalloc(A_d, M_in, N_in))
-        call hipCheck(hipmalloc(B_d, M_in, N_in))
-        call hipCheck(hipmalloc(C_d, M_in, N_in))
+        ! Allocate all tensors.
+        !call hipCheck(hipmalloc(A_d, M_in, N_in))
+        !call hipCheck(hipmalloc(B_d, M_in, N_in))
+        !call hipCheck(hipmalloc(C_d, M_in, N_in))
 
-        ! Could have also done this (f2003+ interface)
-        !call hipCheck(hipmalloc_r4_2_c_size_t(A_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-        !call hipCheck(hipmalloc_r4_2_c_size_t(B_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-        !call hipCheck(hipmalloc_r4_2_c_size_t(C_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+        ! Could have also done this instead.
+        call hipCheck(hipmalloc_r4_2_c_size_t(A_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+        call hipCheck(hipmalloc_r4_2_c_size_t(B_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+        call hipCheck(hipmalloc_r4_2_c_size_t(C_d, int(M_in, c_size_t), int(N_in, c_size_t)))
 
         ! Allocate host memory
         allocate(A_h(M_in,N_in), B_h(M_in,N_in), C_h(M_in,N_in), stat=ierr)
@@ -252,6 +252,7 @@ contains
     end function check
 
     subroutine launch_kernel
+    
         !! Call the C function that launches a HIP kernel
         call launch_kernel_hip( &
             c_loc(A_d), &
@@ -270,15 +271,15 @@ contains
     
         !! Free all memory allocated for the module
 
-        ! Free all tensors on the GPU (f2008+ interface)
-        call hipCheck(hipfree(A_d))
-        call hipCheck(hipfree(B_d))
-        call hipCheck(hipfree(C_d))
+        ! Free all tensors on the GPU. 
+        !call hipCheck(hipfree(A_d))
+        !call hipCheck(hipfree(B_d))
+        !call hipCheck(hipfree(C_d))
         
-        ! Could have also done this, (f2003+ interface)
-        !call hipCheck(hipfree_r4_2(A_d))
-        !call hipCheck(hipfree_r4_2(B_d))
-        !call hipCheck(hipfree_r4_2(C_d))
+        ! Could have also done this instead
+        call hipCheck(hipfree_r4_2(A_d))
+        call hipCheck(hipfree_r4_2(B_d))
+        call hipCheck(hipfree_r4_2(C_d))
 
         ! Deallocate all arrays on the host
         deallocate(A_h, B_h, C_h)
