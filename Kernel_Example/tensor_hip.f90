@@ -1,4 +1,7 @@
-module tensor
+module tensor_hip
+    !! Module to work with HIP memory allocations 
+    !! with a measure of memory safety
+    !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
     ! Module to help us work with C datatypes and functions
     use iso_c_binding
@@ -13,50 +16,60 @@ module tensor
     ! Make sure we do not use implicit typing rules
     implicit none
 
-    type :: tensor_gpu
+    type :: tensor
         !! Object to represent a tensor allocated on the GPU
 
         ! Is this tensor allocated?
         logical :: allocd
+        
         ! Pointer to the memory
         type(c_ptr) :: mem
+        
         ! Number of bytes in the allocation
         integer(c_size_t) :: nbytes
     
         contains
         
             ! Upload procedures
-            procedure :: fh_cptr => copy_from_host_cptr
-            procedure :: fh_fptr_c_float_2D => copy_from_host_c_float_fptr_2D
+            procedure :: cfh_cptr => copy_from_host_cptr
+            procedure :: cfh_fptr_c_float_2D => copy_from_host_c_float_fptr_2D
+            
             ! Download procedures
-            procedure :: th_cptr => copy_to_host_cptr
-            procedure :: th_fptr_c_float_2D => copy_to_host_c_float_fptr_2D
-            ! Allocation and de-allocation processures
-            procedure :: alloc => allocate_tensor
-            procedure :: free => deallocate_tensor
-            ! Generic procedures to have polymorphism
-            generic :: copy_from => fh_cptr, fh_fptr_c_float_2D !, can specify more comma-separated functions here
-            generic :: copy_to => th_cptr, th_fptr_c_float_2D !, can specify more comma-separated functions here
+            procedure :: cth_cptr => copy_to_host_cptr
+            procedure :: cth_fptr_c_float_2D => copy_to_host_c_float_fptr_2D
+            
+            ! Allocation and de-allocation procedures
+            procedure :: malloc
+            procedure :: free
+            
+            ! Generic procedures for different types of data
+            generic :: copy_from => cfh_cptr, cfh_fptr_c_float_2D !, can specify more comma-separated functions here
+            generic :: copy_to => cth_cptr, cth_fptr_c_float_2D !, can specify more comma-separated functions here
+            
             ! Final is a cleanup function when the object goes out of scope
-            final :: destroy_tensor
-    end type tensor_gpu
+            final :: destructor
+            
+    end type tensor
 
 contains
 
-    ! Functions for the tensor_gpu class
-    subroutine allocate_tensor(this, nbytes)
+    ! Functions for the tensor class
+    subroutine malloc(this, nbytes)
         !! Allocate memory for a tensor on the GPU
         
-        ! Import the Hip modules
+        ! Import the HIP modules
         use hipfort
         use hipfort_check
-    
-        class(tensor_gpu), intent(inout) :: this
-        integer(c_size_t) :: nbytes
+
+        ! Polymorphic variable for the class
+        class(tensor), intent(inout) :: this
+
+        ! Number of bytes to allocate
+        integer(c_size_t), intent(in) :: nbytes
 
         ! Check to make sure we are not already allocated
         if (this%allocd) then
-            call deallocate_tensor(this)
+            call this%free
         end if
 
         ! Now allocate memory for the tensor on the GPU
@@ -68,18 +81,17 @@ contains
         ! Set the number of bytes in the allocation
         this%nbytes = nbytes
         
-    end subroutine allocate_tensor
+    end subroutine malloc
 
-    subroutine deallocate_tensor(this)
+    subroutine free(this)
+        !! Free all memory in the allocation
 
-        !! De-allocate all memory allocations
-
-        ! Import the Hip modules
+        ! Import the HIP modules
         use hipfort
         use hipfort_check
     
         !! De-allocate memory for the tensor on the GPU
-        class(tensor_gpu), intent(inout) :: this
+        class(tensor), intent(inout) :: this
 
         ! Free the memory if necessary
         if (this%allocd) then
@@ -92,13 +104,13 @@ contains
         ! Set the number of allocated bytes to 0
         this%nbytes = 0
         
-    end subroutine deallocate_tensor
+    end subroutine free
 
-    subroutine destroy_tensor(this)
+    subroutine destructor(this)
         !! Destructor
-        type(tensor_gpu), intent(inout) :: this
+        type(tensor), intent(inout) :: this
         call this%free
-    end subroutine destroy_tensor
+    end subroutine destructor
 
     subroutine copy_from_host_cptr(this, host_cptr, nbytes)
         use iso_c_binding
@@ -106,8 +118,8 @@ contains
         use hipfort
         use hipfort_check
 
-        ! The tensor_gpu object
-        class(tensor_gpu), intent(inout) :: this
+        ! The tensor object
+        class(tensor), intent(inout) :: this
 
         ! Pointer to host memory
         type(c_ptr), intent(in) :: host_cptr
@@ -117,13 +129,13 @@ contains
 
         ! Necessary checks
         if (.not. this%allocd) then
-            write(error_unit, *) "Error, memory for tensor was not allocated on the GPU."
+            write(error_unit, *) "Error, tensor was not allocated."
             stop
         end if
 
-        if (nbytes/=this%nbytes) then
-            write(error_unit, *) "Error, number of bytes uploaded =", nbytes, &
-                " is not equal to the number of bytes allocated =", this%nbytes
+        if (nbytes>this%nbytes) then
+            write(error_unit, *) "Error, number of bytes to copy from =", nbytes, &
+                " is greater than the number of bytes allocated =", this%nbytes
             stop
         end if
 
@@ -139,8 +151,8 @@ contains
         use hipfort
         use hipfort_check
 
-        ! The tensor_gpu object
-        class(tensor_gpu), intent(inout) :: this
+        ! The tensor object
+        class(tensor), intent(inout) :: this
 
         ! Pointer to host memory
         type(c_ptr), intent(in) :: host_cptr
@@ -150,36 +162,36 @@ contains
 
         ! Necessary checks
         if (.not. this%allocd) then
-            write(error_unit, *) "Error, memory for tensor was not allocated on the GPU."
+            write(error_unit, *) "Error, tensor was not allocated."
             stop
         end if
 
-        if (nbytes/=this%nbytes) then
-            write(error_unit, *) "Error, number of bytes uploaded =", nbytes, &
-                " is not equal to the number of bytes allocated =", this%nbytes
+        if (nbytes<this%nbytes) then
+            write(error_unit, *) "Error, number of bytes to copy to =", nbytes, &
+                " is less than the number of bytes allocated =", this%nbytes
             stop
         end if
 
         ! Now perform the copy
         call hipCheck(hipmemcpy(host_cptr, this%mem, &
-                nbytes, hipmemcpydevicetohost))
+                this%nbytes, hipmemcpydevicetohost))
 
     end subroutine copy_to_host_cptr
 
     subroutine copy_from_host_c_float_fptr_2D(this, host_fptr)
-        !! Copy from a pointer to 2D c_floats
+        !! Copy from a Fortran pointer to 2D c_floats
         use iso_c_binding
-        class(tensor_gpu), intent(inout) :: this
+        class(tensor), intent(inout) :: this
         real(kind=c_float), dimension(:,:), intent(in), pointer :: host_fptr
-        call copy_from_host_cptr_tensor(this, c_loc(host_fptr), sizeof(host_fptr))
+        call this%copy_from(c_loc(host_fptr), sizeof(host_fptr))
     end subroutine copy_from_host_c_float_fptr_2D
 
     subroutine copy_to_host_c_float_fptr_2D(this, host_fptr)
-        !! Copy to a pointer to 2D c_floats
+        !! Copy to a Fortran pointer to 2D c_floats
         use iso_c_binding
-        class(tensor_gpu), intent(inout) :: this
+        class(tensor), intent(inout) :: this
         real(kind=c_float), dimension(:,:), intent(inout), pointer :: host_fptr
-        call copy_to_host_cptr_tensor(this, c_loc(host_fptr), sizeof(host_fptr))
+        call this%copy_from(c_loc(host_fptr), sizeof(host_fptr))
     end subroutine copy_to_host_c_float_fptr_2D
 
-end module tensor
+end module tensor_hip

@@ -5,20 +5,37 @@ program tensoradd
     ! Add this to use the standard fortran environment module
     use iso_fortran_env
 
-    ! The "only" option helps to know where things came from
-    use tensor_lib, only : &
-        ! Arrays on the GPU
-        A_d, B_d, C_d, &
-        ! Arrays on the host
-        A_h, B_h, C_h, &
-        ! Functions and subroutines
-        init_gpu, reset_gpu, init_mem, free_mem, &
-        launch_kernel, check
+    ! C interopability 
+    use iso_c_binding
+
+    ! GPU functionality 
+    use hip_utils, only : init_gpu, reset_gpu
+    use tensor_hip, only : tensor_gpu => tensor
+
+    ! Maths check
+    use math_utils, only : check => check_tensor_addition_2D
 
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
     ! on the first letter of variable names
     implicit none
+
+    ! Interface to launch_kernel_hip function
+    ! in the file kernel_code.cpp
+    interface
+        ! A C function with void return type
+        ! is regarded as a subroutine in Fortran 
+        subroutine launch_kernel_hip(A, B, C, M, N) bind(C)
+            use iso_c_binding
+            ! Fortran passes arguments by reference as the default
+            ! Arguments must have the "value" option present to pass by value
+            ! Otherwise launch_kernel will receive pointers of type void**
+            ! instead of void*
+            type(c_ptr), intent(in), value :: A, B, C
+            integer(c_int), intent(in), value :: M, N
+        end subroutine
+        
+    end interface
 
     ! Number of elements in the tensors
     integer, parameter :: M=14, N=16
@@ -31,11 +48,22 @@ program tensoradd
     ! Outcome of the check
     logical :: success
 
-    ! Find and set the GPU device. Use device 0 by default
-    call init_gpu(0)
+    ! Pointers to arrays on the host
+    real(kind=c_float), dimension(:,:), pointer :: A_h, B_h, C_h
 
-    ! Allocate memory on the GPU and the host 
-    call init_mem(M, N)
+    ! Tensors on the GPU
+    type(tensor_gpu) :: A_d, B_d, C_d
+
+    ! Find and set the GPU device. Use device 0 by default
+    call init_gpu(0)   
+
+    ! Allocate memory on host 
+    allocate(A_h(M,N), B_h(M, N), C_h(M,N))
+
+    ! Allocate tensors on the GPU
+    call A_d%malloc(sizeof(A_h))
+    call B_d%malloc(sizeof(B_h))
+    call C_d%malloc(sizeof(C_h))
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
@@ -43,23 +71,38 @@ program tensoradd
     call random_number(B_h)
 
     ! Copy memory from the host to the GPU 
-    call A_d%copy_from(A_h)
-    call B_d%copy_from(B_h)
+    call A_d%copy_from(c_loc(A_h), sizeof(A_h))
+    call B_d%copy_from(c_loc(B_h), sizeof(B_h))
 
-    ! Launch the kernel
-    call launch_kernel
+    ! Call the C function that launches the kernel
+    call launch_kernel_hip( &
+        A_d%mem, &
+        B_d%mem, &
+        C_d%mem, &
+        int(M, c_int), &
+        int(N, c_int) &
+    )
 
     ! Copy memory from the GPU to the host
-    call C_d%copy_to(C_h)
+    call C_d%copy_to(c_loc(C_h), sizeof(C_h))
 
     ! Check the answer
-    success = check(eps_mult)
+    success = check(A_h, B_h, C_h, eps_mult)
 
     ! Release resources
-    call free_mem
+
+    ! Free host arrays
+    deallocate(A_h, B_h, C_h)
+
+    ! Free tensors on the GPU
+    ! this step is not necessary because 
+    ! the tensor type has a destructor
+    call A_d%free
+    call B_d%free
+    call C_d%free
 
     ! Make sure all resources on the GPU are released
     call reset_gpu
-
+    
 end program tensoradd
 
