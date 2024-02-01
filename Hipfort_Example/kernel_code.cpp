@@ -95,7 +95,7 @@ extern "C" {
         if (global_size.y % block_size.y) nblocks.y += 1;
         if (global_size.z % block_size.z) nblocks.z += 1;
             
-        // Decide on the number of bytes to allocate for shared mem
+        // Decide on the number of bytes to allocate for shared memory
         size_t sharedMemBytes = 0;
 
         // Launch the kernel
