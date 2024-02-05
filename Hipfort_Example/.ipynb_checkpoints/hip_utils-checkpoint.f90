@@ -66,6 +66,12 @@ contains
     
         ! Release all resources on the gpu
         if (acquired) then
+            ! Make sure the GPU is finished
+            ! with all pending activity
+            call hipcheck(hipdevicesynchronize())
+
+            ! Now free all resources on the primary context
+            ! of the selected GPU
             call hipcheck(hipdevicereset())
         end if
     end subroutine reset_gpu

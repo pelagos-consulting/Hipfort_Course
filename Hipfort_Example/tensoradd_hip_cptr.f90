@@ -56,7 +56,7 @@ program tensoradd
     ! Fortran pointers to memory allocations on the host
     real(kind=c_float), dimension(:,:), pointer :: A_h, B_h, C_h
 
-    ! C Pointers to memory allocations on the GPU
+    ! C Pointers to memory allocations on the device
     type(c_ptr) :: A_d, B_d, C_d
 
     ! Find and set the GPU device. Use device 0 by default
@@ -114,7 +114,7 @@ program tensoradd
     B_d = c_null_ptr
     C_d = c_null_ptr
 
-    ! Make sure all resources on the GPU are released
+    ! Make sure all resources on the selected GPU are released
     call reset_gpu
     
 end program tensoradd

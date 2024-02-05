@@ -114,7 +114,7 @@ program tensoradd
     B_d = c_null_ptr
     C_d = c_null_ptr
 
-    ! Make sure all resources on the GPU are released
+    ! Make sure all resources on the selected GPU are released
     call reset_gpu
     
 end program tensoradd
