@@ -66,9 +66,9 @@ program tensoradd
     allocate(A_h(M,N), B_h(M, N), C_h(M,N))
 
     ! Allocate tensors on the GPU
-    call hipCheck(hipmalloc(A_d, sizeof(A_h)))
-    call hipCheck(hipmalloc(B_d, sizeof(B_h)))
-    call hipCheck(hipmalloc(C_d, sizeof(C_h)))
+    call hipcheck(hipmalloc(A_d, sizeof(A_h)))
+    call hipcheck(hipmalloc(B_d, sizeof(B_h)))
+    call hipcheck(hipmalloc(C_d, sizeof(C_h)))
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
@@ -76,8 +76,8 @@ program tensoradd
     call random_number(B_h)
 
     ! Copy memory from the host to the GPU 
-    call hipCheck(hipmemcpy(A_d, c_loc(A_h), sizeof(A_h), hipmemcpyhosttodevice))
-    call hipCheck(hipmemcpy(B_d, c_loc(B_h), sizeof(B_h), hipmemcpyhosttodevice))
+    call hipcheck(hipmemcpy(A_d, c_loc(A_h), sizeof(A_h), hipmemcpyhosttodevice))
+    call hipcheck(hipmemcpy(B_d, c_loc(B_h), sizeof(B_h), hipmemcpyhosttodevice))
 
     ! Call the C function that launches the kernel
     call launch_kernel_hip( &
@@ -89,7 +89,7 @@ program tensoradd
     )
 
     ! Copy memory from the GPU to the host
-    call hipCheck(hipmemcpy(c_loc(C_h), C_d, sizeof(C_h), hipmemcpydevicetohost))
+    call hipcheck(hipmemcpy(c_loc(C_h), C_d, sizeof(C_h), hipmemcpydevicetohost))
 
     ! Check the answer
     success = check(A_h, B_h, C_h, eps_mult)
@@ -101,9 +101,9 @@ program tensoradd
     
 
     ! Free allocations on the GPU
-    call hipCheck(hipfree(A_d))
-    call hipCheck(hipfree(B_d))
-    call hipCheck(hipfree(C_d))
+    call hipcheck(hipfree(A_d))
+    call hipcheck(hipfree(B_d))
+    call hipcheck(hipfree(C_d))
 
     ! It is best practice to nullify all pointers 
     ! once we are done with them 

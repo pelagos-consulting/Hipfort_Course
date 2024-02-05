@@ -66,14 +66,14 @@ program tensoradd
     allocate(A_h(M,N), B_h(M, N), C_h(M,N))
 
     ! Allocate memory on the GPU
-    call hipCheck(hipmalloc(A_d, M, N))
-    call hipCheck(hipmalloc(B_d, M, N))
-    call hipCheck(hipmalloc(C_d, M, N))
+    call hipcheck(hipmalloc(A_d, M, N))
+    call hipcheck(hipmalloc(B_d, M, N))
+    call hipcheck(hipmalloc(C_d, M, N))
 
     ! Could have also done this for the allocate instead
-    !call hipCheck(hipmalloc_r4_2_c_size_t(A_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-    !call hipCheck(hipmalloc_r4_2_c_size_t(B_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-    !call hipCheck(hipmalloc_r4_2_c_size_t(C_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+    !call hipcheck(hipmalloc_r4_2_c_size_t(A_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+    !call hipcheck(hipmalloc_r4_2_c_size_t(B_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+    !call hipcheck(hipmalloc_r4_2_c_size_t(C_d, int(M_in, c_size_t), int(N_in, c_size_t)))
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
@@ -82,13 +82,13 @@ program tensoradd
 
     ! Copy memory from the host to the GPU
     ! Note that size for the copy is in elements, not bytes
-    call hipCheck(hipmemcpy(A_d, A_h, size(A_h), hipmemcpyhosttodevice))
-    call hipCheck(hipmemcpy(B_d, B_h, size(B_h), hipmemcpyhosttodevice))
+    call hipcheck(hipmemcpy(A_d, A_h, size(A_h), hipmemcpyhosttodevice))
+    call hipcheck(hipmemcpy(B_d, B_h, size(B_h), hipmemcpyhosttodevice))
 
     ! Could also have done this for the copy instead
-    !call hipCheck(hipmemcpy_r4_2_c_size_t(A_d, A_h, &
+    !call hipcheck(hipmemcpy_r4_2_c_size_t(A_d, A_h, &
     !    int(size(A_h), c_size_t), hipmemcpyhosttodevice))
-    !call hipCheck(hipmemcpy_r4_2_c_size_t(B_d, B_h, &
+    !call hipcheck(hipmemcpy_r4_2_c_size_t(B_d, B_h, &
     !    int(size(B_h), c_size_t), hipmemcpyhosttodevice))
 
     ! Call the C function that launches the kernel
@@ -101,10 +101,10 @@ program tensoradd
     )
 
     ! Copy from the GPU result back to the host
-    call hipCheck(hipmemcpy(C_h, C_d, size(C_d), hipmemcpydevicetohost))
+    call hipcheck(hipmemcpy(C_h, C_d, size(C_d), hipmemcpydevicetohost))
 
     ! Could have also done this instead for the copy
-    !call hipCheck(hipmemcpy_r4_2_c_size_t(C_h, C_d, &
+    !call hipcheck(hipmemcpy_r4_2_c_size_t(C_h, C_d, &
     !    int(size(C_d), c_size_t), hipmemcpydevicetohost))
 
     ! Check the answer
@@ -116,9 +116,9 @@ program tensoradd
     deallocate(A_h, B_h, C_h)
 
     ! Free allocations on the GPU
-    call hipCheck(hipfree(A_d))
-    call hipCheck(hipfree(B_d))
-    call hipCheck(hipfree(C_d))
+    call hipcheck(hipfree(A_d))
+    call hipcheck(hipfree(B_d))
+    call hipcheck(hipfree(C_d))
 
     ! It is best practice to nullify all pointers 
     ! once we are done with them 

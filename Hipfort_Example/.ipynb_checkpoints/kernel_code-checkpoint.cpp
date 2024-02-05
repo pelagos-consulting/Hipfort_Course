@@ -114,6 +114,9 @@ extern "C" {
                 A, B, C,
                 M, N);
 
+        // The triple-chevron (non C++ compliant) way of launching kernels
+        //tensoradd_2d<<<nblocks, block_size, sharedMemBytes, 0>>>(A, B, C, M, N);
+        
         // Make sure the kernel launch went ok
         HIPCHECK(hipGetLastError());
 
