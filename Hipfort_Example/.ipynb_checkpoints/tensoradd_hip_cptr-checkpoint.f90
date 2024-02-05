@@ -1,7 +1,7 @@
 program tensoradd
     !! Program to compute 2D tensor addition
     !! Using C pointers type(c_ptr) as the handle 
-    !! for GPU allocations
+    !! for device allocations
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
     ! Add this to use the standard Fortran environment module
@@ -14,8 +14,8 @@ program tensoradd
     use hipfort
     use hipfort_check
 
-    ! GPU handling 
-    use hip_utils, only : init_gpu, reset_gpu
+    ! device handling 
+    use hip_utils, only : init_device, reset_device
 
     ! Maths check
     use math_utils, only : check => check_tensor_addition_2D
@@ -56,16 +56,16 @@ program tensoradd
     ! Fortran pointers to memory allocations on the host
     real(kind=c_float), dimension(:,:), pointer :: A_h, B_h, C_h
 
-    ! C Pointers to memory allocations on the GPU
+    ! C Pointers to memory allocations on the device
     type(c_ptr) :: A_d, B_d, C_d
 
-    ! Find and set the GPU device. Use device 0 by default
-    call init_gpu(0)   
+    ! Find and set the device. Use device 0 by default
+    call init_device(0)   
 
     ! Allocate memory on host 
     allocate(A_h(M,N), B_h(M, N), C_h(M,N))
 
-    ! Allocate tensors on the GPU
+    ! Allocate tensors on the device
     call hipcheck(hipmalloc(A_d, sizeof(A_h)))
     call hipcheck(hipmalloc(B_d, sizeof(B_h)))
     call hipcheck(hipmalloc(C_d, sizeof(C_h)))
@@ -75,7 +75,7 @@ program tensoradd
     call random_number(A_h)
     call random_number(B_h)
 
-    ! Copy memory from the host to the GPU 
+    ! Copy memory from the host to the device 
     call hipcheck(hipmemcpy(A_d, c_loc(A_h), sizeof(A_h), hipmemcpyhosttodevice))
     call hipcheck(hipmemcpy(B_d, c_loc(B_h), sizeof(B_h), hipmemcpyhosttodevice))
 
@@ -88,7 +88,7 @@ program tensoradd
         int(N, c_int) &
     )
 
-    ! Copy memory from the GPU to the host
+    ! Copy memory from the device to the host
     call hipcheck(hipmemcpy(c_loc(C_h), C_d, sizeof(C_h), hipmemcpydevicetohost))
 
     ! Check the answer
@@ -98,9 +98,8 @@ program tensoradd
 
     ! Free host arrays
     deallocate(A_h, B_h, C_h)
-    
 
-    ! Free allocations on the GPU
+    ! Free allocations on the device
     call hipcheck(hipfree(A_d))
     call hipcheck(hipfree(B_d))
     call hipcheck(hipfree(C_d))
@@ -114,8 +113,8 @@ program tensoradd
     B_d = c_null_ptr
     C_d = c_null_ptr
 
-    ! Make sure all resources on the selected GPU are released
-    call reset_gpu
+    ! Make sure all resources on the selected device are released
+    call reset_device
     
 end program tensoradd
 
