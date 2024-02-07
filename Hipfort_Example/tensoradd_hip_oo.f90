@@ -10,7 +10,7 @@ program tensoradd
     use iso_c_binding
 
     ! GPU functionality 
-    use hip_utils, only : init_gpu, reset_gpu
+    use hip_utils, only : init_device, reset_device
 
     ! Use the tensor type defined in tensor_hip.f90
     use tensor_hip, only : tensor_gpu => tensor
@@ -57,8 +57,8 @@ program tensoradd
     ! Tensors on the GPU
     type(tensor_gpu) :: A_d, B_d, C_d
 
-    ! Find and set the GPU device. Use device 0 by default
-    call init_gpu(0)   
+    ! Find and set the device device. Use device 0 by default
+    call init_device(0)   
 
     ! Allocate memory on host 
     allocate(A_h(M,N), B_h(M, N), C_h(M,N))
@@ -76,7 +76,7 @@ program tensoradd
     call random_number(B_h)
 
     ! Copy memory from the host 
-    ! to the tensors on the GPU
+    ! to the tensors on the device
     call A_d%copy_from(c_loc(A_h), sizeof(A_h))
     call B_d%copy_from(c_loc(B_h), sizeof(B_h))
 
@@ -89,7 +89,7 @@ program tensoradd
         int(N, c_int) &
     )
 
-    ! Copy memory from the GPU to the host
+    ! Copy memory from the device to the host
     call C_d%copy_to(c_loc(C_h), sizeof(C_h))
 
     ! Check the answer
@@ -100,7 +100,7 @@ program tensoradd
     ! Free host arrays
     deallocate(A_h, B_h, C_h)
 
-    ! Free tensors on the GPU
+    ! Free tensors on the device
     ! this step is not necessary because 
     ! the tensor type has a destructor
     ! that is called when the tensor is out of scope
@@ -108,8 +108,8 @@ program tensoradd
     call B_d%free
     call C_d%free
 
-    ! Make sure all resources on the GPU are released
-    call reset_gpu
+    ! Make sure all resources on the device are released
+    call reset_device
     
 end program tensoradd
 

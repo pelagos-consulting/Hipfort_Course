@@ -21,11 +21,11 @@ module hip_utils
 
 contains 
 
-    subroutine init_gpu(dev_id)
+    subroutine init_device(dev_id)
         use hipfort
         use hipfort_check
 
-        !! Initialise HIP and set GPU device to use
+        !! Initialise HIP and set device device to use
 
         ! The id of the device to use
         integer, intent(in) :: dev_id
@@ -54,26 +54,26 @@ contains
             stop 1
         end if
 
-        ! Set the device id for the GPU
+        ! Set the device id for the device
         device_id = dev_id
 
-    end subroutine init_gpu
+    end subroutine init_device
 
-    subroutine reset_gpu
+    subroutine reset_device
 
         use hipfort
         use hipfort_check
     
-        ! Release all resources on the gpu
+        ! Release all resources on the device
         if (acquired) then
-            ! Make sure the GPU is finished
+            ! Make sure the device is finished
             ! with all pending activity
             call hipcheck(hipdevicesynchronize())
 
             ! Now free all resources on the primary context
-            ! of the selected GPU
+            ! of the selected device
             call hipcheck(hipdevicereset())
         end if
-    end subroutine reset_gpu
+    end subroutine reset_device
 
 end module hip_utils
