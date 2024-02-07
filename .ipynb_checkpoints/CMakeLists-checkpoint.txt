@@ -22,7 +22,7 @@ if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU" )
     set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgfortran")
     set( CMAKE_Fortran_FLAGS_COVERAGE "${CMAKE_Fortran_FLAGS_DEBUG} --coverage")
     set( CMAKE_Fortran_FLAGS_PROFILE "-pg -O3")
-    set( CMAKE_Fortran_FLAGS_RELEASE "-O3" )
+    set( CMAKE_Fortran_FLAGS_RELEASE "-O3 -g" )
 endif()
 
 # ------ dependencies ------ #

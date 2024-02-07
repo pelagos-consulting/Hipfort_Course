@@ -63,6 +63,8 @@ program tensoradd
     ! Allocate memory on host 
     allocate(A_h(M,N), B_h(M, N), C_h(M,N))
 
+    write(*,*) "Allocate memory"
+
     ! Allocate memory for tensors, 
     ! see tensor_hip.f90 for 
     ! definition of generic procedures 
@@ -75,10 +77,14 @@ program tensoradd
     call random_number(A_h)
     call random_number(B_h)
 
+    write(*,*) "Copy from"
+
     ! Copy memory from the host 
     ! to the tensors on the device
-    call A_d%copy_from(c_loc(A_h), sizeof(A_h))
-    call B_d%copy_from(c_loc(B_h), sizeof(B_h))
+    call A_d%copy_from(A_h)
+    call B_d%copy_from(B_h)
+
+    write(*,*) "Launching kernel"
 
     ! Call the C function that launches the kernel
     call launch_kernel_hip( &
@@ -90,7 +96,7 @@ program tensoradd
     )
 
     ! Copy memory from the device to the host
-    call C_d%copy_to(c_loc(C_h), sizeof(C_h))
+    call C_d%copy_to(C_h)
 
     ! Check the answer
     success = check(A_h, B_h, C_h, eps_mult)
