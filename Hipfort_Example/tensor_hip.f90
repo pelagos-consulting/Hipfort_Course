@@ -31,22 +31,26 @@ module tensor_hip
         contains
         
             ! Upload procedures
-            procedure :: cfh_cptr => copy_from_host_cptr
-            procedure :: cfh_c_float_1 => copy_from_host_c_float_1
-            procedure :: cfh_c_float_2 => copy_from_host_c_float_2
+            procedure :: copy_from_host_cptr
+            procedure :: copy_from_host_c_float_1
+            procedure :: copy_from_host_c_float_2
             
             ! Download procedures
-            procedure :: cth_cptr => copy_to_host_cptr
-            procedure :: cth_c_float_1 => copy_to_host_c_float_1
-            procedure :: cth_c_float_2 => copy_to_host_c_float_2
+            procedure :: copy_to_host_cptr
+            procedure :: copy_to_host_c_float_1
+            procedure :: copy_to_host_c_float_2
             
             ! Allocation and de-allocation procedures
             procedure :: malloc
             procedure :: free
             
             ! Generic procedures for different types of data
-            generic :: copy_from => cfh_cptr, cfh_c_float_1, cfh_c_float_2 !, can specify more comma-separated functions here
-            generic :: copy_to => cth_cptr, cth_c_float_1, cth_c_float_2 !, can specify more comma-separated functions here
+            generic :: copy_from => copy_from_host_cptr, &
+                copy_from_host_c_float_1, &
+                copy_from_host_c_float_2 !, can specify more comma-separated functions here
+            generic :: copy_to => copy_to_host_cptr, &
+                copy_to_host_c_float_1, &
+                copy_to_host_c_float_2 !, can specify more comma-separated functions here
             
             ! Final is a cleanup function when the object goes out of scope
             final :: destructor
@@ -109,7 +113,8 @@ contains
     end subroutine free
 
     subroutine destructor(this)
-        !! Destructor
+        !! Destructor, `this` must be of type(tensor) because it is valid only for instances
+        !! of this type
         type(tensor), intent(inout) :: this
         call this%free
     end subroutine destructor
