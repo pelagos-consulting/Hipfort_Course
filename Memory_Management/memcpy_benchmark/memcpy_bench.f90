@@ -127,7 +127,7 @@ subroutine float32_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
   real(real64), intent(out) :: walltime
   real(real64), intent(out) :: bandwidth_gb_s
   ! Local
-  type(c_ptr) :: host_data
+  real(real32), pointer :: host_data(:)
   type(c_ptr) :: dev_data
   integer :: i
   integer(c_size_t) :: array_size
@@ -136,7 +136,7 @@ subroutine float32_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
 
   array_size = array_length*real32
 
-  call hipcheck(hipmallochost(host_data,array_size))
+  call hipcheck(hipHostMalloc(host_data,array_length,hipHostMallocDefault))
 
   call hipcheck(hipmalloc(dev_data,array_size))
 
@@ -144,7 +144,7 @@ subroutine float32_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
   do i = 1, nreps
   
     call hipcheck(hipmemcpy(dev_data, &
-                            host_data, &
+                            c_loc(host_data), &
                             array_size, &
                             hipMemcpyHostToDevice))
   enddo
@@ -154,7 +154,7 @@ subroutine float32_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
   bandwidth_gb_s = real(array_size,real64)/walltime/1.0E9
 
   call hipcheck(hipfree(dev_data))
-  call hipcheck(hipfreehost(host_data))
+  call hipcheck(hipHostFree(host_data))
 
 end subroutine float32_pinned_memcpy_h2d
 
@@ -171,7 +171,7 @@ subroutine float32_pinned_memcpy_d2h( array_length, nreps, walltime, bandwidth_g
   real(real64), intent(out) :: walltime
   real(real64), intent(out) :: bandwidth_gb_s
   ! Local
-  type(c_ptr) :: host_data
+  real(real32), pointer :: host_data(:)
   type(c_ptr) :: dev_data
   integer :: i
   integer(c_size_t) :: array_size
@@ -179,14 +179,14 @@ subroutine float32_pinned_memcpy_d2h( array_length, nreps, walltime, bandwidth_g
   real(real64) :: t2
 
   array_size = array_length*real32
-  call hipcheck(hipmallochost(host_data,array_size))
+  call hipcheck(hipHostMalloc(host_data,array_length,hipHostMallocDefault))
 
   call hipcheck(hipmalloc(dev_data,array_size))
 
   call cpu_time(t1)
   do i = 1, nreps
   
-    call hipcheck(hipmemcpy(host_data, &
+    call hipcheck(hipmemcpy(c_loc(host_data), &
                             dev_data, &
                             array_size, &
                             hipMemcpyDeviceToHost))
@@ -296,7 +296,7 @@ subroutine float64_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
   real(real64), intent(out) :: walltime
   real(real64), intent(out) :: bandwidth_gb_s
   ! Local
-  type(c_ptr) :: host_data
+  real(real64), pointer :: host_data(:)
   type(c_ptr) :: dev_data
   integer :: i
   integer(c_size_t) :: array_size
@@ -305,7 +305,7 @@ subroutine float64_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
 
   array_size = array_length*real64
 
-  call hipcheck(hipmallochost(host_data,array_size))
+  call hipcheck(hipHostMalloc(host_data,array_length,hipHostMallocDefault))
 
   call hipcheck(hipmalloc(dev_data,array_size))
 
@@ -313,7 +313,7 @@ subroutine float64_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
   do i = 1, nreps
   
     call hipcheck(hipmemcpy(dev_data, &
-                            host_data, &
+                            c_loc(host_data), &
                             array_size, &
                             hipMemcpyHostToDevice))
   enddo
@@ -323,7 +323,7 @@ subroutine float64_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
   bandwidth_gb_s = real(array_size,real64)/walltime/1.0E9
 
   call hipcheck(hipfree(dev_data))
-  call hipcheck(hipfreehost(host_data))
+  call hipcheck(hipHostFree(host_data))
 
 end subroutine float64_pinned_memcpy_h2d
 
@@ -340,7 +340,7 @@ subroutine float64_pinned_memcpy_d2h( array_length, nreps, walltime, bandwidth_g
   real(real64), intent(out) :: walltime
   real(real64), intent(out) :: bandwidth_gb_s
   ! Local
-  type(c_ptr) :: host_data
+  real(real64), pointer :: host_data(:)
   type(c_ptr) :: dev_data
   integer :: i
   integer(c_size_t) :: array_size
@@ -348,14 +348,14 @@ subroutine float64_pinned_memcpy_d2h( array_length, nreps, walltime, bandwidth_g
   real(real64) :: t2
 
   array_size = array_length*real64
-  call hipcheck(hipmallochost(host_data,array_size))
+  call hipcheck(hipHostMalloc(host_data,array_length,hipHostMallocDefault))
 
   call hipcheck(hipmalloc(dev_data,array_size))
 
   call cpu_time(t1)
   do i = 1, nreps
   
-    call hipcheck(hipmemcpy(host_data, &
+    call hipcheck(hipmemcpy(c_loc(host_data), &
                             dev_data, &
                             array_size, &
                             hipMemcpyDeviceToHost))
@@ -366,7 +366,7 @@ subroutine float64_pinned_memcpy_d2h( array_length, nreps, walltime, bandwidth_g
   bandwidth_gb_s = real(array_size,real64)/walltime/1.0E9
 
   call hipcheck(hipfree(dev_data))
-  call hipcheck(hipfreehost(host_data))
+  call hipcheck(hipHostFree(host_data))
 
 end subroutine float64_pinned_memcpy_d2h
 
