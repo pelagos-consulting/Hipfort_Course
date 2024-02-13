@@ -20,11 +20,11 @@ project(hipfort_course VERSION 1.0.0
 # Fortran compiler flags
 if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU" )
     set( CMAKE_Fortran_FLAGS "-cpp -ffree-line-length-512" )
-    set( CMAKE_Fortran_FLAGS_DEBUG "-g -O0 -C -Wall -fbounds-check -fbacktrace -ffpe-trap=invalid,zero,overflow" )
+    set( CMAKE_Fortran_FLAGS_DEBUG "-g -O1 -C -Wall -fbounds-check -fbacktrace -ffpe-trap=invalid,zero,overflow" )
     set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgfortran")
     set( CMAKE_Fortran_FLAGS_COVERAGE "${CMAKE_Fortran_FLAGS_DEBUG} --coverage")
     set( CMAKE_Fortran_FLAGS_PROFILE "-pg -O3")
-    set( CMAKE_Fortran_FLAGS_RELEASE "-O3" )
+    set( CMAKE_Fortran_FLAGS_RELEASE "-O3 -g" )
 endif()
 
 # ------ dependencies ------ #
@@ -45,3 +45,4 @@ endforeach()
 # Example Codes
 add_subdirectory(${CMAKE_SOURCE_DIR}/Memory_Management/memcpy_benchmark)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Fortran_Refresher)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Hipfort_Example)
