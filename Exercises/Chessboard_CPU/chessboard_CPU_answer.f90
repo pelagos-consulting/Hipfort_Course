@@ -23,17 +23,16 @@ program chessboard
     real :: dark = 1.0
 
     ! Array indices
-    integer :: i, j, k=0
+    integer :: i, j, k
 
     ! Fill the chessboard
     do j=1,M
         do i=1,N
+            k=i+mod(j, 2)
+        
             ! Use modulo arithmetic to fill the chessboard
             A(i, j) = mod(k+1, 2)*light + mod(k, 2)*dark
-            k=k+1
         end do
-        ! Cycle k at the end of each column
-        k=k+1
     end do
 
     ! Print out the array
