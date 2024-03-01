@@ -16,7 +16,7 @@ program chessboard
     integer, parameter :: M=8, N=8
 
     ! Declare the chessboard
-    real :: A(M,N)
+    real :: B(M,N)
 
     ! Define what light and dark means
     real :: light = 0.0
@@ -31,7 +31,7 @@ program chessboard
             k=i+mod(j, 2)
         
             ! Use modulo arithmetic to fill the chessboard
-            A(i, j) = mod(k+1, 2)*light + mod(k, 2)*dark
+            B(i, j) = mod(k+1, 2)*light + mod(k, 2)*dark
         end do
     end do
 
@@ -39,7 +39,7 @@ program chessboard
     do i=1,N
         do j=1,M
             ! Print values in the chessboard
-            write(*, '(F3.1XX) ', advance="no") A(i,j)
+            write(*, '(F3.1XX) ', advance="no") B(i,j)
         end do
         ! Print a new line
         print *, ""

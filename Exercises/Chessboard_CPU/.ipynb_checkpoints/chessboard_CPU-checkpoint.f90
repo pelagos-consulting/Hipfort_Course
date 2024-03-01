@@ -25,7 +25,7 @@ program chessboard
     do i=1,N
         do j=1,M
             ! Print values in the chessboard
-            !write(*, '(F3.1XX) ', advance="no") A(i,j)
+            !write(*, '(F3.1XX) ', advance="no") B(i,j)
         end do
         ! Print a new line
         print *, ""

@@ -1,8 +1,8 @@
 
 program chessboard
-    !! Program to compute 2D tensor addition
-    !! Using Fortran pointers as the handle 
-    !! for device allocations
+    !! Program to fill a chessboard
+    !! using a HIP kernel on the compute device 
+    !! 
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
     ! Add this to use the standard Fortran environment module
@@ -47,7 +47,10 @@ program chessboard
     ! Number of elements in the tensors
     integer, parameter :: M=8, N=8
 
-    ! Declare the chessboard statically on the host
+    ! Matrix indices
+    integer :: i, j
+
+    ! Declare the chessboard on the host as a static array
     real :: B_h(M,N)
 
     ! Define what light and dark means
@@ -93,5 +96,5 @@ program chessboard
     ! Make sure all resources on the selected device are released
     call reset_device
     
-end program tensoradd
+end program chessboard
 

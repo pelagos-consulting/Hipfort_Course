@@ -34,8 +34,8 @@ __global__ void fill_chessboard (
 	    // Memory allocation
         float_type* B,
         // Floating point values for light and dark
-        float_type  light, 
-        float_type* dark,
+        float_type light, 
+        float_type dark,
         // Size of the board
         int M,
         int N) {
