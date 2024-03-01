@@ -32,7 +32,7 @@ void hipCheck(hipError_t error_code, std::string error_msg) {
 // Kernel to fill a chessboard
 __global__ void fill_chessboard (
 	    // Memory allocation
-        float_type* board,
+        float_type* B,
         // Floating point values for light and dark
         float_type  light, 
         float_type* dark,
@@ -59,7 +59,7 @@ __global__ void fill_chessboard (
 
         // Use modulo arithmetic to fill the chessboard
         int k = i0 + i1 % 2;
-        board[offset] = ((k+1)%2)*light + (k%2)*dark;
+        B[offset] = ((k+1)%2)*light + (k%2)*dark;
 
     }
 }
@@ -68,7 +68,7 @@ __global__ void fill_chessboard (
 extern "C" {
 
     void launch_kernel_hip(
-            float_type* board, 
+            float_type* B, 
             float_type light,
             float_type dark,
             int M,
@@ -100,22 +100,22 @@ extern "C" {
 
         // Launch the kernel
         hipLaunchKernelGGL(
-                // Kernel name
-                fill_chessboard,
-                // Number of blocks per dimension
-                nblocks,
-                // Number of threads along each dimension of the block
-                block_size,
-                // Number of bytes dynamically allocated for shared memory
-                sharedMemBytes,
-                // Stream to use (0 is the default or null stream)
-                0,
-                // Kernel arguments
-                board, light, dark,
-                M, N);
+            // Kernel name
+            fill_chessboard,
+            // Number of blocks per dimension
+            nblocks,
+            // Number of threads along each dimension of the block
+            block_size,
+            // Number of bytes dynamically allocated for shared memory
+            sharedMemBytes,
+            // Stream to use (0 is the default or null stream)
+            0,
+            // Kernel arguments
+            B, light, dark, M, N
+        );
 
         // The triple-chevron (non C++ compliant) way of launching kernels
-        //tensoradd_2d<<<nblocks, block_size, sharedMemBytes, 0>>>(A, B, C, M, N);
+        //fill_chessboard<<<nblocks, block_size, sharedMemBytes, 0>>>(B_d, light, dark, M, N);
         
         // Make sure the kernel launch went ok
         HIPCHECK(hipGetLastError());
