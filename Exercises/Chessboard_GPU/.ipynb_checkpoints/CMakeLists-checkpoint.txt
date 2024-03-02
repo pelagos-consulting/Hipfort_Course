@@ -1,6 +1,7 @@
 # Chessboard on the GPU, the exercise
 
-set(HEADER_FILES 
+set(HEADER_FILES
+    step0_kernel.h
     step1_init.h
     step2_malloc.h
     step3_launch.h

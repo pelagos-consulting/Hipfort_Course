@@ -60,18 +60,26 @@ program chessboard
     ! Fortran pointer to the chessboard on the device
     real(kind=c_float), dimension(:,:), pointer :: B_d
 
-    !! Step 1: Find and set the device. 
+    !!!! Step 1: Find and set the device. 
     !! Use device 0 by default
-    include 'step1_init.h'   
 
-    ! Step 2: Allocate memory for pointer B_d
-    include 'step2_malloc.h'
+    !! Uncomment for the shortcut solution to Step 1.
+    !include 'step1_init.h'   
 
-    ! Step 3: Call the C function that launches the kernel
-    include 'step3_launch.h'
+    !!!! Step 2: Allocate memory for pointer B_d
 
-    ! Step 4: Copy from the device back to the host
-    include 'step4_copy.h'
+    !! Uncomment for the shortcut solution to Step 2.
+    !include 'step2_malloc.h'
+
+    !!!! Step 3: Call the C function that launches the kernel
+    
+    !! Uncomment for the shortcut solution to Step 3.
+    !include 'step3_launch.h'
+
+    !!!! Step 4: Copy from the device back to the host
+    
+    !! Uncomment for the shortcut solution to Step 4.
+    !include 'step4_copy.h'
 
     ! Check the answer by printing it
     do i=1,N
@@ -85,11 +93,15 @@ program chessboard
 
     ! Release resources
 
-    ! Step 5: Free allocation B_d on the device
-    include 'step5_free.h'
+    !!!! Step 5: Free allocation B_d on the device
 
-    ! Step 6: Reset the GPU to make sure all resources are released
-    include 'step6_reset.h'
+    !! Uncomment for the shortcut solution to Step 5.
+    !include 'step5_free.h'
+
+    !!!! Step 6: Reset the GPU to make sure all resources are released
+
+    !! Uncomment for the shortcut solution to Step 6.
+    !include 'step6_reset.h'
     
 end program chessboard
 

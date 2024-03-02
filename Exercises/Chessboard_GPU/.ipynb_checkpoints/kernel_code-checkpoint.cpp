@@ -46,22 +46,19 @@ __global__ void fill_chessboard (
     int i0 = blockIdx.x * blockDim.x + threadIdx.x;
     int i1 = blockIdx.y * blockDim.y + threadIdx.y;
 
+
+    //// Step 0: Implement the kernel code
+    //// Hint: if k = i0 + i1 % 2
+    //// Then the chessboard values may be computed as
+    //// ((k+1)%2)*light + (k%2)*dark
+
     // Due to block sizes 
     // i0 and i1 might lie outside M and N
     // make sure we don't run off the domain
     // of the grid
-    if ((i0<M) && (i1<N)) {
-        // 1D position within 2D arrays
-        // stride down a column is 1
-        // stride along a row is M
-        
-        size_t offset = i0 + i1*M;
 
-        // Use modulo arithmetic to fill the chessboard
-        int k = i0 + i1 % 2;
-        B[offset] = ((k+1)%2)*light + (k%2)*dark;
-
-    }
+    // Uncomment this for the shortcut solution to Step 0.
+    //#include "step0_kernel.h"
 }
 
 // C function to call the tensoradd_2D kernel
