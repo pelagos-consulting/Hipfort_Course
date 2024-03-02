@@ -1,0 +1,2 @@
+
+    call reset_device

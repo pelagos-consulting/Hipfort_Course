@@ -1,9 +1,19 @@
 # Chessboard on the GPU, the exercise
+
+set(HEADER_FILES 
+    step1_init.h
+    step2_malloc.h
+    step3_launch.h
+    step4_copy.h
+    step5_free.h
+    step6_reset.h)
+
 add_executable (chessboard_GPU
     ${CMAKE_CURRENT_SOURCE_DIR}/chessboard_GPU.f90
     ${CMAKE_CURRENT_SOURCE_DIR}/kernel_code.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/hip_utils.f90
-    )
+    ${HEADER_FILES})
+    
 target_link_libraries(chessboard_GPU
                       hip::device)
 

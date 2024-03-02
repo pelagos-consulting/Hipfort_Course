@@ -60,13 +60,14 @@ program chessboard
     ! Fortran pointer to the chessboard on the device
     real(kind=c_float), dimension(:,:), pointer :: B_d
 
-    ! Find and set the device. Use device 0 by default
+    !! Step 1: Find and set the device. 
+    !! Use device 0 by default
     call init_device(0)   
 
-    ! Allocate memory on the device
+    ! Step 2: Allocate memory for pointer B_d
     call hipcheck(hipmalloc(B_d, M, N))
 
-    ! Call the C function that launches the kernel
+    ! Step 3: Call the C function that launches the kernel
     call launch_kernel_hip( &
         c_loc(B_d), &
         light, &
@@ -75,7 +76,7 @@ program chessboard
         int(N, c_int) &
     )
 
-    ! Copy from the device back to the host
+    ! Step 4: Copy from the device back to the host
     call hipcheck(hipmemcpy(B_h, B_d, size(B_d), hipmemcpydevicetohost))
 
     ! Check the answer by printing it
@@ -90,10 +91,10 @@ program chessboard
 
     ! Release resources
 
-    ! Free allocation on the device
+    ! Step 5: Free allocation B_d on the device
     call hipcheck(hipfree(B_d))
 
-    ! Make sure all resources on the selected device are released
+    ! Step 6: Reset the GPU to make sure all resources are released
     call reset_device
     
 end program chessboard
