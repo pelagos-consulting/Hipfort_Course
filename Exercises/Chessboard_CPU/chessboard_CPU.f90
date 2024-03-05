@@ -14,24 +14,27 @@ program chessboard
     ! Number of elements in the tensors
     integer, parameter :: M=8, N=8
 
-    ! Matrix indices
-    integer :: i, j
+     !! Step 0. Declare values for light and dark squares
 
-    ! Declare a chessboard here
+    ! Array indices
+    integer :: i0, i1
 
-    ! Fill the chessboard
+    !! Step 1: Declare the chessboard as a 8x8 array
+    !! and allocate memory for it
+
+    !! Step 2: Use nested loops to fill the chessboard
 
     ! Print out the array
-    do i=1,N
-        do j=1,M
+    do i1=1,N
+        do i0=1,M
             ! Print values in the chessboard
-            !write(*, '(F3.1XX) ', advance="no") B(i,j)
+            !write(*, '(F3.1XX) ', advance="no") B(i0,i1)
         end do
         ! Print a new line
         print *, ""
     end do
 
-    ! Deallocate any allocated memory
+    !! Step 3: Deallocate any allocated memory here
     
 end program chessboard
 

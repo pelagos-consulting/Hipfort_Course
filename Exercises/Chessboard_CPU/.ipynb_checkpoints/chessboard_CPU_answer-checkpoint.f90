@@ -15,35 +15,39 @@ program chessboard
     ! Number of elements in the tensors
     integer, parameter :: M=8, N=8
 
-    ! Declare the chessboard
-    real :: B(M,N)
-
-    ! Define what light and dark means
+    !! Step 0. Declare values for light and dark squares
     real :: light = 0.0
     real :: dark = 1.0
 
     ! Array indices
-    integer :: i, j, k
+    integer :: i0, i1, k
 
-    ! Fill the chessboard
-    do j=1,M
-        do i=1,N
-            k=i+mod(j, 2)
+    !! Step 1: Declare the chessboard as a 8x8 array
+    !! and allocate memory for it
+    real :: B(M,N)
+
+    !! Step 2: Use nested loops to fill the chessboard
+    do i1=1,M
+        do i0=1,N
+            ! Temporary value
+            k=i0+mod(i1, 2)
         
-            ! Use modulo arithmetic to fill the chessboard
-            B(i, j) = mod(k+1, 2)*light + mod(k, 2)*dark
+            ! Use modulo arithmetic 
+            B(i0, i1) = mod(k+1, 2)*light + mod(k, 2)*dark
         end do
     end do
 
     ! Print out the array
-    do i=1,N
-        do j=1,M
+    do i1=1,N
+        do i0=1,M
             ! Print values in the chessboard
-            write(*, '(F3.1XX) ', advance="no") B(i,j)
+            write(*, '(F3.1XX) ', advance="no") B(i0,i1)
         end do
         ! Print a new line
         print *, ""
     end do
+
+    !! Step 3: Deallocate any allocated memory here
     
 end program chessboard
 
