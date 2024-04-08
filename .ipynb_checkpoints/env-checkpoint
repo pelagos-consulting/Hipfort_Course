@@ -12,15 +12,14 @@ RUN_DIR=$INSTALL_DIR/bin
 # Change the path
 export PATH=$PATH:$RUN_DIR
 
-# Set the platform
-export HIP_PLATFORM="nvidia"
+# Set the platform, amd or nvidia
+export HIP_PLATFORM=amd
 
 # Set Fortran compiler
 export FC=hipfc
 
-# Set the C++ compiler
+# Set C++ compiler
 export CXX=hipcc
-export CC=hipcc
 
 # Set the build type, options are DEBUG, COVERAGE, PROFILE, RELEASE
 export BUILD_TYPE=RELEASE

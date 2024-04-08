@@ -9,10 +9,17 @@ if(NOT DEFINED ROCM_PATH)
     endif()
 endif()
 
-# CXX language is needed to properly find "hip" package
 project(hipfort_course VERSION 1.0.0
-	DESCRIPTION "Example codes to accompany a course in hipfort"
-	LANGUAGES Fortran CXX)
+    DESCRIPTION "Example codes to accompany a course in hipfort"
+    LANGUAGES Fortran CXX
+)
+
+if (DEFINED ENV{HIP_PLATFORM})
+    if ($ENV{HIP_PLATFORM} STREQUAL "nvidia")
+        message("Setting variables for nvidia")
+        set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lcudart")  
+    endif()
+endif()
 
 # Default Fortran compiler flags
 # Fortran compiler flags
@@ -33,15 +40,6 @@ find_package(hip REQUIRED)
 find_package(hipfort REQUIRED)
 
 # ----- end dependencies ----- #
-
-# Modify settings if the nvidia platform is detected
-if($ENV{HIP_PLATFORM} STREQUAL "nvidia")
-   message("HIP_PLATFORM is $ENV{HIP_PLATFORM}")
-   set( CMAKE_HIP_COMPILE_SOURCE_TYPE_FLAG "-x cu" )
-   find_package( CUDAToolkit QUIET REQUIRED )
-   set( CMAKE_HIP_IMPLICIT_LINK_LIBRARIES "${CUDA_cudart_LIBRARY}" )
-endif()
-
 
 # Example Codes
 add_subdirectory(${CMAKE_SOURCE_DIR}/Memory_Management/memcpy_benchmark)
