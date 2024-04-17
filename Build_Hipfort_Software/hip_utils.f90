@@ -36,7 +36,7 @@ contains
         ! Initialise resources the best practice way
         if (.not. acquired) then
             ! Initialise HIP
-            call hipcheck(hipinit(0))
+!            call hipcheck(hipinit(0))
 
             ! We have now acquired HIP
             acquired = .true.
