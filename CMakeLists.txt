@@ -11,15 +11,15 @@ endif()
 
 project(hipfort_course VERSION 1.0.0
     DESCRIPTION "Example codes to accompany a course in hipfort"
-    LANGUAGES Fortran CXX
+    LANGUAGES Fortran CXX HIP
 )
 
-if (DEFINED ENV{HIP_PLATFORM})
-    if ($ENV{HIP_PLATFORM} STREQUAL "nvidia")
-        message("Setting variables for nvidia")
-        set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lcudart")  
-    endif()
-endif()
+##if (DEFINED ENV{HIP_PLATFORM})
+##    if ($ENV{HIP_PLATFORM} STREQUAL "nvidia")
+##        message("Setting variables for nvidia")
+##        set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lcudart")  
+##    endif()
+##endif()
 
 # Default Fortran compiler flags
 # Fortran compiler flags

@@ -1,3 +1,11 @@
+
+# Set the language for any kernel files
+set(KERNEL_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/kernel_code.cpp
+)
+set_source_files_properties(${KERNEL_FILES} PROPERTIES LANGUAGE HIP)
+
+
 # Tensor addition with HIP and C pointers
 add_executable (tensoradd_hip_cptr
     ${CMAKE_CURRENT_SOURCE_DIR}/tensoradd_hip_cptr.f90

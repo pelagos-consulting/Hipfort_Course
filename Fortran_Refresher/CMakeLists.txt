@@ -32,6 +32,7 @@ add_executable (tensoradd_cfun
     ${CMAKE_CURRENT_SOURCE_DIR}/c_functions.cpp)
 target_link_libraries(tensoradd_cfun
                       hip::device)
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/c_functions.cpp PROPERTIES LANGUAGE HIP)
 install(TARGETS tensoradd_cfun DESTINATION bin)
 
 

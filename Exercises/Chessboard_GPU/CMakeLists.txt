@@ -9,6 +9,12 @@ set(HEADER_FILES
     step5_free.h
     step6_reset.h)
 
+set(KERNEL_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/kernel_code.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/kernel_code_answer.cpp
+)
+set_source_files_properties(${KERNEL_FILES} PROPERTIES LANGUAGE HIP)
+
 add_executable (chessboard_GPU
     ${CMAKE_CURRENT_SOURCE_DIR}/chessboard_GPU.f90
     ${CMAKE_CURRENT_SOURCE_DIR}/kernel_code.cpp
