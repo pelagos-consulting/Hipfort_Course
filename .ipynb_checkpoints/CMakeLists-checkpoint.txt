@@ -52,6 +52,10 @@ if (DEFINED ENV{HIP_PLATFORM})
         if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.24") 
             set(CMAKE_CUDA_ARCHITECTURES native)
         endif()
+
+        ## Change global preprocessor defintions, but you might need to do this
+        ## per device.
+        
         ## Remove any preprocessor definitions for AMD
         remove_definitions(-D__HIP_PLATFORM_HCC__ -D__HIP_PLATFORM_AMD__)
         ## Replace it with CUDA precprocessor definitions
