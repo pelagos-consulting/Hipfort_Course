@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21) # HIP language support requires 3.21 or gretater
+cmake_minimum_required(VERSION 3.21) # HIP language support requires 3.21 or greater
 cmake_policy(VERSION 3.21...3.27)
 
 if(NOT DEFINED ROCM_PATH)
@@ -11,15 +11,8 @@ endif()
 
 project(hipfort_course VERSION 1.0.0
     DESCRIPTION "Example codes to accompany a course in hipfort"
-    LANGUAGES Fortran CXX HIP
+    LANGUAGES Fortran CXX
 )
-
-##if (DEFINED ENV{HIP_PLATFORM})
-##    if ($ENV{HIP_PLATFORM} STREQUAL "nvidia")
-##        message("Setting variables for nvidia")
-##        set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lcudart")  
-##    endif()
-##endif()
 
 # Default Fortran compiler flags
 # Fortran compiler flags
@@ -39,11 +32,31 @@ find_package(hip REQUIRED)
 # HIPFort
 find_package(hipfort REQUIRED)
 
+# Set language for kernel code
+set(kernel_lang HIP)
+set(kernel_libs hip::device)
+
+if (DEFINED ENV{HIP_PLATFORM})
+    message("HIP_PLATFORM was $ENV{HIP_PLATFORM}")
+    if ($ENV{HIP_PLATFORM} STREQUAL nvidia)
+        message("Setting variables for nvidia")
+        find_package(CUDA REQUIRED)
+        set(kernel_lang CUDA)
+        list(APPEND kernel_libs CUDA::cudart CUDA::cuda::driver)
+        set(CUDA_SEPARABLE_COMPILATION ON)
+        string(APPEND CMAKE_CUDA_FLAGS " -rdc=true")
+        add_definitions(-D__HIP_PLATFORM_NVCC__ -D__HIP_PLATFORM_NVIDIA__)  
+    endif()
+endif()
+
+# Enable the chosen kernel language
+enable_language(${kernel_lang})
+
 # ----- end dependencies ----- #
 
 # Example Codes
-add_subdirectory(${CMAKE_SOURCE_DIR}/Memory_Management/memcpy_benchmark)
-add_subdirectory(${CMAKE_SOURCE_DIR}/Fortran_Refresher)
+##add_subdirectory(${CMAKE_SOURCE_DIR}/Memory_Management/memcpy_benchmark)
+##add_subdirectory(${CMAKE_SOURCE_DIR}/Fortran_Refresher)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Hipfort_Examples)
-add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_CPU)
-add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_GPU)
+##add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_CPU)
+##add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_GPU)
