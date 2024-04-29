@@ -48,8 +48,13 @@ if (DEFINED ENV{HIP_PLATFORM})
         ## Append the CUDA toolkit libraries to kernel_libs
         list(APPEND kernel_libs CUDA::cudart CUDA::cuda_driver)
         message(${kernel_libs})
-        ## Set your CUDA GPU architecture here
-        set(CMAKE_CUDA_ARCHITECTURES 86)
+        ## Set your CUDA GPU architectures to use here
+        if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.24") 
+            set(CMAKE_CUDA_ARCHITECTURES native)
+        endif()
+        ## Remove any preprocessor definitions for AMD
+        remove_definitions(-D__HIP_PLATFORM_HCC__ -D__HIP_PLATFORM_AMD__)
+        ## Replace it with CUDA precprocessor definitions
         add_definitions(-D__HIP_PLATFORM_NVCC__ -D__HIP_PLATFORM_NVIDIA__)  
     else()
         message("Performing compilation for an AMD backend.")        

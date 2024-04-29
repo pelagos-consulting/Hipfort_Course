@@ -13,6 +13,7 @@ set(KERNEL_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/kernel_code.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/kernel_code_answer.cpp
 )
+# Use this switch to make sure either the NVIDIA or AMD compilers are used to compile the kernel code.
 set_source_files_properties(${KERNEL_FILES} PROPERTIES LANGUAGE ${kernel_lang})
 
 add_executable (chessboard_GPU
