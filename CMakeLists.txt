@@ -11,7 +11,7 @@ endif()
 
 project(hipfort_course VERSION 1.0.0
     DESCRIPTION "Example codes to accompany a course in hipfort"
-    LANGUAGES Fortran CXX
+    LANGUAGES HIP CUDA CXX Fortran
 )
 
 # Default Fortran compiler flags
@@ -26,6 +26,7 @@ if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU" )
 endif()
 
 # ------ dependencies ------ #
+
 # HIP
 find_package(hip REQUIRED)
 
@@ -34,29 +35,34 @@ find_package(hipfort REQUIRED)
 
 # Set language for kernel code
 set(kernel_lang HIP)
+# Set libraries for kernel code
 set(kernel_libs hip::device)
 
 if (DEFINED ENV{HIP_PLATFORM})
-    message("HIP_PLATFORM was $ENV{HIP_PLATFORM}")
     if ($ENV{HIP_PLATFORM} STREQUAL nvidia)
-        message("Setting variables for nvidia")
-        find_package(CUDA REQUIRED)
-        set(kernel_lang CUDA)
-        list(APPEND kernel_libs CUDA::cudart CUDA::cuda::driver)
+        message("Performing compilation for an NVIDIA backend.")
         set(CUDA_SEPARABLE_COMPILATION ON)
-        string(APPEND CMAKE_CUDA_FLAGS " -rdc=true")
+        ## Find the CUDA toolkit
+        find_package(CUDAToolkit REQUIRED)
+        set(kernel_lang CUDA)
+        ## Append the CUDA toolkit libraries to kernel_libs
+        list(APPEND kernel_libs CUDA::cudart CUDA::cuda_driver)
+        message(${kernel_libs})
+        ## Set your CUDA GPU architecture here
+        set(CMAKE_CUDA_ARCHITECTURES 86)
         add_definitions(-D__HIP_PLATFORM_NVCC__ -D__HIP_PLATFORM_NVIDIA__)  
+    else()
+        message("Performing compilation for an AMD backend.")        
     endif()
+else()
+    message("Performing compilation for an AMD backend.")      
 endif()
-
-# Enable the chosen kernel language
-enable_language(${kernel_lang})
 
 # ----- end dependencies ----- #
 
 # Example Codes
-##add_subdirectory(${CMAKE_SOURCE_DIR}/Memory_Management/memcpy_benchmark)
-##add_subdirectory(${CMAKE_SOURCE_DIR}/Fortran_Refresher)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Memory_Management/memcpy_benchmark)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Fortran_Refresher)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Hipfort_Examples)
-##add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_CPU)
-##add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_GPU)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_CPU)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_GPU)

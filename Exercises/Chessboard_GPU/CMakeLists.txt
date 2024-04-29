@@ -13,7 +13,7 @@ set(KERNEL_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/kernel_code.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/kernel_code_answer.cpp
 )
-set_source_files_properties(${KERNEL_FILES} PROPERTIES LANGUAGE HIP)
+set_source_files_properties(${KERNEL_FILES} PROPERTIES LANGUAGE ${kernel_lang})
 
 add_executable (chessboard_GPU
     ${CMAKE_CURRENT_SOURCE_DIR}/chessboard_GPU.f90
@@ -22,7 +22,7 @@ add_executable (chessboard_GPU
     ${HEADER_FILES})
     
 target_link_libraries(chessboard_GPU
-                      hip::device)
+                      ${kernel_libs})
 
 # This is needed so that the linker used is the Fortran compiler
 set_target_properties(chessboard_GPU
@@ -39,7 +39,7 @@ add_executable (chessboard_GPU_answer
     ${CMAKE_CURRENT_SOURCE_DIR}/hip_utils.f90
     )
 target_link_libraries(chessboard_GPU_answer
-                      hip::device)
+                      ${kernel_libs})
 
 # This is needed so that the linker used is the Fortran compiler
 set_target_properties(chessboard_GPU_answer
