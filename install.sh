@@ -9,7 +9,6 @@ source $script_path/env
 mkdir -p $script_path/build
 cd $script_path/build
 
-rm -rf ./*
 
 # Run cmake
 cmake -DCMAKE_INSTALL_MESSAGE=LAZY -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_RULE_MESSAGES=OFF -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE $COURSE_DIR/

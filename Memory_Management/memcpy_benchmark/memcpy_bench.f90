@@ -407,9 +407,15 @@ implicit none
   type(hipDeviceProp_t) :: prop
 
   call hipcheck(hipGetDeviceProperties_(prop,deviceId))
+
+! Temporary fix for multi-platform
+#ifdef __HIP_PLATFORM_AMD__
   do i = 1, 6
     gpuarch(i:i) = prop % gcnArchName(i)
   enddo
+#else
+  gpuarch='NVIDIA'
+#endif
 
   stat = hostnm(hostname)
   

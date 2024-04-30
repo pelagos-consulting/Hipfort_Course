@@ -61,10 +61,8 @@ __global__ void fill_chessboard (
         //// Hint: if k = i0 + i1 % 2
         //// Then the chessboard values may be computed as
         //// ((k+1)%2)*light + (k%2)*dark
-        
         int k = i0 + i1 % 2;
         B[offset] = ((k+1)%2)*light + (k%2)*dark;
-
     }
 }
 

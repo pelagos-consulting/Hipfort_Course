@@ -15,6 +15,9 @@ export PATH=$PATH:$RUN_DIR
 # Set the platform, amd or nvidia
 export HIP_PLATFORM=nvidia
 
+# Must set the GPU architecture here, i.e sm_86, gfx90a, gfx1035 
+export GPU_ARCH=sm_86
+
 # Set Fortran compiler
 export FC=hipfc
 

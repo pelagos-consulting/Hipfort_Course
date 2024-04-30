@@ -51,15 +51,15 @@ program chessboard
     integer :: i, j
 
     ! Declare the chessboard on the host as a static array
-    real :: B_h(M,N)
+    real(c_float), target :: B_h(M,N)
 
     ! Define what light and dark means
     real(c_float) :: light = 0.0
     real(c_float) :: dark = 1.0
 
     ! Fortran pointer to the chessboard on the device
-    real(kind=c_float), dimension(:,:), pointer :: B_d
-
+    real(c_float), dimension(:,:), pointer :: B_d
+    
     !! Step 1: Find and set the device. 
     !! Use device 0 by default
     call init_device(0)   
@@ -69,7 +69,7 @@ program chessboard
 
     ! Step 3: Call the C function that launches the kernel
     call launch_kernel_hip( &
-        c_loc(B_d), &
+        c_loc(B_d(1,1)), &
         light, &
         dark, &
         int(M, c_int), &
@@ -77,7 +77,7 @@ program chessboard
     )
 
     ! Step 4: Copy from the device back to the host
-    call hipcheck(hipmemcpy(B_h, B_d, size(B_d), hipmemcpydevicetohost))
+    call hipcheck(hipmemcpy(B_h, B_d, size(B_h), hipmemcpydevicetohost))
 
     ! Check the answer by printing it
     do i=1,N

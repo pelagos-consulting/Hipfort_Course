@@ -35,9 +35,11 @@ contains
 
         ! Initialise resources the best practice way
         if (.not. acquired) then
-            ! Initialise HIP
-!            call hipcheck(hipinit(0))
 
+#ifdef __HIP_PLATFORM_AMD__
+            ! Initialise HIP
+            call hipcheck(hipinit(0))
+#endif
             ! We have now acquired HIP
             acquired = .true.
             
