@@ -18,7 +18,6 @@ project(hipfort_course VERSION 1.0.0
 # Fortran compiler flags
 if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU" )
     set( CMAKE_Fortran_FLAGS "-cpp -ffree-line-length-512" )
-    set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=$ENV{GPU_ARCH}" )
     set( CMAKE_Fortran_FLAGS_DEBUG "-g -O1 -C -Wall -fbounds-check -fbacktrace -ffpe-trap=invalid,zero,overflow" )
     set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgfortran")
     set( CMAKE_Fortran_FLAGS_COVERAGE "${CMAKE_Fortran_FLAGS_DEBUG} --coverage")
@@ -36,8 +35,12 @@ find_package(hipfort REQUIRED)
 
 # Set language for kernel code
 set(kernel_lang HIP)
+
 # Set libraries for kernel code
 set(kernel_libs hip::device)
+
+# Set the GPU architecture for the hipfc compiler
+set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=$ENV{GPU_ARCH}" )
 
 if (DEFINED ENV{HIP_PLATFORM})
     if ($ENV{HIP_PLATFORM} STREQUAL nvidia)
@@ -48,13 +51,17 @@ if (DEFINED ENV{HIP_PLATFORM})
         ## Find the CUDA toolkit, 
         ## it must be present if we use HIP_PLATFORM=nvidia 
         find_package(CUDAToolkit REQUIRED)
+        
         set(kernel_lang CUDA)
         
         ## Append the CUDA toolkit libraries to kernel_libs
-        list(APPEND kernel_libs CUDA::cudart CUDA::cuda_driver)
-        message(${kernel_libs})
+        ##list(APPEND kernel_libs CUDA::cudart CUDA::cuda_driver)
+
+        ## Point kernel_libs to the CUDA toolkit libraries
+        set(kernel_libs CUDA::cudart CUDA::cuda_driver)
         
         ## Set your CUDA GPU architectures to use here
+        ## This is to make sure nvcc is compiling for the same architecture
         set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --gpu-architecture=$ENV{GPU_ARCH}")
 
         # Set debug flags
@@ -67,7 +74,7 @@ if (DEFINED ENV{HIP_PLATFORM})
         ## Replace it with CUDA precprocessor definitions
         add_definitions(-D__HIP_PLATFORM_NVCC__ -D__HIP_PLATFORM_NVIDIA__)  
     else()
-        message("Performing compilation for an AMD backend.")        
+        message("Performing compilation for an AMD backend.")
     endif()
 else()
     message("Performing compilation for an AMD backend.")      
