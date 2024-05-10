@@ -11,7 +11,7 @@ endif()
 
 project(hipfort_course VERSION 1.0.0
     DESCRIPTION "Example codes to accompany a course in hipfort"
-    LANGUAGES HIP CXX Fortran
+    LANGUAGES C HIP CXX Fortran
 )
 
 # Default Fortran compiler flags
@@ -33,58 +33,73 @@ find_package(hip REQUIRED)
 # HIPFort
 find_package(hipfort REQUIRED)
 
-# Set language for kernel code
-set(kernel_lang HIP)
+# Set the GPU architecture for the hipfc compiler and enable OpenMP
+set( CMAKE_Fortran_FLAGS "-fPIC -fopenmp" )
 
-# Set libraries for kernel code
-set(kernel_libs hip::device)
-
-# Set the GPU architecture for the hipfc compiler
-set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=$ENV{GPU_ARCH}" )
-
-if (DEFINED ENV{HIP_PLATFORM})
-    if ($ENV{HIP_PLATFORM} STREQUAL nvidia)
-        message("Performing compilation for an NVIDIA backend.")
-        enable_language(CUDA)
-        set(CUDA_SEPARABLE_COMPILATION ON)
+if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
+    message("Performing compilation for an NVIDIA backend.")
+    enable_language(CUDA)
+    set(CUDA_SEPARABLE_COMPILATION ON)
         
-        ## Find the CUDA toolkit, 
-        ## it must be present if we use HIP_PLATFORM=nvidia 
-        find_package(CUDAToolkit REQUIRED)
-        
-        set(kernel_lang CUDA)
-        
-        ## Append the CUDA toolkit libraries to kernel_libs
-        ##list(APPEND kernel_libs CUDA::cudart CUDA::cuda_driver)
+    ## Find the CUDA toolkit, 
+    ## it must be present if we use HIP_PLATFORM=nvidia 
+    find_package(CUDAToolkit REQUIRED)
 
-        ## Point kernel_libs to the CUDA toolkit libraries
-        set(kernel_libs CUDA::cudart CUDA::cuda_driver)
-        
-        ## Set your CUDA GPU architectures to use here
-        ## This is to make sure nvcc is compiling for the same architecture
-        set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --gpu-architecture=$ENV{GPU_ARCH}")
+    # Set the kernel language to use
+    set(kernel_lang CUDA)
 
-        # Set debug flags
-        set(CMAKE_CUDA_FLAGS_DEBUG "-g -G")
-
-        ## Change global preprocessor defintions for CUDA sources
+    ## Set kernel_libs
+    set(kernel_libs CUDA::cudart CUDA::cuda_driver)
         
-        ## Remove any preprocessor definitions for AMD
-        remove_definitions(-D__HIP_PLATFORM_HCC__ -D__HIP_PLATFORM_AMD__)
-        ## Replace it with CUDA precprocessor definitions
-        add_definitions(-D__HIP_PLATFORM_NVCC__ -D__HIP_PLATFORM_NVIDIA__)  
-    else()
-        message("Performing compilation for an AMD backend.")
-    endif()
+    # Set GPU architectures
+    set(CMAKE_CUDA_ARCHITECTURES $ENV{GPU_ARCH})
+
+    # Add arch information to hipfc compiler flags as well
+    foreach(arch $ENV{GPU_ARCH})
+        set(CMAKE_Fortran_FLAGS "${CMAKE_FORTRAN_FLAGS} --offload-arch=sm_${arch}")
+    endforeach()
+
+    # Set compiler flags
+    set(CMAKE_CUDA_FLAGS "-g -Xcompiler -fopenmp -Xcompiler -fPIC")
+    set(CMAKE_CUDA_FLAGS_DEBUG "-G -O0")
+    set(CMAKE_CUDA_FLAGS_PROFILE "-pg -O3")
+    set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
+
+    ## Change global preprocessor defintions for CUDA sources
+        
+    ## Remove any preprocessor definitions for AMD
+    remove_definitions(-D__HIP_PLATFORM_HCC__ -D__HIP_PLATFORM_AMD__)
+    ## Replace it with CUDA precprocessor definitions
+    add_definitions(-D__HIP_PLATFORM_NVCC__ -D__HIP_PLATFORM_NVIDIA__)  
+
 else()
-    message("Performing compilation for an AMD backend.")      
+
+    message("Performing compilation for an AMD backend.")
+    # Set language for device code
+    set(kernel_lang HIP)
+
+    # Set libraries for kernel code
+    set(kernel_libs hip::device)
+
+    # Set the GPU architecture
+    set(CMAKE_HIP_ARCHITECTURES, $ENV{GPU_ARCH})
+    
+    # Add arch information to hipfc Fortran compiler flags as well
+    foreach(arch $ENV{GPU_ARCH})
+        set(CMAKE_Fortran_FLAGS "${CMAKE_FORTRAN_FLAGS} --offload-arch=${arch}")
+    endforeach()
+
+    # Set HIP flags
+    set(CMAKE_HIP_FLAGS "${CMAKE_HIP_FLAGS} -g -fopenmp")
+    set(CMAKE_HIP_FLAGS_DEBUG, "-ggdb -O1")
+    set(CMAKE_HIP_FLAGS_PROFILE, "-pg -O3")
+    set(CMAKE_HIP_FLAGS_RELEASE, "-O3")
+    
 endif()
 
-# ----- end dependencies ----- #
-
 # Example Codes
-add_subdirectory(${CMAKE_SOURCE_DIR}/Memory_Management/memcpy_benchmark)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Fortran_Refresher)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Hipfort_Examples)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_CPU)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_GPU)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Memory_Management/memcpy_benchmark)
