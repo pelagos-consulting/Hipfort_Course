@@ -98,8 +98,8 @@ else()
 endif()
 
 # Example Codes
-add_subdirectory(${CMAKE_SOURCE_DIR}/Fortran_Refresher)
-add_subdirectory(${CMAKE_SOURCE_DIR}/Hipfort_Examples)
-add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_CPU)
-add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/Chessboard_GPU)
-add_subdirectory(${CMAKE_SOURCE_DIR}/Memory_Management/memcpy_benchmark)
+add_subdirectory(${CMAKE_SOURCE_DIR}/L1_Fortran_Refresher)
+add_subdirectory(${CMAKE_SOURCE_DIR}/L5_Hipfort_Examples)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/E1_Chessboard_CPU)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/E2_Chessboard_GPU)
+add_subdirectory(${CMAKE_SOURCE_DIR}/L6_Memory_Management/memcpy_benchmark)
