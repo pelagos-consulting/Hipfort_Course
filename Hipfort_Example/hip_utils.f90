@@ -76,4 +76,29 @@ contains
         end if
     end subroutine reset_device
 
+    logical function supports_managed_memory(dev_id)
+        use hipfort
+        use hipfort_check
+        use iso_c_binding
+
+        !! check if the device `dev_id` supports managed memory
+
+        ! The id of the device to use
+        integer, intent(in) :: dev_id
+        ! Local
+        type(c_ptr) :: managed_memory
+        integer, pointer :: supported
+
+        allocate(managed_memory)
+        call hipcheck(hipDeviceGetAttribute(managed_memory, &
+            hipDeviceAttributeManagedMemory,dev_id)) ! Check if managed memory is supported on this device
+
+        call c_f_pointer(managed_memory, supported) ! convert output to c_ptr
+
+        supports_managed_memory = supported! convert to logical and output
+        deallocate(managed_memory)
+
+    end function supports_managed_memory
+
+
 end module hip_utils
