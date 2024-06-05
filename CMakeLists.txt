@@ -33,10 +33,11 @@ endif()
 find_package(hip REQUIRED)
 
 # HIPFort
-find_package(hipfort REQUIRED)
+#find_package(hipfort REQUIRED)
+
 
 # Set the GPU architecture for the hipfc compiler and enable OpenMP
-set( CMAKE_Fortran_FLAGS "-fPIC -fopenmp" )
+set( CMAKE_Fortran_FLAGS "-v -fPIC" )
 
 if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     message("Performing compilation for an NVIDIA backend.")
@@ -62,7 +63,7 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     endforeach()
 
     # Set compiler flags
-    set(CMAKE_CUDA_FLAGS "-g -Xcompiler -fopenmp -Xcompiler -fPIC")
+    set(CMAKE_CUDA_FLAGS "-g -Xcompiler -Xcompiler -fPIC")
     set(CMAKE_CUDA_FLAGS_DEBUG "-G -O0")
     set(CMAKE_CUDA_FLAGS_PROFILE "-pg -O3")
     set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
@@ -73,6 +74,10 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     remove_definitions(-D__HIP_PLATFORM_HCC__ -D__HIP_PLATFORM_AMD__)
     ## Replace it with CUDA precprocessor definitions
     add_definitions(-D__HIP_PLATFORM_NVCC__ -D__HIP_PLATFORM_NVIDIA__)  
+
+    find_library(HIPFORT_LIBRARIES NAMES libhipfort-nvptx.a HINTS ENV HIPFORT_ROOT REQUIRED)
+    find_path(HIPFORT_INCLUDE_DIRS hipfort.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/amdgcn/ REQUIRED)
+
 
 else()
 
@@ -92,10 +97,14 @@ else()
     endforeach()
 
     # Set HIP flags
-    set(CMAKE_HIP_FLAGS "${CMAKE_HIP_FLAGS} -g -fopenmp")
+    set(CMAKE_HIP_FLAGS "${CMAKE_HIP_FLAGS} -g")
     set(CMAKE_HIP_FLAGS_DEBUG, "-ggdb -O1")
     set(CMAKE_HIP_FLAGS_PROFILE, "-pg -O3")
     set(CMAKE_HIP_FLAGS_RELEASE, "-O3")
+
+    find_library(HIPFORT_LIBRARIES NAMES libhipfort-amdgcn.a HINTS ENV HIPFORT_ROOT REQUIRED)
+    find_path(HIPFORT_INCLUDE_DIRS hipfort.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/amdgcn/ REQUIRED)
+
     
 endif()
 
