@@ -92,14 +92,12 @@ contains
         type(c_ptr) :: managed_memory
         integer, pointer :: supported
 
-        allocate(managed_memory)
         call hipcheck(hipDeviceGetAttribute(managed_memory, &
             hipDeviceAttributeManagedMemory,dev_id)) ! Check if managed memory is supported on this device
 
         call c_f_pointer(managed_memory, supported) ! convert output to c_ptr
 
         supports_managed_memory = supported! convert to logical and output
-        deallocate(managed_memory)
 
     end function supports_managed_memory
 

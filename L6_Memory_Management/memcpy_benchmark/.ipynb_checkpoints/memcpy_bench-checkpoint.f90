@@ -127,8 +127,7 @@ subroutine float32_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
   real(real64), intent(out) :: walltime
   real(real64), intent(out) :: bandwidth_gb_s
   ! Local
-  type(c_ptr) :: host_data
-  type(c_ptr) :: dev_data
+  type(c_ptr) :: dev_data, host_data
   integer :: i
   integer(c_size_t) :: array_size
   real(real64) :: t1
@@ -136,8 +135,7 @@ subroutine float32_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
 
   array_size = array_length*real32
 
-  call hipcheck(hipmallochost(host_data,array_size))
-
+  call hipcheck(hipMallocHost(host_data,array_size))
   call hipcheck(hipmalloc(dev_data,array_size))
 
   call cpu_time(t1)
@@ -154,7 +152,7 @@ subroutine float32_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
   bandwidth_gb_s = real(array_size,real64)/walltime/1.0E9
 
   call hipcheck(hipfree(dev_data))
-  call hipcheck(hipfreehost(host_data))
+  call hipcheck(hipFreeHost(host_data))
 
 end subroutine float32_pinned_memcpy_h2d
 
@@ -171,16 +169,14 @@ subroutine float32_pinned_memcpy_d2h( array_length, nreps, walltime, bandwidth_g
   real(real64), intent(out) :: walltime
   real(real64), intent(out) :: bandwidth_gb_s
   ! Local
-  type(c_ptr) :: host_data
-  type(c_ptr) :: dev_data
+  type(c_ptr) :: dev_data, host_data
   integer :: i
   integer(c_size_t) :: array_size
   real(real64) :: t1
   real(real64) :: t2
 
   array_size = array_length*real32
-  call hipcheck(hipmallochost(host_data,array_size))
-
+  call hipcheck(hipMallocHost(host_data,array_size))
   call hipcheck(hipmalloc(dev_data,array_size))
 
   call cpu_time(t1)
@@ -197,7 +193,7 @@ subroutine float32_pinned_memcpy_d2h( array_length, nreps, walltime, bandwidth_g
   bandwidth_gb_s = real(array_size,real64)/walltime/1.0E9
 
   call hipcheck(hipfree(dev_data))
-  call hipcheck(hipfreehost(host_data))
+  call hipcheck(hipFreeHost(host_data))
 
 end subroutine float32_pinned_memcpy_d2h
 
@@ -296,8 +292,7 @@ subroutine float64_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
   real(real64), intent(out) :: walltime
   real(real64), intent(out) :: bandwidth_gb_s
   ! Local
-  type(c_ptr) :: host_data
-  type(c_ptr) :: dev_data
+  type(c_ptr) :: dev_data, host_data
   integer :: i
   integer(c_size_t) :: array_size
   real(real64) :: t1
@@ -305,8 +300,7 @@ subroutine float64_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
 
   array_size = array_length*real64
 
-  call hipcheck(hipmallochost(host_data,array_size))
-
+  call hipcheck(hipMallocHost(host_data,array_size))
   call hipcheck(hipmalloc(dev_data,array_size))
 
   call cpu_time(t1)
@@ -323,7 +317,7 @@ subroutine float64_pinned_memcpy_h2d( array_length, nreps, walltime, bandwidth_g
   bandwidth_gb_s = real(array_size,real64)/walltime/1.0E9
 
   call hipcheck(hipfree(dev_data))
-  call hipcheck(hipfreehost(host_data))
+  call hipcheck(hipFreeHost(host_data))
 
 end subroutine float64_pinned_memcpy_h2d
 
@@ -340,16 +334,14 @@ subroutine float64_pinned_memcpy_d2h( array_length, nreps, walltime, bandwidth_g
   real(real64), intent(out) :: walltime
   real(real64), intent(out) :: bandwidth_gb_s
   ! Local
-  type(c_ptr) :: host_data
-  type(c_ptr) :: dev_data
+  type(c_ptr) :: dev_data, host_data
   integer :: i
   integer(c_size_t) :: array_size
   real(real64) :: t1
   real(real64) :: t2
 
   array_size = array_length*real64
-  call hipcheck(hipmallochost(host_data,array_size))
-
+  call hipcheck(hipMallocHost(host_data,array_size))
   call hipcheck(hipmalloc(dev_data,array_size))
 
   call cpu_time(t1)
@@ -366,7 +358,7 @@ subroutine float64_pinned_memcpy_d2h( array_length, nreps, walltime, bandwidth_g
   bandwidth_gb_s = real(array_size,real64)/walltime/1.0E9
 
   call hipcheck(hipfree(dev_data))
-  call hipcheck(hipfreehost(host_data))
+  call hipcheck(hipFreeHost(host_data))
 
 end subroutine float64_pinned_memcpy_d2h
 
