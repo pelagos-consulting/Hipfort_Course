@@ -59,5 +59,20 @@ set_target_properties(tensoradd_hip_oo
 install(TARGETS tensoradd_hip_oo DESTINATION bin)
 
 
+# tensoradd_hip_fptr_managed - Tensor addition with HIP and Fortran pointers and managed memory
+add_executable (tensoradd_hip_fptr_managed
+    ${CMAKE_CURRENT_SOURCE_DIR}/tensoradd_hip_fptr_managed.f90
+    ${KERNEL_FILES}
+    ${COMMON_FILES}
+)
+# Link in other libraries
+target_link_libraries(tensoradd_hip_fptr_managed ${kernel_libs})
+# This is needed so that the linker used is the Fortran compiler
+set_target_properties(tensoradd_hip_fptr_managed
+    PROPERTIES LINKER_LANGUAGE Fortran
+)                   
+install(TARGETS tensoradd_hip_fptr_managed DESTINATION bin)
+
+
 
 

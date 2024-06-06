@@ -12,6 +12,14 @@ then
 
     export HIP_PLATFORM=amd
     export GPU_ARCH=gfx90a
+elif [[ $HOSTNAME =~ "noether" ]]
+then
+
+    module load gcc/13.2.0 hip/5.7.3 cmake/3.27.9 hipfort/5.7.1
+    export HIP_PLATFORM=amd
+    export GPU_ARCH=gfx90a
+    export HIPFORT_COMPILER=$(which gfortran)
+
 else
     # Load crucial modules
     module load gcc rocm mpich
@@ -46,4 +54,4 @@ export FC=hipfc
 # Set the build type, options are DEBUG, COVERAGE, PROFILE, RELEASE
 export BUILD_TYPE=DEBUG
 
-export HIPFLAGS="-fPIC -fopenmp"
+export HIPFLAGS="-fPIC"
