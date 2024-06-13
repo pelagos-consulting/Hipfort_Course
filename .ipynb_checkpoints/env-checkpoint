@@ -12,20 +12,37 @@ then
 
     export HIP_PLATFORM=amd
     export GPU_ARCH=gfx90a
-else
-    # Load crucial modules
-    module load gcc rocm mpich
+elif [[ $HOSTNAME =~ "noether" ]]
+then
 
-    if module load cuda 2>/dev/null; then
-        # We are using the nvidia backend
-        export HIP_PLATFORM=nvidia
-        # CUDA architectures to support
-        export GPU_ARCH="60;61;70;75;80;86;89;90"
-    else
-        # We are using the AMD backend
-        export HIP_PLATFORM=amd
-        export GPU_ARCH="gfx906;gfx908;gfx90a;gfx1035"
-    fi    
+    module load gcc/13.2.0 hip/5.7.3 cmake/3.27.9 hipfort/5.7.1
+    export HIP_PLATFORM=amd
+    export GPU_ARCH=gfx90a
+    export HIPFORT_COMPILER=$(which gfortran)
+
+else
+
+    # Locations for ROCM and CUDA
+    export ROCM_PATH=/opt/rocm
+    export CUDA_PATH=/usr/local/cuda
+
+    # Set HIPFORT_ROOT
+    export HIPFORT_ROOT=$ROCM_PATH
+
+    # Try to make sure nvcc and hipconfig are in the path
+    export PATH=${PATH}:${ROCM_PATH}/bin:${CUDA_PATH}/bin
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ROCM_PATH}/lib:${CUDA_PATH}/lib64:${ROCM_PATH}/llvm/lib
+    export LIBRARY_PATH=${LIBRARY_PATH}:${ROCM_PATH}/lib:${CUDA_PATH}/lib64:${ROCM_PATH}/llvm/lib
+    export CPATH=${CPATH}:${ROCM_PATH}/include:${CUDA_PATH}/include:${ROCM_PATH}/llvm/include
+
+    # Use a CUDA backend
+    export HIP_PLATFORM=nvidia
+    export GPU_ARCH="60;61;70;75;80;86;89;90"
+    
+    # Use an AMD backend
+    #export HIP_PLATFORM=amd
+    #export GPU_ARCH="gfx906;gfx908;gfx90a;gfx1035"
+
 fi
 
 # Get the directory that this file is located in
@@ -46,4 +63,4 @@ export FC=hipfc
 # Set the build type, options are DEBUG, COVERAGE, PROFILE, RELEASE
 export BUILD_TYPE=DEBUG
 
-export HIPFLAGS="-fPIC -fopenmp"
+export HIPFLAGS="-fPIC"

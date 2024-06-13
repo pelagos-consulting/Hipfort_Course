@@ -9,6 +9,14 @@ if(NOT DEFINED ROCM_PATH)
     endif()
 endif()
 
+if(NOT DEFINED HIPFORT_ROOT)
+    if(NOT DEFINED ENV{HIPFORT_ROOT})
+        set(HIPFORT_ROOT "/opt/rocm/" CACHE PATH "Path to which Hipfort has been installed")
+    else()
+        set(HIPFORT_ROOT $ENV{HIPFORT_ROOT} CACHE PATH "Path to which Hipfort has been installed")
+    endif()
+endif()
+
 project(hipfort_course VERSION 1.0.0
     DESCRIPTION "Example codes to accompany a course in hipfort"
     LANGUAGES C HIP CXX Fortran
@@ -34,7 +42,6 @@ find_package(hip REQUIRED)
 
 # HIPFort
 #find_package(hipfort REQUIRED)
-
 
 # Set the GPU architecture for the hipfc compiler and enable OpenMP
 set( CMAKE_Fortran_FLAGS "-v -fPIC" )
@@ -63,7 +70,7 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     endforeach()
 
     # Set compiler flags
-    set(CMAKE_CUDA_FLAGS "-g -Xcompiler -Xcompiler -fPIC")
+    set(CMAKE_CUDA_FLAGS "-g -Xcompiler -fPIC")
     set(CMAKE_CUDA_FLAGS_DEBUG "-G -O0")
     set(CMAKE_CUDA_FLAGS_PROFILE "-pg -O3")
     set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
@@ -75,7 +82,7 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     ## Replace it with CUDA precprocessor definitions
     add_definitions(-D__HIP_PLATFORM_NVCC__ -D__HIP_PLATFORM_NVIDIA__)  
 
-    find_library(HIPFORT_LIBRARIES NAMES libhipfort-nvptx.a HINTS ENV HIPFORT_ROOT REQUIRED)
+    find_library(HIPFORT_LIBRARIES NAMES libhipfort-nvptx.a HINTS ENV HIPFORT_ROOT PATH_SUFFIXES lib/ REQUIRED)
     find_path(HIPFORT_INCLUDE_DIRS hipfort.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/amdgcn/ REQUIRED)
 
 
@@ -102,7 +109,7 @@ else()
     set(CMAKE_HIP_FLAGS_PROFILE, "-pg -O3")
     set(CMAKE_HIP_FLAGS_RELEASE, "-O3")
 
-    find_library(HIPFORT_LIBRARIES NAMES libhipfort-amdgcn.a HINTS ENV HIPFORT_ROOT REQUIRED)
+    find_library(HIPFORT_LIBRARIES NAMES libhipfort-amdgcn.a HINTS ENV HIPFORT_ROOT PATH_SUFFIXES lib/ REQUIRED)
     find_path(HIPFORT_INCLUDE_DIRS hipfort.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/amdgcn/ REQUIRED)
 
     
