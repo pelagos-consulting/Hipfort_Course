@@ -20,13 +20,20 @@ then
     export GPU_ARCH=gfx90a
     export HIPFORT_COMPILER=$(which gfortran)
 
+elif [[ $HOSTNAME =~ "fullcircle" ]]
+then
+
+    module load gcc rocm cuda hipfort
+    export HIP_PLATFORM=nvidia
+    export GPU_ARCH="86"
+
 else
 
     # Locations for ROCM and CUDA
     export ROCM_PATH=/opt/rocm
     export CUDA_PATH=/usr/local/cuda
 
-    # Set HIPFORT_ROOT
+    # Must set HIPFORT_ROOT environment variable
     export HIPFORT_ROOT=$ROCM_PATH
 
     # Try to make sure nvcc and hipconfig are in the path

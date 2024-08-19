@@ -19,10 +19,8 @@ endif()
 
 project(hipfort_course VERSION 1.0.0
     DESCRIPTION "Example codes to accompany a course in hipfort"
-    LANGUAGES C HIP CXX Fortran
+    LANGUAGES C CXX Fortran
 )
-
-# hardcode C++ compiler to hipcc -- interpret .cpp extension as hip language
 
 # Default Fortran compiler flags
 # Fortran compiler flags
@@ -55,10 +53,10 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     ## it must be present if we use HIP_PLATFORM=nvidia 
     find_package(CUDAToolkit REQUIRED)
 
-    # Set the kernel language to use
+    # Set the kernel language for device code
     set(kernel_lang CUDA)
 
-    ## Set kernel_libs
+    ## Set libraries to link to for device code
     set(kernel_libs CUDA::cudart CUDA::cuda_driver)
         
     # Set GPU architectures
@@ -82,6 +80,7 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     ## Replace it with CUDA precprocessor definitions
     add_definitions(-D__HIP_PLATFORM_NVCC__ -D__HIP_PLATFORM_NVIDIA__)  
 
+    # Locate the hipfort library
     find_library(HIPFORT_LIBRARIES NAMES libhipfort-nvptx.a HINTS ENV HIPFORT_ROOT PATH_SUFFIXES lib/ REQUIRED)
     find_path(HIPFORT_INCLUDE_DIRS hipfort.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/amdgcn/ REQUIRED)
 
@@ -89,6 +88,10 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
 else()
 
     message("Performing compilation for an AMD backend.")
+    
+    # Enable the HIP language
+    enable_language(HIP)
+
     # Set language for device code
     set(kernel_lang HIP)
 
@@ -109,12 +112,14 @@ else()
     set(CMAKE_HIP_FLAGS_PROFILE, "-pg -O3")
     set(CMAKE_HIP_FLAGS_RELEASE, "-O3")
 
+    # Locate the hipfort library
     find_library(HIPFORT_LIBRARIES NAMES libhipfort-amdgcn.a HINTS ENV HIPFORT_ROOT PATH_SUFFIXES lib/ REQUIRED)
     find_path(HIPFORT_INCLUDE_DIRS hipfort.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/amdgcn/ REQUIRED)
 
     
 endif()
 
+# Debugging
 get_cmake_property(_variableNames VARIABLES)
 list (SORT _variableNames)
 foreach (_variableName ${_variableNames})
