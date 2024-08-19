@@ -27,6 +27,13 @@ then
     export HIP_PLATFORM=nvidia
     export GPU_ARCH="86"
 
+elif [[ $HOSTNAME =~ "workshop" ]]
+then
+
+    module load gcc rocm hipfort
+    export HIP_PLATFORM=amd
+    export GPU_ARCH="gfx1035"
+
 else
 
     # Locations for ROCM and CUDA
