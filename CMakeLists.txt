@@ -25,7 +25,7 @@ project(hipfort_course VERSION 1.0.0
 # Default Fortran compiler flags
 # Fortran compiler flags
 if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU" )
-    set( CMAKE_Fortran_FLAGS "-cpp -ffree-line-length-512" )
+    set( CMAKE_Fortran_FLAGS "-cpp -ffree-line-length-512 -fPIC" )
     set( CMAKE_Fortran_FLAGS_DEBUG "-g -O1 -C -Wall -fbounds-check -fbacktrace -ffpe-trap=invalid,zero,overflow" )
     set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgfortran")
     set( CMAKE_Fortran_FLAGS_COVERAGE "${CMAKE_Fortran_FLAGS_DEBUG} --coverage")
@@ -37,12 +37,6 @@ endif()
 
 # HIP
 find_package(hip REQUIRED)
-
-# HIPFort
-#find_package(hipfort REQUIRED)
-
-# Set the GPU architecture for the hipfc compiler and enable OpenMP
-set( CMAKE_Fortran_FLAGS "-v -fPIC" )
 
 if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     message("Performing compilation for an NVIDIA backend.")
@@ -64,7 +58,7 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
 
     # Add arch information to hipfc compiler flags as well
     foreach(arch $ENV{GPU_ARCH})
-        set(CMAKE_Fortran_FLAGS "${CMAKE_FORTRAN_FLAGS} --offload-arch=sm_${arch}")
+        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}")
     endforeach()
 
     # Set compiler flags
@@ -82,7 +76,7 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
 
     # Locate the hipfort library
     find_library(HIPFORT_LIBRARIES NAMES libhipfort-nvptx.a HINTS ENV HIPFORT_ROOT PATH_SUFFIXES lib/ REQUIRED)
-    find_path(HIPFORT_INCLUDE_DIRS hipfort.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/amdgcn/ REQUIRED)
+    find_path(HIPFORT_INCLUDE_DIRS hipfort.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/nvptx/ REQUIRED)
 
 
 else()
@@ -103,7 +97,7 @@ else()
     
     # Add arch information to hipfc Fortran compiler flags as well
     foreach(arch $ENV{GPU_ARCH})
-        set(CMAKE_Fortran_FLAGS "${CMAKE_FORTRAN_FLAGS} --offload-arch=${arch}")
+        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=${arch}")
     endforeach()
 
     # Set HIP flags
@@ -119,7 +113,7 @@ else()
     
 endif()
 
-# Debugging
+# Debugging and display
 get_cmake_property(_variableNames VARIABLES)
 list (SORT _variableNames)
 foreach (_variableName ${_variableNames})
