@@ -27,6 +27,10 @@ then
     export HIP_PLATFORM=nvidia
     export GPU_ARCH="86"
 
+    #export HIP_PLATFORM=amd
+    #export GPU_ARCH="gfx1035"
+
+
 elif [[ $HOSTNAME =~ "workshop" ]]
 then
 

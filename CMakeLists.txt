@@ -50,16 +50,13 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     # Set the kernel language for device code
     set(kernel_lang CUDA)
 
-    ## Set libraries to link to for device code
-    set(kernel_libs CUDA::cudart CUDA::cuda_driver)
-        
     # Set GPU architectures
     set(CMAKE_CUDA_ARCHITECTURES $ENV{GPU_ARCH})
 
     # Add arch information to hipfc compiler flags as well
-    foreach(arch $ENV{GPU_ARCH})
-        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}")
-    endforeach()
+    #foreach(arch $ENV{GPU_ARCH})
+    #    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}")
+    #endforeach()
 
     # Set compiler flags
     set(CMAKE_CUDA_FLAGS "-g -Xcompiler -fPIC")
@@ -78,6 +75,9 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     find_library(HIPFORT_LIBRARIES NAMES libhipfort-nvptx.a HINTS ENV HIPFORT_ROOT PATH_SUFFIXES lib/ REQUIRED)
     find_path(HIPFORT_INCLUDE_DIRS hipfort.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/nvptx/ REQUIRED)
 
+    ## Set libraries to link to for device code
+    set(kernel_libs CUDA::cudart CUDA::cuda_driver ${HIPFORT_LIBRARIES})
+    include_directories(${HIPFORT_INCLUDE_DIRS})
 
 else()
 
@@ -88,9 +88,6 @@ else()
 
     # Set language for device code
     set(kernel_lang HIP)
-
-    # Set libraries for kernel code
-    set(kernel_libs hip::device)
 
     # Set the GPU architecture
     set(CMAKE_HIP_ARCHITECTURES, $ENV{GPU_ARCH})
@@ -110,6 +107,9 @@ else()
     find_library(HIPFORT_LIBRARIES NAMES libhipfort-amdgcn.a HINTS ENV HIPFORT_ROOT PATH_SUFFIXES lib/ REQUIRED)
     find_path(HIPFORT_INCLUDE_DIRS hipfort.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/amdgcn/ REQUIRED)
 
+    ## Set libraries to link to for device code
+    set(kernel_libs hip::device ${HIPFORT_LIBRARIES})
+    include_directories(${HIPFORT_INCLUDE_DIRS})
     
 endif()
 
@@ -125,4 +125,5 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/L1_Fortran_Refresher)
 add_subdirectory(${CMAKE_SOURCE_DIR}/L5_Hipfort_Examples)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/E1_Chessboard_CPU)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/E2_Chessboard_GPU)
+add_subdirectory(${CMAKE_SOURCE_DIR}/L6_Memory_Management)
 add_subdirectory(${CMAKE_SOURCE_DIR}/L6_Memory_Management/memcpy_benchmark)
