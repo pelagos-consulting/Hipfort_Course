@@ -38,9 +38,23 @@ endif()
 # HIP
 find_package(hip REQUIRED)
 
+# Choose to use either an NVIDIA package or a HIP package
 if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
+    
     message("Performing compilation for an NVIDIA backend.")
+
+    # Set GPU architectures
+    set(CMAKE_CUDA_ARCHITECTURES $ENV{GPU_ARCH})
+
+    # Set compiler flags
+    set(CMAKE_CUDA_FLAGS "-g -allow-unsupported-compiler -Xcompiler -fPIC")
+    set(CMAKE_CUDA_FLAGS_DEBUG "-G -O0")
+    set(CMAKE_CUDA_FLAGS_PROFILE "-pg -O3")
+    set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
+
+    # Enable the CUDA language
     enable_language(CUDA)
+    
     set(CUDA_SEPARABLE_COMPILATION ON)
         
     ## Find the CUDA toolkit, 
@@ -50,19 +64,10 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     # Set the kernel language for device code
     set(kernel_lang CUDA)
 
-    # Set GPU architectures
-    set(CMAKE_CUDA_ARCHITECTURES $ENV{GPU_ARCH})
-
     # Add arch information to hipfc compiler flags as well
-    #foreach(arch $ENV{GPU_ARCH})
-    #    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}")
-    #endforeach()
-
-    # Set compiler flags
-    set(CMAKE_CUDA_FLAGS "-g -Xcompiler -fPIC")
-    set(CMAKE_CUDA_FLAGS_DEBUG "-G -O0")
-    set(CMAKE_CUDA_FLAGS_PROFILE "-pg -O3")
-    set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
+    foreach(arch $ENV{GPU_ARCH})
+        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}")
+    endforeach()
 
     ## Change global preprocessor defintions for CUDA sources
         
