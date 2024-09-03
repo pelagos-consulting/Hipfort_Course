@@ -40,9 +40,33 @@ set_target_properties(pinned_mem
 )                      
 install(TARGETS pinned_mem DESTINATION bin)
 
+# Memory transfers using synchronous interface
+add_executable (memcpy_sync
+    ${CMAKE_CURRENT_SOURCE_DIR}/memcpy_sync.f90
+    #${KERNEL_FILES}
+    ${COMMON_FILES}
+)
+# Link in other libraries
+target_link_libraries(memcpy_sync ${kernel_libs})
+# This is needed so that the linker used is the Fortran compiler
+set_target_properties(memcpy_sync
+    PROPERTIES LINKER_LANGUAGE Fortran
+)                      
+install(TARGETS memcpy_sync DESTINATION bin)
 
-
-
+# Memory transfers using asynchronous interface
+add_executable (memcpy_async
+    ${CMAKE_CURRENT_SOURCE_DIR}/memcpy_async.f90
+    #${KERNEL_FILES}
+    ${COMMON_FILES}
+)
+# Link in other libraries
+target_link_libraries(memcpy_async ${kernel_libs})
+# This is needed so that the linker used is the Fortran compiler
+set_target_properties(memcpy_async
+    PROPERTIES LINKER_LANGUAGE Fortran
+)                      
+install(TARGETS memcpy_async DESTINATION bin)
 
 
 

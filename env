@@ -23,12 +23,12 @@ then
 elif [[ $HOSTNAME =~ "fullcircle" ]]
 then
 
-    module load rocm 
-    export HIP_PLATFORM=nvidia
-    export GPU_ARCH="86"
+    module load gcc rocm cuda hipfort
+    #export HIP_PLATFORM=nvidia
+    #export GPU_ARCH="86"
 
-    #export HIP_PLATFORM=amd
-    #export GPU_ARCH="gfx1035"
+    export HIP_PLATFORM=amd
+    export GPU_ARCH="gfx1035"
 
 
 elif [[ $HOSTNAME =~ "workshop" ]]
