@@ -40,6 +40,21 @@ set_target_properties(pinned_mem
 )                      
 install(TARGETS pinned_mem DESTINATION bin)
 
+# Managed memory example
+add_executable (managed_mem
+    ${CMAKE_CURRENT_SOURCE_DIR}/managed_mem.f90
+    #${KERNEL_FILES}
+    ${COMMON_FILES}
+)
+# Link in other libraries
+target_link_libraries(managed_mem ${kernel_libs})
+# This is needed so that the linker used is the Fortran compiler
+set_target_properties(managed_mem
+    PROPERTIES LINKER_LANGUAGE Fortran
+)                      
+install(TARGETS managed_mem DESTINATION bin)
+
+
 # Memory transfers using synchronous interface
 add_executable (memcpy_sync
     ${CMAKE_CURRENT_SOURCE_DIR}/memcpy_sync.f90

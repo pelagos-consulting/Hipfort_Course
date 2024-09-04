@@ -88,16 +88,24 @@ contains
 
         ! The id of the device to use
         integer, intent(in) :: dev_id
-        ! Local
-        type(c_ptr) :: managed_memory
-        integer, pointer :: supported
 
-        call hipcheck(hipDeviceGetAttribute(managed_memory, &
-            hipDeviceAttributeManagedMemory,dev_id)) ! Check if managed memory is supported on this device
+        ! Structure to store GPU properties
+        type(hipdeviceprop_t) :: prop
 
-        call c_f_pointer(managed_memory, supported) ! convert output to c_ptr
+        ! Get device properties
+        call hipcheck(hipgetdeviceproperties(prop, dev_id))        
 
-        supports_managed_memory = supported! convert to logical and output
+        ! Check if managed memory is supported on dev_id
+        ! this method is not cross-platform
+        !call hipcheck(hipDeviceGetAttribute(c_loc(supported), &
+        !    hipDeviceAttributeManagedMemory,dev_id)) 
+
+        ! Default answer
+        supports_managed_memory = .false. 
+
+        if (prop%managedmemory /= 0) then
+            supports_managed_memory = .true. ! convert to logical and output
+        endif
 
     end function supports_managed_memory
 
