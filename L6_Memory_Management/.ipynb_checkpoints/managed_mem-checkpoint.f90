@@ -9,11 +9,12 @@ program managed_mem
     
     implicit none
     
-    real,pointer,dimension(:) :: f, x
+    real(c_float),pointer,dimension(:,:) :: f, x
     
     type(c_ptr) :: stream
-    
-    integer, parameter :: N = 1000
+
+    integer, parameter :: M = 10
+    integer, parameter :: N = 50
 
     ! Choose device 0 by default
     integer :: dev_id = 0
@@ -27,8 +28,8 @@ program managed_mem
     endif
 
     ! Allocate managed memory 
-    call hipcheck(hipMallocManaged(f,N,hipMemAttachGlobal))
-    call hipcheck(hipMallocManaged(x,N,hipMemAttachGlobal))
+    call hipcheck(hipMallocManaged(f, dims=(/M, N/), flags=hipMemAttachGlobal))
+    call hipcheck(hipMallocManaged(x, dims=(/M, N/), flags=hipMemAttachGlobal))
 
 #ifdef __HIP_PLATFORM_AMD__ 
     ! Set coarse-grained coherence for f on device id 0
@@ -44,11 +45,15 @@ program managed_mem
     ! Pre-fetch `x` to device id 0 on stream 0
     call hipcheck(hipMemPrefetchAsync(c_loc(x),sizeof(x),dev_id,stream))
     
-    ! call device_subroutine(f, x)
+    ! call device_subroutine(f, x, stream)
     
     call hipcheck(hipDeviceSynchronize())
     
     ! call host_subroutine(f, x)
+
+    ! Free up memory
+    call hipcheck(hipFree(f))
+    call hipcheck(hipFree(x))
 
     ! Release all resources and reset the compute device
     call reset_device()

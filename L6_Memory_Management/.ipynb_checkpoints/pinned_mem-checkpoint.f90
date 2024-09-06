@@ -10,7 +10,7 @@ program pinned_mem
   integer, parameter :: N=1000
   integer, parameter :: M=5000
 
-  real :: real_element
+  real(c_float) :: real_element
   
   type(c_ptr) :: f_host
   type(c_ptr) :: f_device

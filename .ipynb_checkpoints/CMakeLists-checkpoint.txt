@@ -43,14 +43,8 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     
     message("Performing compilation for an NVIDIA backend.")
 
-    # Set GPU architectures
+    # Set GPU architectures before enabling CUDA
     set(CMAKE_CUDA_ARCHITECTURES $ENV{GPU_ARCH})
-
-    # Set compiler flags
-    set(CMAKE_CUDA_FLAGS "-g -allow-unsupported-compiler -Xcompiler -fPIC")
-    set(CMAKE_CUDA_FLAGS_DEBUG "-G -O0")
-    set(CMAKE_CUDA_FLAGS_PROFILE "-pg -O3")
-    set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
 
     # Enable the CUDA language
     enable_language(CUDA)
@@ -68,6 +62,12 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     foreach(arch $ENV{GPU_ARCH})
         set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}")
     endforeach()
+
+    # Set compiler flags
+    set(CMAKE_CUDA_FLAGS "-g -Xcompiler -fPIC")
+    set(CMAKE_CUDA_FLAGS_DEBUG "-G -O0")
+    set(CMAKE_CUDA_FLAGS_PROFILE "-pg -O3")
+    set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
 
     ## Change global preprocessor defintions for CUDA sources
         
@@ -118,17 +118,18 @@ else()
     
 endif()
 
-# Debugging and display
-get_cmake_property(_variableNames VARIABLES)
-list (SORT _variableNames)
-foreach (_variableName ${_variableNames})
-    message(STATUS "${_variableName}=${${_variableName}}")
-endforeach()
+## Debugging and display
+## get_cmake_property(_variableNames VARIABLES)
+## list (SORT _variableNames)
+##foreach (_variableName ${_variableNames})
+##    message(STATUS "${_variableName}=${${_variableName}}")
+##endforeach()
 
 # Example Codes
 add_subdirectory(${CMAKE_SOURCE_DIR}/L1_Fortran_Refresher)
-add_subdirectory(${CMAKE_SOURCE_DIR}/L5_Hipfort_Examples)
+add_subdirectory(${CMAKE_SOURCE_DIR}/L5_hipFORT_Examples)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/E1_Chessboard_CPU)
 add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/E2_Chessboard_GPU)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Exercises/E3_Managed_Memory)
 add_subdirectory(${CMAKE_SOURCE_DIR}/L6_Memory_Management)
 add_subdirectory(${CMAKE_SOURCE_DIR}/L6_Memory_Management/memcpy_benchmark)
