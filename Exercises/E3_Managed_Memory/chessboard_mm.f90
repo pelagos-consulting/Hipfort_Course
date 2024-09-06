@@ -1,5 +1,5 @@
 
-program chessboard
+program chessboard_mm
     !! Program to fill a chessboard
     !! using a HIP kernel on the compute device 
     !! 
@@ -65,7 +65,7 @@ program chessboard
     call init_device(0)   
 
     ! Step 2: Allocate memory for pointer B_d
-    call hipcheck(hipmalloc(B_d, M, N))
+    call hipcheck(hipMalloc(B_d, M, N))
 
     ! Step 3: Call the C function that launches the kernel
     call launch_kernel_hip( &
@@ -97,5 +97,5 @@ program chessboard
     ! Step 6: Reset the GPU to make sure all resources are released
     call reset_device
     
-end program chessboard
+end program chessboard_mm
 

@@ -1,5 +1,5 @@
 
-program chessboard
+program chessboard_mm
     !! Program to fill a chessboard
     !! using a HIP kernel on the compute device 
     !! 
@@ -97,5 +97,5 @@ program chessboard
     ! Step 6: Reset the GPU to make sure all resources are released
     call reset_device
     
-end program chessboard
+end program chessboard_mm
 

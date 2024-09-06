@@ -50,6 +50,7 @@ program chessboard_mm_answer
     ! Matrix indices
     integer :: i, j
 
+    ! Fortran pointer to the chessboard
     real(c_float), dimension(:,:), pointer :: B
 
     ! Define what light and dark means
