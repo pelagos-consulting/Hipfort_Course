@@ -119,11 +119,11 @@ else()
 endif()
 
 ## Debugging and display
-## get_cmake_property(_variableNames VARIABLES)
-## list (SORT _variableNames)
-##foreach (_variableName ${_variableNames})
-##    message(STATUS "${_variableName}=${${_variableName}}")
-##endforeach()
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+    message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()
 
 # Example Codes
 add_subdirectory(${CMAKE_SOURCE_DIR}/L1_Fortran_Refresher)
