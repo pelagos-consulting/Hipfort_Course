@@ -59,9 +59,9 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     set(kernel_lang CUDA)
 
     # Add arch information to hipfc compiler flags as well
-    foreach(arch $ENV{GPU_ARCH})
-        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}")
-    endforeach()
+    if(CMAKE_FORTRAN_COMPILER MATCHES "hipfc$")
+    	set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}")
+    endif()
 
     # Set compiler flags
     set(CMAKE_CUDA_FLAGS "-g -Xcompiler -fPIC")
@@ -98,9 +98,9 @@ else()
     set(CMAKE_HIP_ARCHITECTURES, $ENV{GPU_ARCH})
     
     # Add arch information to hipfc Fortran compiler flags as well
-    foreach(arch $ENV{GPU_ARCH})
-        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=${arch}")
-    endforeach()
+    if(CMAKE_FORTRAN_COMPILER MATCHES "hipfc$")
+    	set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=${arch}")
+    endif()
 
     # Set HIP flags
     set(CMAKE_HIP_FLAGS "${CMAKE_HIP_FLAGS} -g")
