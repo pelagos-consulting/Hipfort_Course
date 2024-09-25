@@ -2,7 +2,8 @@
 
 if [[ $HOSTNAME =~ "setonix" ]]
 then
-    #module swap PrgEnv-gnu/8.4.0 PrgEnv-cray
+    module swap PrgEnv-gnu/8.4.0 PrgEnv-cray
+    #module load PrgEnv-gnu/8.4.0
     module load cmake/3.27.7
     module load hipfort/5.7.1
     module load craype-accel-amd-gfx90a 
