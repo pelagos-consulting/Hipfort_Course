@@ -66,9 +66,9 @@ program tensoradd
     allocate(A_h(M,N), B_h(M, N), C_h(M,N))
 
     ! Allocate tensors on the device
-    call hipcheck(hipmalloc(A_d, sizeof(A_h)))
-    call hipcheck(hipmalloc(B_d, sizeof(B_h)))
-    call hipcheck(hipmalloc(C_d, sizeof(C_h)))
+    call hipcheck(hipmalloc(A_d, int(sizeof(A_h), c_size_t)))
+    call hipcheck(hipmalloc(B_d, int(sizeof(B_h), c_size_t)))
+    call hipcheck(hipmalloc(C_d, int(sizeof(C_h), c_size_t)))
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
@@ -76,8 +76,8 @@ program tensoradd
     call random_number(B_h)
 
     ! Copy memory from the host to the device 
-    call hipcheck(hipmemcpy(A_d, c_loc(A_h), sizeof(A_h), hipmemcpyhosttodevice))
-    call hipcheck(hipmemcpy(B_d, c_loc(B_h), sizeof(B_h), hipmemcpyhosttodevice))
+    call hipcheck(hipmemcpy(A_d, c_loc(A_h), int(sizeof(A_h), c_size_t), hipmemcpyhosttodevice))
+    call hipcheck(hipmemcpy(B_d, c_loc(B_h), int(sizeof(B_h), c_size_t), hipmemcpyhosttodevice))
 
     ! Call the C function that launches the kernel
     call launch_kernel_hip( &
@@ -89,7 +89,7 @@ program tensoradd
     )
 
     ! Copy memory from the device to the host
-    call hipcheck(hipmemcpy(c_loc(C_h), C_d, sizeof(C_h), hipmemcpydevicetohost))
+    call hipcheck(hipmemcpy(c_loc(C_h), C_d, int(sizeof(C_h),c_size_t), hipmemcpydevicetohost))
 
     ! Check the answer
     success = check(A_h, B_h, C_h, eps_mult)

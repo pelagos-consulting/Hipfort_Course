@@ -193,7 +193,7 @@ contains
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
         real(kind=c_float), dimension(:), intent(in), pointer :: host_fptr
-        call this%copy_from(c_loc(host_fptr), sizeof(host_fptr))
+        call this%copy_from(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
     end subroutine copy_from_host_c_float_1
 
     subroutine copy_to_host_c_float_1(this, host_fptr)
@@ -202,7 +202,7 @@ contains
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
         real(kind=c_float), dimension(:), intent(inout), pointer :: host_fptr
-        call this%copy_to(c_loc(host_fptr), sizeof(host_fptr))
+        call this%copy_to(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
     end subroutine copy_to_host_c_float_1
 
     subroutine copy_from_host_c_float_2(this, host_fptr)
@@ -211,7 +211,7 @@ contains
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
         real(kind=c_float), dimension(:,:), intent(in), pointer :: host_fptr
-        call this%copy_from(c_loc(host_fptr), sizeof(host_fptr))
+        call this%copy_from(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
     end subroutine copy_from_host_c_float_2
 
     subroutine copy_to_host_c_float_2(this, host_fptr)
@@ -220,7 +220,7 @@ contains
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
         real(kind=c_float), dimension(:,:), intent(inout), pointer :: host_fptr
-        call this%copy_to(c_loc(host_fptr), sizeof(host_fptr))
+        call this%copy_to(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
     end subroutine copy_to_host_c_float_2
 
 end module tensor_hip

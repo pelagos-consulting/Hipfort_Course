@@ -33,17 +33,17 @@ program managed_mem
 
 #ifdef __HIP_PLATFORM_AMD__ 
     ! Set coarse-grained coherence for f on device id 0
-    call hipcheck(hipMemAdvise(c_loc(f),sizeof(f),hipMemAdviseSetCoarseGrain,dev_id))
+    call hipcheck(hipMemAdvise(c_loc(f), int(sizeof(f), c_size_t), hipMemAdviseSetCoarseGrain, dev_id))
     
     ! Set coarse-grained coherence for x on device id 0
-    call hipcheck(hipMemAdvise(c_loc(x),sizeof(x),hipMemAdviseSetCoarseGrain,dev_id))
+    call hipcheck(hipMemAdvise(c_loc(x), int(sizeof(x), c_size_t), hipMemAdviseSetCoarseGrain, dev_id))
 #endif
 
     ! Create the stream
     call hipcheck(hipStreamCreate(stream))
     
     ! Pre-fetch `x` to device id 0 on stream 0
-    call hipcheck(hipMemPrefetchAsync(c_loc(x),sizeof(x),dev_id,stream))
+    call hipcheck(hipMemPrefetchAsync(c_loc(x), int(sizeof(x), c_size_t), dev_id,stream))
     
     ! call device_subroutine(f, x, stream)
     

@@ -66,9 +66,9 @@ program tensoradd
     ! Allocate memory for tensors, 
     ! see tensor_hip.f90 for 
     ! definition of generic procedures 
-    call A_d%malloc(sizeof(A_h))
-    call B_d%malloc(sizeof(B_h))
-    call C_d%malloc(sizeof(C_h))
+    call A_d%malloc(int(sizeof(A_h), c_size_t))
+    call B_d%malloc(int(sizeof(B_h), c_size_t))
+    call C_d%malloc(int(sizeof(C_h), c_size_t))
 
     ! Fill host allocations with random numbers using the
     ! Fortran intrinsic function "random_number"

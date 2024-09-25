@@ -66,9 +66,9 @@ program tensoradd
     call hipCheck(hipMallocmanaged(C, M, N, hipMemAttachGlobal))
 
     ! Set coarse grained coherence for all variables
-    call hipCheck(hipMemAdvise(c_loc(A), sizeof(A), hipMemAdviseSetCoarseGrain,0))
-    call hipCheck(hipMemAdvise(c_loc(B), sizeof(B), hipMemAdviseSetCoarseGrain,0))
-    call hipCheck(hipMemAdvise(c_loc(C), sizeof(C), hipMemAdviseSetCoarseGrain,0))
+    call hipCheck(hipMemAdvise(c_loc(A), int(sizeof(A), c_size_t), hipMemAdviseSetCoarseGrain,0))
+    call hipCheck(hipMemAdvise(c_loc(B), int(sizeof(B), c_size_t), hipMemAdviseSetCoarseGrain,0))
+    call hipCheck(hipMemAdvise(c_loc(C), int(sizeof(C), c_size_t), hipMemAdviseSetCoarseGrain,0))
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
@@ -78,8 +78,8 @@ program tensoradd
     ! Pre-fetch A and B to the device
     ! Copy memory from the host to the device
     ! Note that size for the copy is in elements, not bytes
-    call hipCheck(hipMemPrefetchAsync(c_loc(A),sizeof(A),0,c_null_ptr))
-    call hipCheck(hipMemPrefetchAsync(c_loc(B),sizeof(B),0,c_null_ptr))
+    call hipCheck(hipMemPrefetchAsync(c_loc(A),int(sizeof(A),c_size_t),0,c_null_ptr))
+    call hipCheck(hipMemPrefetchAsync(c_loc(B),int(sizeof(B),c_size_t),0,c_null_ptr))
 
     ! Call the C function that launches the kernel
     call launch_kernel_hip( &

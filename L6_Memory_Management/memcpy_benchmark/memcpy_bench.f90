@@ -53,14 +53,14 @@ subroutine float32_pageable_memcpy_h2d( array_length, nreps, walltime, bandwidth
 
   allocate(host_data(1:array_length))
 
-  call hipcheck(hipmalloc(dev_data,sizeof(host_data)))
+  call hipcheck(hipmalloc(dev_data,int(sizeof(host_data), c_size_t)))
 
   call cpu_time(t1)
   do i = 1, nreps
   
     call hipcheck(hipmemcpy(dev_data, &
                             c_loc(host_data), &
-                            sizeof(host_data), &
+                            int(sizeof(host_data), c_size_t), &
                             hipMemcpyHostToDevice))
   enddo
   call cpu_time(t2)
@@ -94,14 +94,14 @@ subroutine float32_pageable_memcpy_d2h( array_length, nreps, walltime, bandwidth
 
   allocate(host_data(1:array_length))
 
-  call hipcheck(hipmalloc(dev_data,sizeof(host_data)))
+  call hipcheck(hipmalloc(dev_data,int(sizeof(host_data), c_size_t)))
 
   call cpu_time(t1)
   do i = 1, nreps
   
     call hipcheck(hipmemcpy(c_loc(host_data), &
                             dev_data, &
-                            sizeof(host_data), &
+                            int(sizeof(host_data), c_size_t), &
                             hipMemcpyDeviceToHost))
   enddo
   call cpu_time(t2)
@@ -218,14 +218,14 @@ subroutine float64_pageable_memcpy_h2d( array_length, nreps, walltime, bandwidth
 
   allocate(host_data(1:array_length))
 
-  call hipcheck(hipmalloc(dev_data,sizeof(host_data)))
+  call hipcheck(hipmalloc(dev_data,int(sizeof(host_data),c_size_t)))
 
   call cpu_time(t1)
   do i = 1, nreps
   
     call hipcheck(hipmemcpy(dev_data, &
                             c_loc(host_data), &
-                            sizeof(host_data), &
+                            int(sizeof(host_data), c_size_t), &
                             hipMemcpyHostToDevice))
   enddo
   call cpu_time(t2)
@@ -259,14 +259,14 @@ subroutine float64_pageable_memcpy_d2h( array_length, nreps, walltime, bandwidth
 
   allocate(host_data(1:array_length))
 
-  call hipcheck(hipmalloc(dev_data,sizeof(host_data)))
+  call hipcheck(hipmalloc(dev_data,int(sizeof(host_data), c_size_t)))
 
   call cpu_time(t1)
   do i = 1, nreps
   
     call hipcheck(hipmemcpy(c_loc(host_data), &
                             dev_data, &
-                            sizeof(host_data), &
+                            int(sizeof(host_data), c_size_t), &
                             hipMemcpyDeviceToHost))
   enddo
   call cpu_time(t2)
@@ -395,6 +395,7 @@ implicit none
   character(24) :: wall_time_char
   character(24) :: bandwidth_char
   character(24) :: hostname
+  integer :: hostnm
   character(6) :: gpuarch
   type(hipDeviceProp_t) :: prop
 
