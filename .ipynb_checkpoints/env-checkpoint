@@ -37,6 +37,10 @@ then
     #export HIP_PLATFORM=amd
     #export GPU_ARCH="gfx1035"
 
+    export HIPFORT_COMPILER=$(which gfortran)
+    export FC=$(which gfortran)
+    export CC=$(which gcc)
+    export CXX=$(which g++)
 
 elif [[ $HOSTNAME =~ "workshop" ]]
 then
@@ -44,6 +48,11 @@ then
     module load gcc rocm hipfort
     export HIP_PLATFORM=amd
     export GPU_ARCH="gfx1035"
+
+    export HIPFORT_COMPILER=$(which gfortran)
+    export FC=$(which gfortran)
+    export CC=$(which gcc)
+    export CXX=$(which g++)
 
 else
 
@@ -63,6 +72,8 @@ else
     # Use a CUDA backend
     export HIP_PLATFORM=nvidia
     export GPU_ARCH="60;61;70;75;80;86;89;90"
+    
+    export HIPFORT_COMPILER=$(which gfortran)
     
     # Use an AMD backend
     #export HIP_PLATFORM=amd
