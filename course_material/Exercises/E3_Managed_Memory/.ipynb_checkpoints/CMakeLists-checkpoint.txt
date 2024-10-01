@@ -9,7 +9,7 @@ set_source_files_properties(${KERNEL_FILES} PROPERTIES LANGUAGE ${kernel_lang})
 add_executable (chessboard_mm
     ${CMAKE_CURRENT_SOURCE_DIR}/chessboard_mm.f90
     ${KERNEL_FILES}
-    ${PROJECT_SOURCE_DIR}/src/hip_utils.f90
+    ${COURSE_MATERIAL_DIR}/src/hip_utils.f90
     )
 target_link_libraries(chessboard_mm
                       ${kernel_libs})
@@ -25,7 +25,7 @@ install(TARGETS chessboard_mm DESTINATION bin)
 add_executable (chessboard_mm_answer
     ${CMAKE_CURRENT_SOURCE_DIR}/chessboard_mm_answer.f90
     ${KERNEL_FILES}
-    ${PROJECT_SOURCE_DIR}/src/hip_utils.f90
+    ${COURSE_MATERIAL_DIR}/src/hip_utils.f90
     )
 target_link_libraries(chessboard_mm_answer
                       ${kernel_libs})

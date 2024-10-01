@@ -8,8 +8,8 @@ set_source_files_properties(${KERNEL_FILES} PROPERTIES LANGUAGE ${kernel_lang})
 
 ## Files common to all examples - language is determined by file extension
 set(COMMON_FILES
-    ${PROJECT_SOURCE_DIR}/src/hip_utils.f90
-    ${PROJECT_SOURCE_DIR}/src/math_utils.f90
+    ${COURSE_MATERIAL_DIR}/src/hip_utils.f90
+    ${COURSE_MATERIAL_DIR}/src/math_utils.f90
 )
 
     
@@ -57,6 +57,21 @@ set_target_properties(tensoradd_hip_oo
     PROPERTIES LINKER_LANGUAGE Fortran
 )
 install(TARGETS tensoradd_hip_oo DESTINATION bin)
+
+
+# tensoradd_hip_fptr_managed - Tensor addition with HIP and Fortran pointers and managed memory
+add_executable (tensoradd_hip_fptr_managed
+    ${CMAKE_CURRENT_SOURCE_DIR}/tensoradd_hip_fptr_managed.f90
+    ${KERNEL_FILES}
+    ${COMMON_FILES}
+)
+# Link in other libraries
+target_link_libraries(tensoradd_hip_fptr_managed ${kernel_libs})
+# This is needed so that the linker used is the Fortran compiler
+set_target_properties(tensoradd_hip_fptr_managed
+    PROPERTIES LINKER_LANGUAGE Fortran
+)                   
+install(TARGETS tensoradd_hip_fptr_managed DESTINATION bin)
 
 
 

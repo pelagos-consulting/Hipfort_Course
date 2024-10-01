@@ -8,8 +8,8 @@
 
 ## Files common to all examples - language is determined by file extension
 set(COMMON_FILES
-    ${PROJECT_SOURCE_DIR}/src/hip_utils.f90
-    ${PROJECT_SOURCE_DIR}/src/math_utils.f90
+    ${COURSE_MATERIAL_DIR}/src/hip_utils.f90
+    ${COURSE_MATERIAL_DIR}/src/math_utils.f90
 )
 
 # Paged memory example
