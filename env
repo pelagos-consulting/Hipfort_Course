@@ -18,6 +18,10 @@ then
     export GPU_ARCH=gfx90a
 
     export HIPFORT_COMPILER=ftn
+    export FC=$(which ftn)
+    export CC=$(which cc)
+    export CXX=$(which CC)
+
 
 elif [[ $HOSTNAME =~ "noether" ]]
 then

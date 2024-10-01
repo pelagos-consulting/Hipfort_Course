@@ -42,6 +42,7 @@ if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "Cray" )
     set( CMAKE_Fortran_FLAGS_RELEASE "-O3 -g" )
 endif()
 
+message("Fortran compiler id is " ${CMAKE_Fortran_COMPILER_ID})
 
 # ------ dependencies ------ #
 
