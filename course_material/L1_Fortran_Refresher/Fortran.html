@@ -7775,7 +7775,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Do-loops-and-array-access">Do loops and array access<a class="anchor-link" href="#Do-loops-and-array-access">¶</a></h2><p>Loops are made using the <code>do</code> construct. Here we loop over <code>i</code> from 1 to N inclusive and set elements in <strong>C_h</strong> using elements in <strong>A_h</strong> and <strong>B_h</strong>. Indexing into arrays is done by appending a comma-separated tuple of coordinates to the array name. The loop index variable <code>i</code> must be declared at the beginning of the program, function, or subroutine.</p>
+<h2 id="Do-loops-and-array-access">Do loops and array access<a class="anchor-link" href="#Do-loops-and-array-access">¶</a></h2><p>Loops are made using the <code>do</code> construct. Here we loop over <code>i</code> from 1 to N inclusive and set elements in <strong>C_h</strong> using elements in <strong>A_h</strong> and <strong>B_h</strong>. Indexing into arrays is done by appending a comma-separated tuple of coordinates to the array name. Unlike in C the loop index variable <code>i</code> must be declared at the beginning of the program, function, or subroutine.</p>
 <div class="highlight"><pre><span></span><span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span>
 <span class="w">    </span><span class="c">! Kernel math</span>
 <span class="w">    </span><span class="n">C_h</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_h</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">B_h</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
@@ -7805,7 +7805,7 @@ $$</p>
 <span class="w">    </span><span class="k">end do</span>
 <span class="k">end do</span>
 </pre></div>
-<p>Or using indexing operations the above can be written as:</p>
+<p>Or, using Fortran array indexing, the above can be written as:</p>
 <div class="highlight"><pre><span></span><span class="n">C_h</span><span class="p">(:,:)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_h</span><span class="p">(:,:)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">B_h</span><span class="p">(:,:</span><span class="w"> </span><span class="p">)</span>
 </pre></div>
 </div>
@@ -8020,11 +8020,11 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">'PATH'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">'PATH'</span><span class="p">]</span><span class="si">}</span><span class="s2">:../install/bin"</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">'PATH'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">'PATH'</span><span class="p">]</span><span class="si">}</span><span class="s2">:../../install/bin"</span>
 
 <span class="c1"># At a Bash terminal you need to do this instead</span>
 <span class="c1"># source ../env</span>
@@ -8038,7 +8038,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>run<span class="w"> </span>tensoradd_simple
@@ -8060,30 +8060,17 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2317f6f1-71ce-44e2-8f5f-bfdc6a06e710">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2317f6f1-71ce-44e2-8f5f-bfdc6a06e710">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1">## Remove any files made</span>
 <span class="o">!</span>rm<span class="w"> </span>*.dat
 </pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>rm: cannot remove '*.dat': No such file or directory
-</pre>
 </div>
 </div>
 </div>
@@ -8095,7 +8082,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Dynamic-memory-allocation">Dynamic memory allocation<a class="anchor-link" href="#Dynamic-memory-allocation">¶</a></h2><p>Thus far we have been allocating storage for tensors <strong>A_h</strong>, <strong>B_h</strong>, and <strong>C_h</strong> statically. This memory is allocated on the stack when parts of the program runs where that memory is declared. By default this area of memory storage is quite small in comparison to the available memory size, and the size of static allocations <strong>must be known</strong> at compile time. Another area in which memory can be allocated is the heap. With this form of storage, memory can be dynamically allocated and de-allocated from a much larger pool, and the size of the allocations don't need to be determined at compile time.</p>
+<h2 id="Dynamic-memory-allocation">Dynamic memory allocation<a class="anchor-link" href="#Dynamic-memory-allocation">¶</a></h2><p>Thus far we have been allocating storage for tensors <strong>A_h</strong>, <strong>B_h</strong>, and <strong>C_h</strong> statically. This memory is allocated on the <strong>stack</strong> when parts of the program runs where that memory is declared. By default this area of memory storage is quite small in comparison to the available memory size, and the size of static allocations <strong>must be known</strong> at compile time. Another area in which memory can be allocated is the <strong>heap</strong>. With this form of storage, memory can be dynamically allocated and de-allocated from a much larger pool, and the size of the allocations don't need to be determined at compile time.</p>
 </div>
 </div>
 </div>
@@ -8189,7 +8176,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>run<span class="w"> </span>tensoradd_allocatable
@@ -8218,9 +8205,9 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Fortran-pointers">Fortran pointers<a class="anchor-link" href="#Fortran-pointers">¶</a></h3><p>Fortran also has a pointer. Pointers in Fortran are declared with the <code>pointer</code> option in addition to a data type. Unlike void pointers in C, Fortran pointers must only "point" to objects of the same data type, and there is a restriction in that pointers can only "point" to objects with the <code>target</code> attribute set as well as memory pointed at by other pointers. Using Fortran pointers is usually not best practice because their misuse can introduce memory safety bugs, however they are useful for interopability with C code in libraries such as HIP.</p>
-<p>Using the <code>allocate</code> command we can allocate memory through a Fortran pointer and treat the pointer as an array. This memory automatically has the <code>target</code> attribute set.</p>
-<h4 id="Example-program-with-pointers">Example program with pointers<a class="anchor-link" href="#Example-program-with-pointers">¶</a></h4><p>In the code <a href="tensoradd_pointer.f90">tensoradd_pointer.f90</a> we declare <strong>A_h</strong>, <strong>B_h</strong>, and <strong>C_h</strong> as pointers to one dimensional allocations of memory as follows:</p>
+<h3 id="Fortran-pointers">Fortran pointers<a class="anchor-link" href="#Fortran-pointers">¶</a></h3><p>Pointers in Fortran are declared with the <code>pointer</code> option in addition to a data type. Unlike void pointers in C, Fortran pointers must only "point" to objects of the same data type, and there is a restriction in that pointers can only "point" to objects with the <code>target</code> attribute set, or memory pointed at by other pointers. Using Fortran pointers is usually not best practice because their misuse can introduce memory safety bugs, however they are useful for interopability with C code in libraries such as HIP.</p>
+<p>Using the <code>allocate</code> command, we can allocate memory and associate it with a Fortran pointer, and then treat the pointer as an array.</p>
+<h3 id="Example-program-with-pointers">Example program with pointers<a class="anchor-link" href="#Example-program-with-pointers">¶</a></h3><p>In the code <a href="tensoradd_pointer.f90">tensoradd_pointer.f90</a> we declare <strong>A_h</strong>, <strong>B_h</strong>, and <strong>C_h</strong> as pointers to one dimensional allocations of memory as follows:</p>
 </div>
 </div>
 </div>
@@ -8254,12 +8241,11 @@ $$</p>
 <span class="w">    </span><span class="k">stop </span>
 <span class="k">end if</span>
 </pre></div>
-<p>These pointers now "point" at or are associated with the array allocations. We can use the <code>associated</code> function to check if a pointer is pointing to something.</p>
+<p>These pointers now "point" at or are associated with the array allocations. We can use the <code>associated</code> intrinsic function to check if a pointer is pointing at something.</p>
 <div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">associated</span><span class="p">(</span><span class="n">A_h</span><span class="p">))</span><span class="w"> </span><span class="k">then</span>
 <span class="k">    print</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="s2">"A_h is associated"</span>
 <span class="k">end if</span>
 </pre></div>
-<p>Once the alloat</p>
 </div>
 </div>
 </div>
@@ -8270,7 +8256,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Pointer-remapping">Pointer remapping<a class="anchor-link" href="#Pointer-remapping">¶</a></h4><p>A powerful feature of Fortran pointers is that they can be used to "point" at a portion of a 1D allocation and even "upgrade" the dimensions and bounds of that array access. This is called <strong>pointer remapping</strong>. Remapping targets can only be of rank 1 so that contiguous access is upheld. We demonstrate this in <a href="tensoradd_pointer.f90">tensoradd_pointer.f90</a> by creating a 2D pointer <code>D_h</code>.</p>
+<h4 id="Pointer-remapping">Pointer remapping<a class="anchor-link" href="#Pointer-remapping">¶</a></h4><p>A powerful feature of Fortran pointers is that they can be used to "point" at a portion of a 1D allocation and even "upgrade" the dimensions and bounds of that array access. This is called <strong>pointer remapping</strong>. We demonstrate this in <a href="tensoradd_pointer.f90">tensoradd_pointer.f90</a> by creating a 2D pointer <code>D_h</code>.</p>
 <div class="highlight"><pre><span></span><span class="c">! Demonstrate pointer remapping with D_h</span>
 <span class="w">    </span><span class="kt">real</span><span class="p">,</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:,:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">D_h</span>
 </pre></div>
@@ -8284,7 +8270,7 @@ $$</p>
 <span class="w">    </span><span class="c">! at the last 4 elements of A_h</span>
 <span class="w">    </span><span class="n">D_h</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A_h</span><span class="p">((</span><span class="n">N</span><span class="o">-</span><span class="mi">4</span><span class="p">):</span><span class="n">N</span><span class="p">)</span>
 </pre></div>
-<p>When performing pointer remapping one has to be careful that the mapped pointer does not access memory that is beyond the allocation of the target object.</p>
+<p>When performing pointer remapping one has to be careful that the mapped pointer does not access memory that is beyond the allocation of the target object. Pointers of higher dimensions can only remap to targets that are of rank 1 (one dimension).</p>
 </div>
 </div>
 </div>
@@ -8295,7 +8281,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="De-allocation">De-allocation<a class="anchor-link" href="#De-allocation">¶</a></h4><p>As with allocatable arrays we can use the <code>deallocate</code> function to release memory that the pointers <strong>A_h</strong>, <strong>B_h</strong>, <strong>C_h</strong> are associated with.</p>
+<h4 id="De-allocation">De-allocation<a class="anchor-link" href="#De-allocation">¶</a></h4><p>As with allocatable arrays, we can use the <code>deallocate</code> function to release memory that the pointers <strong>A_h</strong>, <strong>B_h</strong>, <strong>C_h</strong> are associated with.</p>
 <div class="highlight"><pre><span></span><span class="c">! Always free heap memory when you no longer need it</span>
 <span class="k">deallocate</span><span class="p">(</span><span class="n">A_h</span><span class="p">,</span><span class="w"> </span><span class="n">B_h</span><span class="p">,</span><span class="w"> </span><span class="n">C_h</span><span class="p">)</span>
 </pre></div>
@@ -8330,7 +8316,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>run<span class="w"> </span>tensoradd_pointer
@@ -8371,7 +8357,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Functions">Functions<a class="anchor-link" href="#Functions">¶</a></h3><p>Functions are intended to take any number of arguments and produce one argument as the result. It is good practice to build functions so they <strong>do not modify</strong> their input arguments. Here we have a function that takes as arguments the pointers <code>A</code>, <code>B</code>, <code>C</code>, the integer <code>N</code>, and the epsilon multiplier <code>eps_mult</code> and produces a <code>result</code> or return value in the variable <code>success</code>, indicating wether or not validation was successful.</p>
+<h3 id="Functions">Functions<a class="anchor-link" href="#Functions">¶</a></h3><p>Functions are intended to take any number of arguments and produce one argument as the result. It is good practice to build functions that <strong>do not modify</strong> their input arguments. Here we have a function that takes as arguments the pointers <code>A</code>, <code>B</code>, <code>C</code>, the integer <code>N</code>, and the epsilon multiplier <code>eps_mult</code> and produces a <code>result</code> or return value in the variable <code>success</code>, indicating wether or not validation was successful.</p>
 <div class="highlight"><pre><span></span><span class="k">function </span><span class="n">check</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">,</span><span class="w"> </span><span class="n">C</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">eps_mult</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">success</span><span class="p">)</span>
 <span class="w">    </span><span class="c">!! Function to check to if a tensor addition operation was successful</span>
 
@@ -8437,8 +8423,8 @@ $$</p>
 <span class="w">        </span><span class="c">!! Epsilon multiplier, how many floating point spacings</span>
 <span class="w">        </span><span class="c">!! can the computed answer be from our benchmark answer?</span>
 </pre></div>
-<p>Arguments in Fortran are generally passed <strong>by reference</strong>, so modifying an argument within a function or subroutine will modify the variable passed in. Notice the <code>intent</code> option on each argument declaration. The <code>intent</code> option has three choices, <code>in</code>, <code>out</code>, and <code>inout</code> to signify that the variable passed is intended to be read-only, write-only, or read-write. It is <strong>good practice</strong> to provide the intent option on arguments, not only for readability but for compiler optimization as well.</p>
-<p>During the execution of a function the result variable <strong>must</strong> be declared and then set when the function is called. Within the function we define <code>success</code> as a logical. The variable is set to <code>.true.</code> by default and then set to <code>.false.</code> if validation fails at any point i along <strong>C</strong>.</p>
+<p>Arguments in Fortran are generally passed <strong>by reference</strong>, so modifying an argument within a function or subroutine will modify the variable passed in. Notice the <code>intent</code> option on each argument declaration. The <code>intent</code> attribute has three choices, <code>in</code>, <code>out</code>, and <code>inout</code>, to signify that the variable passed is intended to be read-only, write-only, or read-write. It is <strong>good practice</strong> to use the <code>intent</code> attribute for arguments, because it clarifies to the compiler (and the reader) how a variable is to be used, and may unlock some optimizations. Using <code>intent</code> ensures consistent handling of variables. If, for example, a variable is marked as <code>in</code> within a scope and passed to another function or subroutine where the variable is is marked as <code>inout</code> or <code>out</code>, the compiler will generate a somewhat vague error indicating that it cannot find a suitable function.</p>
+<p>During the execution of a function, the <strong>result</strong> variable <strong>must</strong> be declared. Within the function we define <code>success</code> as a logical. The variable is set to <code>.true.</code> by default and then set to <code>.false.</code> if validation fails at any point i along <strong>C</strong>, we set <code>success</code> to <code>.false</code>. The <strong>return</strong> statement may optionally be used anywhere within the function to exit the function and return control to the caller.</p>
 <div class="highlight"><pre><span></span><span class="c">! Set the return type of the function</span>
 <span class="w">    </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">success</span>
 <span class="w">    </span><span class="n">success</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
@@ -8456,6 +8442,11 @@ $$</p>
 <span class="w">            </span><span class="k">return</span>
 <span class="k">        end if</span>
 <span class="k">    end do</span>
+
+<span class="w">    </span><span class="c">! We got to here because we didn't return on failure</span>
+<span class="w">    </span><span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="s1">'Tensor addition passed validation.'</span>
+<span class="w">    </span>
+<span class="k">end function </span><span class="n">check</span>
 </pre></div>
 <p>Functions must end with the <code>end function</code> keyword. It is good practice to also include the name of that which is being ended.</p>
 </div>
@@ -8468,7 +8459,8 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Subroutines">Subroutines<a class="anchor-link" href="#Subroutines">¶</a></h3><p>Subroutines are similar to functions, however they have <strong>no return value</strong> and are intended to be used for situations where the input arguments may be modified. In the file <a href="tensoradd_function.f90">tensoradd_function.f90</a> we define a subroutine to perform tensor addition (kernel) math over every point in the input arrays <strong>A</strong> and <strong>B</strong>, putting the result in <strong>C</strong>. The rules and best practices for subroutine arguments are similar to that of functions, however we do not need to be concerned about declaring and setting a return type.</p>
+<h3 id="Subroutines">Subroutines<a class="anchor-link" href="#Subroutines">¶</a></h3><p>Subroutines are similar to functions, however they have <strong>no return value</strong> and are intended to be used for situations where the input arguments may be modified.</p>
+<p>In the file <a href="tensoradd_function.f90">tensoradd_function.f90</a> we define a subroutine called <code>launch_kernel</code> to perform tensor addition (kernel) math over every point in the input arrays <strong>A</strong> and <strong>B</strong>, putting the result in <strong>C</strong>. The rules and best practices for subroutine arguments are similar to that of functions, however we do not need to be concerned about declaring and setting a return type.</p>
 <div class="highlight"><pre><span></span><span class="c">! Run kernel math to perform tensor addition at </span>
 <span class="c">! every point in input tensors A and B. </span>
 <span class="c">! Put the result in C</span>
@@ -8501,7 +8493,14 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Interfaces">Interfaces<a class="anchor-link" href="#Interfaces">¶</a></h3><p>Interfaces are usually only necessary when an external function or subroutine (such as a C function) is being called from a Fortran program. However since we <strong>pass Fortran pointers</strong> to <code>check</code> and <code>launch_kernel</code>, and these are defined <strong>outside the program</strong> we also need to define an <code>interface</code> to them from within the body of the program. An interface is just the definition of what the functions and subroutines are, as well as the data types of the arguments and function return types. In the file <a href="tensoradd_function.f90">tensoradd_function.f90</a> the interface for <code>check</code> and <code>launch_kernel</code> is declared along with variable declarations.</p>
+<h3 id="Interfaces">Interfaces<a class="anchor-link" href="#Interfaces">¶</a></h3><p>An interface is just the definition of what the functions or subroutine is, as well as the data types of the arguments and function return types. Interfaces are necessary when:</p>
+<ul>
+<li>Calling external C functions</li>
+<li>Using optional arguments</li>
+<li>Passing arrays or pointers where the size in each dimension is not determined</li>
+<li>Using derived types or complex structures</li>
+</ul>
+<p>Since the function <code>check</code> and subroutine <code>launch_kernel</code> both accept pointer arguments, we need to define an interface to them within the body of the program. In the file <a href="tensoradd_function.f90">tensoradd_function.f90</a> the interface for <code>check</code> and <code>launch_kernel</code> is declared along with variable declarations.</p>
 <div class="highlight"><pre><span></span><span class="k">interface</span>
 <span class="k">        subroutine </span><span class="n">launch_kernel</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">,</span><span class="w"> </span><span class="n">C</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">)</span>
 <span class="w">            </span><span class="kt">real</span><span class="p">,</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">,</span><span class="w"> </span><span class="n">C</span>
@@ -8516,7 +8515,7 @@ $$</p>
 <span class="w">        </span><span class="k">end function </span><span class="n">check</span>
 <span class="w">    </span><span class="k">end interface</span>
 </pre></div>
-<p>Constructing an interface for external function is rather tedious and error prone. We could have avoided this by placing the code for <code>launch_kernel</code> and <code>check</code> after a <code>contains</code> statement at the end of the main program.</p>
+<p>Constructing an interface for external functions can be tedious and error prone. We could have avoided this by placing the code for <code>launch_kernel</code> and <code>check</code> after a <code>contains</code> statement at the end of the main program.</p>
 <div class="highlight"><pre><span></span><span class="k">contains</span>
 
 <span class="w">    </span><span class="c">! The subroutine "launch_kernel" and the checking function "check"</span>
@@ -8561,7 +8560,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>run<span class="w"> </span>tensoradd_function
@@ -8590,7 +8589,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Modules">Modules<a class="anchor-link" href="#Modules">¶</a></h2><p>Modules are a way to keep data and the procedures that work on the data contained in one location of your code. A module may be made available to any running part of the program, so the variables and routines in a module are global in nature. Modules can be defined in any file.</p>
+<h2 id="Modules">Modules<a class="anchor-link" href="#Modules">¶</a></h2><p>Modules are a way to keep data, and the procedures and functions that work on the data, contained in one location of your code. A module may be made available to any running part of the program, so the variables and routines in a module are global in nature. Modules can be defined in any Fortran source file.</p>
 <h3 id="Example-program-with-modules">Example program with modules<a class="anchor-link" href="#Example-program-with-modules">¶</a></h3><p>In <a href="tensor_lib.f90">tensor_lib.f90</a> is a Fortran module that contains the tensors <strong>A_h</strong>, <strong>B_h</strong>, and <strong>C_h</strong> and everything needed to work on those tensors. If you open that file we can go through it line by line:</p>
 </div>
 </div>
@@ -8620,7 +8619,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Module-variables">Module variables<a class="anchor-link" href="#Module-variables">¶</a></h3><p>At the beginning of a module you can put any number of <code>use</code> statements followed by declarations of variables that are accessible to every function or subroutine in the module. Here we declare a logical variable <code>allocd</code> to hold wether or not the memory for <strong>A_h</strong>, <strong>B_h</strong> and <strong>C_h</strong> has been allocated.</p>
+<h3 id="Module-variables">Module variables<a class="anchor-link" href="#Module-variables">¶</a></h3><p>At the beginning of a module you can put any number of <code>use</code> statements followed by declarations of variables. These variables are accessible to every function or subroutine in the module. Here we declare a logical variable <code>allocd</code> to store wether or not the memory for <strong>A_h</strong>, <strong>B_h</strong> and <strong>C_h</strong> has been allocated.</p>
 <div class="highlight"><pre><span></span><span class="k">implicit none</span>
 
 <span class="w">    </span><span class="c">! Have we already allocated memory?</span>
@@ -8657,13 +8656,13 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Module-functions-and-subroutines">Module functions and subroutines<a class="anchor-link" href="#Module-functions-and-subroutines">¶</a></h3><p>Following a <code>contains</code> statement you are free to define any functions or subroutines that is part of the module. In the rest of the module we define:</p>
+<h3 id="Module-functions-and-subroutines">Module functions and subroutines<a class="anchor-link" href="#Module-functions-and-subroutines">¶</a></h3><p>Following a <code>contains</code> statement you are free to define any functions or subroutines that the module contains. After the <code>contains</code> statement we define:</p>
 <ul>
-<li>Function <code>check</code> to check the result of tensor addition</li>
-<li>Subroutine called <code>init_mem</code> to allocate memory for the tensors</li>
-<li>Subroutine <code>kernel</code> to perform kernel math at a single index <code>i</code> in the tensors <strong>A_h</strong>, <strong>B_h</strong>, and <strong>C_h</strong></li>
-<li>Subroutine <code>launch_kernel</code> to launch an instance of <code>kernel</code> at every point along the tensors.</li>
-<li>Subroutine called <code>free_mem</code> to de-allocate memory in the tensors.</li>
+<li>a function <code>check</code> to check the result of tensor addition</li>
+<li>a subroutine called <code>init_mem</code> to allocate memory for the tensors</li>
+<li>a subroutine called <code>kernel</code> to perform kernel math at a single index <code>i</code> in the tensors <strong>A_h</strong>, <strong>B_h</strong>, and <strong>C_h</strong></li>
+<li>another subroutine <code>launch_kernel</code> to launch an instance of <code>kernel</code> at every point along the tensors.</li>
+<li>a subroutine called <code>free_mem</code> to de-allocate memory in the tensors.</li>
 </ul>
 </div>
 </div>
@@ -8686,14 +8685,14 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Use-the-created-module">Use the created module<a class="anchor-link" href="#Use-the-created-module">¶</a></h3><p>In the file <a href="tensoradd_module.f90">tensoradd_module.f90</a> we import the module using the <code>use</code> statement. Here we use the <code>only</code> option to only import the <code>init_mem</code>, <code>init_mem</code>, <code>free_mem</code> and <code>launch_kernel</code> subroutines as well as the variables <code>A_h</code> and <code>B_h</code>. During import we can rename anything using the <code>=&gt;</code> operator. Here we say that <code>init_mem</code> from the module must be used via the name <code>alloc_mem</code> in the program.</p>
+<h3 id="Use-the-created-module">Use the created module<a class="anchor-link" href="#Use-the-created-module">¶</a></h3><p>In the file <a href="tensoradd_module.f90">tensoradd_module.f90</a> we import the module using the <code>use</code> statement. Here we use the <code>only</code> option to <strong>only</strong> import the <code>init_mem</code>, <code>init_mem</code>, <code>free_mem</code> and <code>launch_kernel</code> subroutines as well as the variables <code>A_h</code> and <code>B_h</code>. During import we can rename anything using the <code>=&gt;</code> operator. Here we say that <code>init_mem</code> from the module must be used via the name <code>alloc_mem</code> in the program.</p>
 <div class="highlight"><pre><span></span><span class="c">! The "only" helps to know where things came from</span>
 <span class="w">    </span><span class="c">! can use the "=&gt;" operator to use things in modules as something else</span>
 <span class="w">    </span><span class="c">! use tensor_lib, init_mem =&gt; alloc_mem</span>
 <span class="w">    </span><span class="k">use </span><span class="n">tensor_lib</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">check</span><span class="p">,</span><span class="w"> </span><span class="n">alloc_mem</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">init_mem</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
 <span class="w">        </span><span class="n">free_mem</span><span class="p">,</span><span class="w"> </span><span class="n">launch_kernel</span><span class="p">,</span><span class="w"> </span><span class="n">A_h</span><span class="p">,</span><span class="w"> </span><span class="n">B_h</span>
 </pre></div>
-<p>Now each of the these subroutines and variables are available for use. The benefit of this is that the task of allocating, storing and deallocating is performed in one place in the module.</p>
+<p>Each of the these subroutines and variables are now available for use within the <code>tensoradd</code> program. The benefit of this is that the task of allocating, storing and deallocating is performed in one place in the module.</p>
 <div class="highlight"><pre><span></span><span class="c">! Allocate memory </span>
 <span class="w">    </span><span class="k">call </span><span class="n">alloc_mem</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
 
@@ -8730,7 +8729,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>run<span class="w"> </span>tensoradd_module
@@ -8759,7 +8758,8 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Integrate-Fortran-and-C-code">Integrate Fortran and C code<a class="anchor-link" href="#Integrate-Fortran-and-C-code">¶</a></h2><p>Integrating Fortran with C can be challenging, according to <a href="https://fftw.org/doc/Allocating-aligned-memory-in-Fortran.html#:~:text=7.5%20Allocating%20aligned%20memory%20in%20Fortran&amp;text=Unfortunately%2C%20standard%20Fortran%20arrays%20do,the%20fftw_alloc_real%20and%20fftw_alloc_complex%20functions.">this source</a>,  Fortran arrays don't have any guarantee that they will be aligned to any multiple of bytes. Furthermore, aligned memory on the host is crucial when working with frameworks like OpenCL. Whenever you integerate Fortran and C code, it is then a good idea to have a C routine allocate memory with whatever alignment you need, then you can then wrap a Fortran pointer around the allocated memory.</p>
+<h2 id="Integrate-Fortran-and-C-code">Integrate Fortran and C code<a class="anchor-link" href="#Integrate-Fortran-and-C-code">¶</a></h2><p>Integrating Fortran with C can be challenging due to inconsistencies in data types, function names, and case sensititvity. Furthermore, the alignment of a memory allocation can sometimes be important for optimization, and in some cases it is necessary (as in the case of OpenCL buffers). According to <a href="https://fftw.org/doc/Allocating-aligned-memory-in-Fortran.html#:~:text=7.5%20Allocating%20aligned%20memory%20in%20Fortran&amp;text=Unfortunately%2C%20standard%20Fortran%20arrays%20do,the%20fftw_alloc_real%20and%20fftw_alloc_complex%20functions.">this source</a>, Fortran arrays don't have any guarantee that they will be aligned to a multiple of bytes by default. You can sometimes set a compiler flag to ensure alignment.</p>
+<p>Whenever you integerate Fortran and C code and aligned memory is required, it is then a good idea to either set the compiler flags (not portable) or have a C routine allocate memory with whatever alignment you need, then you can then wrap a Fortran pointer around the allocated memory.</p>
 <h3 id="Example-program-that-integrates-Fortran-and-C">Example program that integrates Fortran and C<a class="anchor-link" href="#Example-program-that-integrates-Fortran-and-C">¶</a></h3><p>In the file <a href="tensor_lib_c.f90">tensor_lib_c.f90</a> is a Fortran module that provides the same functions and subroutines as <a href="tensor_lib.f90">tensor_lib.f90</a>, namely:</p>
 <ul>
 <li>A function called <code>check</code> to check the result of tensor addition</li>
@@ -8770,7 +8770,7 @@ $$</p>
 </ul>
 <p>However in the <code>tensor_lib</code> module in <a href="tensor_lib_c.f90">tensor_lib_c.f90</a> we are using calls to C functions to provide all the backend functionality. In the file <a href="c_functions.cpp">c_functions.cpp</a> are four C functions, three of which will be called from <a href="tensor_lib_c.f90">tensor_lib_c.f90</a>:</p>
 <ul>
-<li><strong>c_kernel</strong> runs a kernel element $i$ in arrays <code>A</code>, <code>B</code>, and <code>C</code></li>
+<li><strong>c_kernel</strong> runs a kernel for element $i$ in arrays <code>A</code>, <code>B</code>, and <code>C</code></li>
 <li><strong>launch_c_kernel</strong> runs c_kernel over every element in <code>A</code>, <code>B</code>, and <code>C</code>.</li>
 <li><strong>c_alloc</strong> allocates memory that is aligned to a 128 Byte boundary.</li>
 <li><strong>c_free</strong> frees memory that was previously allocated with <strong>c_alloc</strong>.</li>
@@ -8785,7 +8785,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Prepare-C-code">Prepare C code<a class="anchor-link" href="#Prepare-C-code">¶</a></h3><p>C code can be made visible to Fortran by wrapping it in an <code>extern "C"</code> code block like we have done in <a href="c_functions.cpp">c_functions.cpp</a>. This enables the function to have C linkage, meaning the function name won't be mangled during compilation and the Fortran code will be able to call it.</p>
+<h3 id="Prepare-C-code">Prepare C code<a class="anchor-link" href="#Prepare-C-code">¶</a></h3><p>C code can be made visible to Fortran by wrapping it or its header in an <code>extern "C"</code> code block like we have done in <a href="c_functions.cpp">c_functions.cpp</a>. This enables the function to have <code>C linkage</code>, meaning the function name won't be mangled during compilation and the Fortran code will be able to call it. We have three functions <code>launch_c_kernel</code>, <code>c_alloc</code>, and <code>c_free</code> to launch a kernel, allocate and free memory.</p>
 <div class="highlight"><pre><span></span><span class="k">extern</span><span class="w"> </span><span class="s">"C"</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="c1">// Function to launch c_kernel at every point</span>
@@ -8839,7 +8839,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Prepare-Fortran-code">Prepare Fortran code<a class="anchor-link" href="#Prepare-Fortran-code">¶</a></h3><p>Fortran code that calls C must have an <code>interface</code> section with the functions and subroutines defined as well as their arguments. C functions with a <code>void</code> return type are regarded as <strong>subroutines</strong> in Fortran. C functions with other return types are similarly regarded as <strong>functions</strong> in Fortran as well. Before we begin we need to use the <code>iso_c_binding</code> module which gives us access to C datatypes, as well as helpful utilities and definitions that are useful in working with C.</p>
+<h3 id="Prepare-Fortran-code">Prepare Fortran code<a class="anchor-link" href="#Prepare-Fortran-code">¶</a></h3><p>Fortran code that calls <code>C</code> must have an <code>interface</code> section with the functions and subroutines defined as well as their arguments. C functions with a <code>void</code> return type are regarded as <strong>subroutines</strong> in Fortran. C functions with other return types are similarly regarded as <strong>functions</strong> in Fortran. Before we begin we need to use the <code>iso_c_binding</code> module which gives us access to C datatypes, as well as helpful utilities and definitions that are useful in working with C.</p>
 <div class="highlight"><pre><span></span><span class="c">! Use the ISO Fortran environment module</span>
 <span class="w">    </span><span class="k">use </span><span class="nb">iso_c_binding</span>
 </pre></div>
@@ -8879,13 +8879,21 @@ $$</p>
 <span class="w">        </span>
 <span class="w">    </span><span class="k">end interface</span>
 </pre></div>
-<p>Every function or subroutine defined in the interface has the same number of arguments as the corresponding C function in <a href="c_functions.cpp">c_functions.cpp</a>. In order to bind the name (without mangling) to that of the corresponding C function also notice the presence of the <code>bind(C)</code> statement.</p>
+<p>Every function or subroutine defined in the interface has the same number of arguments as the corresponding C function in <a href="c_functions.cpp">c_functions.cpp</a>. The <code>bind(C)</code> statment means use C linkage to bind to a C function of the same name. In the <code>bind</code> statement you can also put <code>name=other_fun</code> to bind the Fortran function to a C function with another name like <code>other_fun</code>, as in the hypthetical example below.</p>
+<div class="highlight"><pre><span></span><span class="c">! C function to free memory </span>
+<span class="w">        </span><span class="k">subroutine </span><span class="n">c_free</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="k">bind</span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="n">other_fun</span><span class="p">)</span>
+<span class="w">            </span><span class="k">use </span><span class="nb">iso_c_binding</span>
+<span class="w">            </span><span class="c">! Make sure we have the value option set</span>
+<span class="w">            </span><span class="c">! to pass by value</span>
+<span class="w">            </span><span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">),</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span><span class="w"> </span><span class="k">value</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ptr</span>
+<span class="w">        </span><span class="k">end subroutine </span><span class="n">c_free</span>
+</pre></div>
 <h4 id="Standard-datatypes">Standard datatypes<a class="anchor-link" href="#Standard-datatypes">¶</a></h4><p>In Fortran the number of bytes used to represent reals or integers may be easily changed with a compiler option. When passing memory between Fortran an C is it a <strong>very good idea</strong> to use standardised data types from the <code>iso_fortran_env</code> module. In <a href="tensor_lib_c.f90">tensor_lib_c.f90</a> we use the <strong>real32</strong> kind from <code>iso_fortran_env</code> to make sure that the pointers always have a consistent datatype that is compatible with <code>float</code> in C.</p>
 <div class="highlight"><pre><span></span><span class="kt">real</span><span class="p">(</span><span class="nb">kind</span><span class="o">=</span><span class="n">real32</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A_h</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nb">null</span><span class="p">(),</span><span class="w"> </span><span class="n">B_h</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nb">null</span><span class="p">(),</span><span class="w"> </span><span class="n">C_h</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nb">null</span><span class="p">()</span>
 </pre></div>
 <p>Alternatively, we could also have used the <code>c_float</code> kind from the <code>iso_c_binding</code> module.</p>
-<h4 id="Fortran-equivalent-of-void*">Fortran equivalent of void*<a class="anchor-link" href="#Fortran-equivalent-of-void*">¶</a></h4><p>The data type of arguments in and out of the functions and subroutines are defined in the interface. The Fortran <code>type(c_ptr)</code> is equivalent to <code>void*</code> in C/C++. Also notice that integers passed in can have a type of <code>c_int</code> or <code>c_size_t</code> that correspond to their C/C++ equivalents.</p>
-<h4 id="Pass-by-value-instead">Pass by value instead<a class="anchor-link" href="#Pass-by-value-instead">¶</a></h4><p>When functions are called from Fortran, remember that arguments are usually passed <strong>by reference</strong> instead of by <strong>value</strong>. This means that by default the C function will receive a <strong>pointer</strong> to the argument instead of the actual value of the argument. If you are trying to pass a pointer of <code>type(c_ptr)</code> then the C function by default will receive a <strong>reference</strong> to that pointer, which is a pointer to a pointer of type <code>void**</code>. You can modify this behaviour by adding the <code>value</code> option for each input argument in the interface. Then the <strong>value</strong> of each argument will be passed to the C function instead and the C function will receive a pointer of type <code>void*</code>.</p>
+<h4 id="Fortran-equivalent-of-void*">Fortran equivalent of void*<a class="anchor-link" href="#Fortran-equivalent-of-void*">¶</a></h4><p>The data type of arguments in and out of the functions and subroutines are defined in the interface. The Fortran <code>type(c_ptr)</code> is equivalent to a <code>void*</code> pointer in C/C++. Also notice that integers passed in can have a type of <code>c_int</code> or <code>c_size_t</code> that correspond to their C/C++ equivalents.</p>
+<h4 id="Pass-by-value-instead">Pass by value instead<a class="anchor-link" href="#Pass-by-value-instead">¶</a></h4><p>When functions are called from Fortran, remember that arguments are usually passed <strong>by reference</strong> instead of by <strong>value</strong>. This means that by default the C function will receive a <strong>pointer</strong> to the argument instead of the <strong>actual value</strong> of the argument. If you are trying to pass a pointer of <code>type(c_ptr)</code> to a C function then by default the C function will receive a <strong>reference</strong> to that pointer, which is a pointer to a pointer of type <code>void**</code>. You can modify this behaviour by adding the <code>value</code> option for each input argument in the interface. Then Fortran will pass the argument by <strong>value</strong> instead, and the C function will receive a pointer of type <code>void*</code>.</p>
 </div>
 </div>
 </div>
@@ -8907,12 +8915,12 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>In the module <a href="tensor_lib_c.f90">tensor_lib_c.f90</a> we call C code from the Fortran subroutines <code>init_mem</code>, <code>launch_kernel</code> and <code>free_mem</code>. In <code>init_mem</code> we call the function <code>c_alloc</code> (defined in <a href="c_functions.cpp">c_functions.cpp</a>) that allocates aligned memory and returns a C pointer.</p>
-<h4 id="Fortran-data-types-to-C-equivalents">Fortran data types to C equivalents<a class="anchor-link" href="#Fortran-data-types-to-C-equivalents">¶</a></h4><p>When calling C functions it is <strong>vital</strong> that the input data type is the same type and precision as what the C function is expecting. We pass in an integer of type <code>size_t</code> by using the Fortran <code>int</code> function to cast the input argument (number of bytes to allocate) to an integer of type <code>c_size_t</code> defined in the <code>iso_c_binding</code> module.</p>
+<p>Because of the interface we can now call the C functions from Fortran. From the module <a href="tensor_lib_c.f90">tensor_lib_c.f90</a> in the subroutines <code>init_mem</code>, <code>launch_kernel</code> and <code>free_mem</code>, we call the C functions <code>c_alloc</code>, <code>c_free</code>, and <code>launch_kernel</code>.</p>
+<h4 id="Fortran-data-types-to-C-equivalents">Fortran data types to C equivalents<a class="anchor-link" href="#Fortran-data-types-to-C-equivalents">¶</a></h4><p>When passing arguments to C functions it is <strong>vital</strong> that the data type and precision of the argument is the same as what the C function is expecting. We pass in an integer of type <code>size_t</code> by using the Fortran <code>int</code> function to cast the input argument (number of bytes to allocate) to an integer of type <code>c_size_t</code> defined in the <code>iso_c_binding</code> module.</p>
 <div class="highlight"><pre><span></span><span class="c">! Allocate memory for arrays using C functions</span>
 <span class="n">temp_cptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c_alloc</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">N_in</span><span class="o">*</span><span class="n">sizeof</span><span class="p">(</span><span class="n">temp_real</span><span class="p">),</span><span class="w"> </span><span class="kt">c_size_t</span><span class="p">))</span>
 </pre></div>
-<h4 id="C-pointers-to-Fortran-pointers">C pointers to Fortran pointers<a class="anchor-link" href="#C-pointers-to-Fortran-pointers">¶</a></h4><p>The returned data type is of <code>type(c_ptr)</code>. We convert this pointer to a Fortran pointer using the <code>c_f_pointer</code> subroutine. At the same time we have the option of passing in a shape ([N_in]) for the created Fortran pointer</p>
+<h4 id="C-pointers-to-Fortran-pointers">C pointers to Fortran pointers<a class="anchor-link" href="#C-pointers-to-Fortran-pointers">¶</a></h4><p>The returned data type is of <code>type(c_ptr)</code> from the <code>iso_c_binding</code> module. We can convert this pointer to a Fortran pointer using the <code>c_f_pointer</code> subroutine. At the same time we have the option of passing in a shape ([N_in]) for the created Fortran pointer</p>
 <pre><code>call c_f_pointer(temp_cptr, A_h, [N_in])
 </code></pre>
 <h4 id="Fortran-pointers-to-C-pointers">Fortran pointers to C pointers<a class="anchor-link" href="#Fortran-pointers-to-C-pointers">¶</a></h4><p>The <code>launch_kernel</code> subroutine in <a href="tensor_lib_c.f90">tensor_lib_c.f90</a> calls the C function <code>launch_c_kernel</code> from <a href="c_functions.cpp">c_functions.cpp</a>. It expects three arguments of <code>type(c_ptr)</code> and one integer of type <code>c_int</code>. We use the function <code>c_loc</code> to get a void pointer to the starting address for the Fortran pointers <code>A_h</code>, <code>B_h</code>, and <code>C_h</code>.</p>
@@ -8956,7 +8964,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>run<span class="w"> </span>tensoradd_cfun
