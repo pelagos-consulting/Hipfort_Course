@@ -18,6 +18,10 @@ then
     export GPU_ARCH=gfx90a
 
     export HIPFORT_COMPILER=ftn
+    export FC=$(which ftn)
+    export CC=$(which cc)
+    export CXX=$(which CC)
+
 
 elif [[ $HOSTNAME =~ "noether" ]]
 then
@@ -69,11 +73,14 @@ else
     export LIBRARY_PATH=${LIBRARY_PATH}:${ROCM_PATH}/lib:${CUDA_PATH}/lib64:${ROCM_PATH}/llvm/lib
     export CPATH=${CPATH}:${ROCM_PATH}/include:${CUDA_PATH}/include:${ROCM_PATH}/llvm/include
 
+    # Try to load the necessary modules
+    module load rocm cuda hipfort
+
     # Use a CUDA backend
     export HIP_PLATFORM=nvidia
     export GPU_ARCH="60;61;70;75;80;86;89;90"
     
-    export HIPFORT_COMPILER=$(which gfortran)
+    export FC=$(which hipfc)
     
     # Use an AMD backend
     #export HIP_PLATFORM=amd

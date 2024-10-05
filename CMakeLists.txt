@@ -92,7 +92,7 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
     find_path(HIPFORT_INCLUDE_DIRS NAMES hipfort.mod HIPFORT.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/nvptx/ REQUIRED)
 
     ## Set libraries to link to for device code
-    set(kernel_libs CUDA::cudart CUDA::cuda_driver ${HIPFORT_LIBRARIES})
+    set(kernel_libs ${HIPFORT_LIBRARIES} CUDA::cuda_driver CUDA::cudart)
     include_directories(${HIPFORT_INCLUDE_DIRS})
 
 else()
@@ -124,7 +124,7 @@ else()
     find_path(HIPFORT_INCLUDE_DIRS NAMES hipfort.mod HIPFORT.mod HINTS ENV HIPFORT_ROOT PATH_SUFFIXES include/hipfort/amdgcn/ REQUIRED)
 
     ## Set libraries to link to for device code
-    set(kernel_libs hip::device ${HIPFORT_LIBRARIES})
+    set(kernel_libs ${HIPFORT_LIBRARIES} hip::device)
     include_directories(${HIPFORT_INCLUDE_DIRS})
     
 endif()
