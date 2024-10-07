@@ -3,7 +3,7 @@ program tensoradd
     !! Program to compute a 1D tensor addition
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
-    ! Add this to use the standard fortran environment module
+    ! Add this to use the standard Fortran environment module
     use iso_fortran_env
 
     ! Add this to make sure that all variables must be declared
