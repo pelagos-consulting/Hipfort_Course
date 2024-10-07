@@ -20,13 +20,13 @@ module tensor_hip
         !! Object to represent a tensor allocated on the GPU
 
         ! Is this tensor allocated?
-        logical :: allocd
+        logical :: allocd = .false.
         
         ! Pointer to the memory
-        type(c_ptr) :: mem
+        type(c_ptr) :: mem = c_null_ptr
         
         ! Number of bytes in the allocation
-        integer(c_size_t) :: nbytes
+        integer(c_size_t) :: nbytes = 0
     
         contains
         

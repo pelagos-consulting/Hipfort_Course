@@ -20,13 +20,13 @@ module tensor_hip
         !! Object to represent a tensor allocated on the GPU
 
         ! Is this tensor allocated?
-        logical :: allocd
+        logical :: allocd = .false.
         
         ! Pointer to the memory
-        type(c_ptr) :: mem
+        type(c_ptr) :: mem = c_null_ptr
         
         ! Number of bytes in the allocation
-        integer(c_size_t) :: nbytes
+        integer(c_size_t) :: nbytes = 0
     
         contains
         
@@ -113,7 +113,8 @@ contains
     end subroutine free
 
     subroutine destructor(this)
-        !! Destructor
+        !! Destructor, `this` must be of type(tensor) because it is valid only for instances
+        !! of this type
         type(tensor), intent(inout) :: this
         call this%free
     end subroutine destructor
@@ -192,7 +193,7 @@ contains
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
         real(kind=c_float), dimension(:), intent(in), pointer :: host_fptr
-        call this%copy_from(c_loc(host_fptr), sizeof(host_fptr))
+        call this%copy_from(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
     end subroutine copy_from_host_c_float_1
 
     subroutine copy_to_host_c_float_1(this, host_fptr)
@@ -201,7 +202,7 @@ contains
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
         real(kind=c_float), dimension(:), intent(inout), pointer :: host_fptr
-        call this%copy_to(c_loc(host_fptr), sizeof(host_fptr))
+        call this%copy_to(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
     end subroutine copy_to_host_c_float_1
 
     subroutine copy_from_host_c_float_2(this, host_fptr)
@@ -210,7 +211,7 @@ contains
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
         real(kind=c_float), dimension(:,:), intent(in), pointer :: host_fptr
-        call this%copy_from(c_loc(host_fptr), sizeof(host_fptr))
+        call this%copy_from(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
     end subroutine copy_from_host_c_float_2
 
     subroutine copy_to_host_c_float_2(this, host_fptr)
@@ -219,7 +220,7 @@ contains
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
         real(kind=c_float), dimension(:,:), intent(inout), pointer :: host_fptr
-        call this%copy_to(c_loc(host_fptr), sizeof(host_fptr))
+        call this%copy_to(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
     end subroutine copy_to_host_c_float_2
 
 end module tensor_hip
