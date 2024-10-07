@@ -3,7 +3,8 @@ module tensor_lib
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
     use iso_fortran_env
-    
+
+    ! We only need one implicit none for the whole module
     implicit none
 
     ! Have we already allocated memory?

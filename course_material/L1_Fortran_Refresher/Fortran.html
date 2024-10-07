@@ -7527,7 +7527,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">¶</a></h2><p>Fortran was developed in the 1950's as a purpose built language for STEM applications. It is a good language to use for high performance computing because it is <strong>easy</strong> to understand, highly performant, and comes with a first-rate multi-dimensional array implementation. Furthermore, the language has access to both thread-level and accelerator-assisted paralleism via extensions such as OpenMP and OpenACC, as well as access to process-level parallelism with a message passing library.</p>
+<h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">¶</a></h2><p>Fortran (<strong>For</strong>mula <strong>Tran</strong>slation) was developed in the 1950's as a purpose built language for STEM applications. It is a good language to use for high performance computing because it is <strong>easy</strong> to read, highly performant, and comes with a first-rate multi-dimensional array implementation. Furthermore, the language has access to both thread-level and accelerator-assisted paralleism via extensions such as OpenMP and OpenACC, as well as access to process-level parallelism with a message passing library.</p>
 <p>It is true that older versions of the Fortran standard (i.e Fortran 77 and earlier) have <strong>archaic features</strong> and idiosyncrasies that may discourage folks with training in modern coding techniques. However, like other standard programming languages such as C++, the standard is under <strong>active development</strong>, and modern Fortran programs can even be expressed in object-oriented coding styles. Some of the benefits of Fortran include:</p>
 <ul>
 <li>Longevity, Fortran will be around as a standard for a long time.</li>
@@ -7540,10 +7540,11 @@ a.anchor-link {
 <li>Objects are passed to subroutines and functions <strong>by reference</strong> as the default. This potentially has implications for memory safety.</li>
 <li>Poor IO functionality and string handling.</li>
 <li>Memory alignment complexities when interfacing Fortran with C.</li>
-<li>No central website for the Fortran standard. The site <a href="https://fortran-lang.org/">Fortran Lang</a> is a good resource for news and updates on Fortran.</li>
+<li>No central website for the Fortran standard. The site <a href="https://fortran-lang.org/">Fortran Lang</a> is a good resource for news and updates on Fortran. As a result, Fortran compilers behave differently!</li>
 <li>Finding expertise in Fortran is difficult.</li>
-<li>Debugging in Fortran can be difficult. Reasons for compilation errors are cryptic!</li>
+<li>Debugging in Fortran can be difficult. Explanations for compile errors are cryptic!</li>
 </ul>
+<p>For this course we are going to focus on the Fortran 2003 standard and higher. On the Fortran Lang site there is a section on <a href="https://fortran-lang.org/en/learn/best_practices/">Best Practices</a> in Fortran code, and we will try to follow these.</p>
 </div>
 </div>
 </div>
@@ -7627,7 +7628,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Variable-names">Variable names<a class="anchor-link" href="#Variable-names">¶</a></h2><p>In Fortran all variables must be declared <strong>before any other statements</strong>. This means declaring all the variables we are going to use at the beginning, as opposed to when they are needed. Variable names must begin with a letter and may contain letters <code>[a-zA-Z]</code>, numbers <code>[0-9]</code>, or an underscore <code>_</code>. Fortran is also <strong>case insensitive</strong> by default, meaning that uppercase and lowercase code is interpreted the same way unless you set a compiler flag.</p>
+<h2 id="Variable-names">Variable names<a class="anchor-link" href="#Variable-names">¶</a></h2><p>In Fortran all variables must be declared <strong>before any other statements</strong>. This means declaring all the variables we are going to use at the beginning, as opposed to when they are needed. Variable names must begin with a letter and may contain letters <code>[a-zA-Z]</code>, numbers <code>[0-9]</code>, or an underscore <code>_</code>. Fortran is also <strong>case insensitive</strong> by default, meaning that uppercase and lowercase code is interpreted the same way, unless you set a compiler flag.</p>
 <h2 id="Implicit-(weak)-typing">Implicit (weak) typing<a class="anchor-link" href="#Implicit-(weak)-typing">¶</a></h2><p>By default Fortran also has implicit typing. This means that if a variable starts with <code>i, j, k, l, m, n</code> then the variable is created as a (4 byte) integer, otherwise it is created as a (4 byte) floating point number. This can be a source of errors because:</p>
 <ul>
 <li>The precision of implicitly typed variables may change from platform to platform</li>
@@ -7751,11 +7752,11 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Calling-functions-and-subroutines">Calling functions and subroutines<a class="anchor-link" href="#Calling-functions-and-subroutines">¶</a></h2><p>Fortran has <strong>functions</strong> and <strong>subroutines</strong>. Functions take any number of input variables and return 1 output variable. The output of functions can be used on the right hand side of an assignment statement. For example, the call to the built-in <strong>spacing</strong> function returns the value of floating point spacing from the input floating point value to the next value. Here we use it in the validation step to help calculate the upper and lower bounds on a validation result.</p>
+<h2 id="Calling-functions-and-subroutines">Calling functions and subroutines<a class="anchor-link" href="#Calling-functions-and-subroutines">¶</a></h2><p>Fortran has <strong>functions</strong> and <strong>subroutines</strong>. Functions take any number of <strong>input variables</strong> and return 1 output variable. The output of functions can be used on the right hand side of an assignment statement. For example, the call to the built-in <strong>spacing</strong> function returns the value of floating point spacing from the input floating point value to the next value. Here we use it in the validation step to help calculate the upper and lower bounds on a validation result.</p>
 <div class="highlight"><pre><span></span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scratch</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eps_mult</span><span class="o">*</span><span class="nb">spacing</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">scratch</span><span class="p">))</span>
 <span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scratch</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">eps_mult</span><span class="o">*</span><span class="nb">spacing</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">scratch</span><span class="p">))</span>
 </pre></div>
-<p><strong>Subroutines</strong> are like functions but they do not return a value. Here we use the built-in subroutine <strong>random_number</strong> to fill the tensors <strong>A_h</strong> and <strong>B_h</strong> with random numbers. All subroutines are called with the <code>call</code> statement.</p>
+<p><strong>Subroutines</strong> are like functions, but they do not return a value. Here we use the built-in subroutine <strong>random_number</strong> to fill the tensors <strong>A_h</strong> and <strong>B_h</strong> with random numbers. All subroutines are called with the <code>call</code> statement.</p>
 <div class="highlight"><pre><span></span><span class="c">! Fill arrays with random numbers using the</span>
 <span class="w">    </span><span class="c">! Fortran intrinsic function "random_number"</span>
 <span class="w">    </span><span class="k">call </span><span class="nb">random_number</span><span class="p">(</span><span class="n">A_h</span><span class="p">)</span>
@@ -8020,7 +8021,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -8038,7 +8039,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>run<span class="w"> </span>tensoradd_simple
@@ -8065,7 +8066,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1">## Remove any files made</span>
@@ -8153,7 +8154,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Cleanup">Cleanup<a class="anchor-link" href="#Cleanup">¶</a></h4><p>When an array is allocated on the heap it is always good practice to de-allocate  (clean it up) when it is no longer needed.</p>
+<h4 id="Cleanup">Cleanup<a class="anchor-link" href="#Cleanup">¶</a></h4><p>When an array is allocated on the heap it is <strong>always good practice</strong> to de-allocate  (clean it up) when it is no longer needed.</p>
 <div class="highlight"><pre><span></span><span class="c">! Always free heap memory when you no longer need it</span>
 <span class="k">deallocate</span><span class="p">(</span><span class="n">A_h</span><span class="p">,</span><span class="w"> </span><span class="n">B_h</span><span class="p">,</span><span class="w"> </span><span class="n">C_h</span><span class="p">)</span>
 </pre></div>
@@ -8176,7 +8177,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>run<span class="w"> </span>tensoradd_allocatable
@@ -8260,12 +8261,14 @@ $$</p>
 <div class="highlight"><pre><span></span><span class="c">! Demonstrate pointer remapping with D_h</span>
 <span class="w">    </span><span class="kt">real</span><span class="p">,</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:,:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">D_h</span>
 </pre></div>
-<p>Then we can point the 2D pointer at a 1D allocation. In doing so we must set the bounds of the allocation. With the code below we change the bounds of <code>D_h</code> to be (1:N/2, 1:N/2) and point it to the same memory pointed to by <code>A_h</code>:</p>
+<p>Then we can point the 2D pointer at a 1D allocation. In doing so we must set the bounds of the allocation. With the code below we change the bounds of <code>D_h</code> to be (1:4, 1:4) and point it to the same memory pointed to by <code>A_h</code>:</p>
 <div class="highlight"><pre><span></span><span class="c">! Demonstrate pointer remapping.</span>
 <span class="w">    </span><span class="c">! Point a 4x4 2D pointer at the allocated memory</span>
-<span class="w">    </span><span class="n">D_h</span><span class="p">(</span><span class="mi">1</span><span class="p">:(</span><span class="n">N</span><span class="o">/</span><span class="mi">4</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="p">:(</span><span class="n">N</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A_h</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c">! We normally wouldn't hardcode array sizes like this</span>
+<span class="w">    </span><span class="n">D_h</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A_h</span>
 </pre></div>
-<p>Access to <code>D_h</code> is then treated the same way as any array of size (N/2, N/2). Next, we again change the size of the 2D pointer to 2x2 and point it at the last four elements of the <code>A_h</code> allocation.</p>
+<p>Access to <code>D_h</code> is then treated the same way as any array of size (N/4, N/4). Next, we again change the size of the 2D pointer to 2x2 and point it at the last four elements of the <code>A_h</code> allocation.</p>
 <div class="highlight"><pre><span></span><span class="c">! Point a 2D pointer of size 2x2 </span>
 <span class="w">    </span><span class="c">! at the last 4 elements of A_h</span>
 <span class="w">    </span><span class="n">D_h</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">A_h</span><span class="p">((</span><span class="n">N</span><span class="o">-</span><span class="mi">4</span><span class="p">):</span><span class="n">N</span><span class="p">)</span>
@@ -8316,7 +8319,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>run<span class="w"> </span>tensoradd_pointer
@@ -8620,7 +8623,8 @@ $$</p>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="Module-variables">Module variables<a class="anchor-link" href="#Module-variables">¶</a></h3><p>At the beginning of a module you can put any number of <code>use</code> statements followed by declarations of variables. These variables are accessible to every function or subroutine in the module. Here we declare a logical variable <code>allocd</code> to store wether or not the memory for <strong>A_h</strong>, <strong>B_h</strong> and <strong>C_h</strong> has been allocated.</p>
-<div class="highlight"><pre><span></span><span class="k">implicit none</span>
+<div class="highlight"><pre><span></span><span class="c">! We only need one implicit none for the whole module</span>
+<span class="w">    </span><span class="k">implicit none</span>
 
 <span class="w">    </span><span class="c">! Have we already allocated memory?</span>
 <span class="w">    </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">allocd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
@@ -8729,7 +8733,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>run<span class="w"> </span>tensoradd_module
@@ -8997,7 +9001,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>build<span class="w"> </span>tensoradd_cfun<span class="p">;</span><span class="w"> </span>run<span class="w"> </span>tensoradd_cfun
@@ -9013,22 +9017,33 @@ $$</p>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[100%] Built target tensoradd_cfun
+<pre><span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_cfun</span>
+[100%] Built target tensoradd_cfun
 [  2%] Built target tensoradd_simple
 [  5%] Built target tensoradd_allocatable
 [  7%] Built target tensoradd_pointer
 [ 10%] Built target tensoradd_function
+<span class="ansi-magenta-intense-fg ansi-bold">Scanning dependencies of target tensoradd_module</span>
+<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_module</span>
 [ 15%] Built target tensoradd_module
 [ 20%] Built target tensoradd_cfun
+<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_hip_cptr</span>
 [ 26%] Built target tensoradd_hip_cptr
+<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_hip_fptr</span>
 [ 32%] Built target tensoradd_hip_fptr
+<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_hip_oo</span>
 [ 40%] Built target tensoradd_hip_oo
+<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_hip_fptr_managed</span>
 [ 46%] Built target tensoradd_hip_fptr_managed
 [ 49%] Built target chessboard_CPU_answer
 [ 51%] Built target chessboard_CPU
+<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target chessboard_GPU</span>
 [ 56%] Built target chessboard_GPU
+<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target chessboard_GPU_answer</span>
 [ 62%] Built target chessboard_GPU_answer
+<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target chessboard_mm</span>
 [ 67%] Built target chessboard_mm
+<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target chessboard_mm_answer</span>
 [ 72%] Built target chessboard_mm_answer
 [ 77%] Built target paged_mem
 [ 82%] Built target pinned_mem
@@ -9038,6 +9053,7 @@ $$</p>
 [100%] Built target memcpy_bench
 <span class="ansi-cyan-fg">Install the project...</span>
 -- Install configuration: "DEBUG"
+-- Installing: /home/toby/Pelagos/Projects/Hipfort_Course/install/bin/tensoradd_module
  Tensor addition passed validation.
 </pre>
 </div>

@@ -45,7 +45,9 @@ program tensoradd
 
     ! Demonstrate pointer remapping.
     ! Point a 4x4 2D pointer at the allocated memory
-    D_h(1:(N/4), 1:(N/4)) => A_h    
+    
+    ! We normally wouldn't hardcode array sizes like this
+    D_h(1:4, 1:4) => A_h    
     
     ! Point a 2D pointer of size 2x2 
     ! at the last 4 elements of A_h

@@ -1,8 +1,9 @@
+
 program tensoradd
     !! Program to compute a 1D tensor addition
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
-    ! Add this to use the standard fortran environment module
+    ! Add this to use the standard Fortran environment module
     use iso_fortran_env
 
     ! Add this to make sure that all variables must be declared
@@ -32,7 +33,7 @@ program tensoradd
 
     ! Declare the tensors to use
     ! Memory for these will be allocated on the stack
-    real :: A_h(0:N), B_h(0:N), C_h(0:N)
+    real :: A_h(N), B_h(N), C_h(N)
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
@@ -67,7 +68,7 @@ program tensoradd
         scratch = A_h(i) + B_h(i)
 
         ! Get upper and lower bounds on the computed solution
-        ! the "spacing" intrinsic function gets the floating point spacing
+        ! the "spacing" built-in function gets the floating point spacing
         ! from one number to the next
         upper = scratch + eps_mult*spacing(abs(scratch))
         lower = scratch - eps_mult*spacing(abs(scratch))
