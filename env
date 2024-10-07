@@ -61,17 +61,17 @@ then
 else
 
     # Locations for ROCM and CUDA
-    export ROCM_PATH=/opt/rocm
-    export CUDA_PATH=/usr/local/cuda
+    #export ROCM_PATH=/opt/rocm
+    #export CUDA_PATH=/usr/local/cuda
 
     # Must set HIPFORT_ROOT environment variable
-    export HIPFORT_ROOT=$ROCM_PATH
+    #export HIPFORT_ROOT=$ROCM_PATH
 
     # Try to make sure nvcc and hipconfig are in the path
-    export PATH=${PATH}:${ROCM_PATH}/bin:${CUDA_PATH}/bin
-    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ROCM_PATH}/lib:${CUDA_PATH}/lib64:${ROCM_PATH}/llvm/lib
-    export LIBRARY_PATH=${LIBRARY_PATH}:${ROCM_PATH}/lib:${CUDA_PATH}/lib64:${ROCM_PATH}/llvm/lib
-    export CPATH=${CPATH}:${ROCM_PATH}/include:${CUDA_PATH}/include:${ROCM_PATH}/llvm/include
+    #export PATH=${PATH}:${ROCM_PATH}/bin:${CUDA_PATH}/bin
+    #export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ROCM_PATH}/lib:${CUDA_PATH}/lib64:${ROCM_PATH}/llvm/lib
+    #export LIBRARY_PATH=${LIBRARY_PATH}:${ROCM_PATH}/lib:${CUDA_PATH}/lib64:${ROCM_PATH}/llvm/lib
+    #export CPATH=${CPATH}:${ROCM_PATH}/include:${CUDA_PATH}/include:${ROCM_PATH}/llvm/include
 
     # Try to load the necessary modules
     module load rocm cuda hipfort
@@ -79,9 +79,12 @@ else
     # Use a CUDA backend
     export HIP_PLATFORM=nvidia
     export GPU_ARCH="60;61;70;75;80;86;89;90"
-    
-    export FC=$(which hipfc)
-    
+
+    export HIPFORT_COMPILER=$(which gfortran)
+    export FC=$(which gfortran)
+    export CC=$(which gcc)
+    export CXX=$(which g++)
+
     # Use an AMD backend
     #export HIP_PLATFORM=amd
     #export GPU_ARCH="gfx906;gfx908;gfx90a;gfx1035"
