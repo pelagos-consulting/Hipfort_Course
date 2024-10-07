@@ -51,7 +51,7 @@ then
 
     module load gcc rocm hipfort
     export HIP_PLATFORM=amd
-    export GPU_ARCH="gfx1035"
+    export GPU_ARCH="gfx906"
 
     export HIPFORT_COMPILER=$(which gfortran)
     export FC=$(which gfortran)
