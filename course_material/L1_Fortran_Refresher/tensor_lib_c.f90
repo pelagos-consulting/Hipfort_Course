@@ -15,7 +15,7 @@ module tensor_lib
     
         ! Fortran regards a C function with void return type
         ! as a subroutine 
-        ! This is the fortran interface to the C function
+        ! This is the Fortran interface to the C function
         subroutine launch_c_kernel(A, B, C, N) bind(C)
             use iso_c_binding
             ! Fortran passes by reference as the default
@@ -52,7 +52,7 @@ module tensor_lib
     integer :: N
 
     ! Pointers to memory on the host
-    real(kind=real32), pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
+    real(kind=c_float), pointer, dimension(:) :: A_h => null(), B_h => null(), C_h => null()
 
     ! Declare private variables functions and subroutines
     ! that belong only to the module

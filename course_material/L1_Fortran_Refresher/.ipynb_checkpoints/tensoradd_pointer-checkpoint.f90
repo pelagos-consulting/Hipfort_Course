@@ -90,6 +90,9 @@ program tensoradd
 
     ! Always free heap memory when you no longer need it
     deallocate(A_h, B_h, C_h)
+
+    ! Now set those pointers to null for safety
+    nullify(A_h, B_h, C_h)
     
 end program tensoradd
 
