@@ -7800,7 +7800,7 @@ $$</p>
 </pre></div>
 <h3 id="Loop-nests-and-multi-dimensional-indexing">Loop nests and multi-dimensional indexing<a class="anchor-link" href="#Loop-nests-and-multi-dimensional-indexing">¶</a></h3><p>Loops can of course be nested. Nesting loops is a common way to cover multi-dimensional arrays. If this was a two dimensional problem it would look something like this:</p>
 <div class="highlight"><pre><span></span><span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">M</span>
-<span class="w">    </span><span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span>
+<span class="w">    </span><span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span>
 <span class="w">        </span><span class="c">! Kernel math</span>
 <span class="w">        </span><span class="n">C_h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">B_h</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
 <span class="w">    </span><span class="k">end do</span>
@@ -8006,6 +8006,19 @@ $$</p>
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bea6bc52-17e4-4b29-964f-52c6757d718f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Compile-the-example">Compile the example<a class="anchor-link" href="#Compile-the-example">¶</a></h2><p>From the command line we can compile tensoradd_simple.f90 with Gfortran using this command</p>
+<div class="highlight"><pre><span></span>gfortran<span class="w"> </span>tensoradd_simple.f90<span class="w"> </span>-o<span class="w"> </span>tensoradd_simple
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=27ccf2ec-c36a-486d-97ca-768d7440be55">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -8042,7 +8055,7 @@ $$</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>run<span class="w"> </span>tensoradd_simple
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>build<span class="w"> </span>tensoradd_simple<span class="p">;</span><span class="w"> </span>run<span class="w"> </span>tensoradd_simple
 </pre></div>
 </div>
 </div>
@@ -8055,13 +8068,40 @@ $$</p>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre> Tensor addition passed validation.
+<pre><span class="ansi-magenta-intense-fg ansi-bold">Scanning dependencies of target tensoradd_simple</span>
+[100%] Built target tensoradd_simple
+[  2%] Built target tensoradd_simple
+[  5%] Built target tensoradd_allocatable
+[  7%] Built target tensoradd_pointer
+[ 10%] Built target tensoradd_function
+[ 15%] Built target tensoradd_module
+[ 20%] Built target tensoradd_cfun
+[ 26%] Built target tensoradd_hip_cptr
+[ 32%] Built target tensoradd_hip_fptr
+[ 40%] Built target tensoradd_hip_oo
+[ 46%] Built target tensoradd_hip_fptr_managed
+[ 49%] Built target chessboard_CPU_answer
+[ 51%] Built target chessboard_CPU
+[ 56%] Built target chessboard_GPU
+[ 62%] Built target chessboard_GPU_answer
+[ 67%] Built target chessboard_mm
+[ 72%] Built target chessboard_mm_answer
+[ 77%] Built target paged_mem
+[ 82%] Built target pinned_mem
+[ 87%] Built target managed_mem
+[ 92%] Built target memcpy_sync
+[ 97%] Built target memcpy_async
+[100%] Built target memcpy_bench
+<span class="ansi-cyan-fg">Install the project...</span>
+-- Install configuration: "DEBUG"
+-- Installing: /home/toby/Pelagos/Projects/Hipfort_Course/install/bin/tensoradd_simple
+ Tensor addition passed validation.
 </pre>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2317f6f1-71ce-44e2-8f5f-bfdc6a06e710">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2317f6f1-71ce-44e2-8f5f-bfdc6a06e710">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8070,8 +8110,27 @@ $$</p>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1">## Remove any files made</span>
+<span class="o">!</span>ls
 <span class="o">!</span>rm<span class="w"> </span>*.dat
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>array_A_h.dat	 Fortran.ipynb		    tensoradd_pointer.f90
+array_B_h.dat	 README.md		    tensoradd_simple.f90
+array_C_h.dat	 tensoradd_allocatable.f90  tensor_lib_c.f90
+c_functions.cpp  tensoradd_cfun.f90	    tensor_lib.f90
+CMakeLists.txt	 tensoradd_function.f90     tensor_lib.mod
+Fortran.html	 tensoradd_module.f90
+</pre>
 </div>
 </div>
 </div>
@@ -8154,7 +8213,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Cleanup">Cleanup<a class="anchor-link" href="#Cleanup">¶</a></h4><p>When an array is allocated on the heap it is <strong>always good practice</strong> to de-allocate  (clean it up) when it is no longer needed.</p>
+<h4 id="Cleanup">Cleanup<a class="anchor-link" href="#Cleanup">¶</a></h4><p>Allocatable arrays are deallocated automatically once the variable goes out of scope. It is <strong>always good practice</strong> to de-allocate  (clean it up) when it is no longer needed.</p>
 <div class="highlight"><pre><span></span><span class="c">! Always free heap memory when you no longer need it</span>
 <span class="k">deallocate</span><span class="p">(</span><span class="n">A_h</span><span class="p">,</span><span class="w"> </span><span class="n">B_h</span><span class="p">,</span><span class="w"> </span><span class="n">C_h</span><span class="p">)</span>
 </pre></div>
@@ -8284,7 +8343,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="De-allocation">De-allocation<a class="anchor-link" href="#De-allocation">¶</a></h4><p>As with allocatable arrays, we can use the <code>deallocate</code> function to release memory that the pointers <strong>A_h</strong>, <strong>B_h</strong>, <strong>C_h</strong> are associated with.</p>
+<h4 id="Clean-up">Clean up<a class="anchor-link" href="#Clean-up">¶</a></h4><p>As with allocatable arrays, we can use the <code>deallocate</code> function to release memory that the pointers <strong>A_h</strong>, <strong>B_h</strong>, <strong>C_h</strong> are associated with.</p>
 <div class="highlight"><pre><span></span><span class="c">! Always free heap memory when you no longer need it</span>
 <span class="k">deallocate</span><span class="p">(</span><span class="n">A_h</span><span class="p">,</span><span class="w"> </span><span class="n">B_h</span><span class="p">,</span><span class="w"> </span><span class="n">C_h</span><span class="p">)</span>
 </pre></div>
@@ -8299,7 +8358,10 @@ $$</p>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h4 id="Safety-issues-with-pointers">Safety issues with pointers<a class="anchor-link" href="#Safety-issues-with-pointers">¶</a></h4><p>As mentioned before, using pointers carries the risk of introducing <strong>memory safety bugs</strong>. For example once we deallocated <strong>A_h</strong>, then access via the associated pointer <strong>D_h</strong> becomes undefined because the memory it points to <strong>no longer exists</strong>. If we tried to use <strong>D_h</strong> after the underlying memory allocation disappears, then it would result in a memory access violation. If we tried to deallocate <code>D_h</code> after <code>A_h</code> then it would result in an error. Lets imagine that this code has been worked on for many years and has gotten rather complex. What function or subroutine is responsible for deallocating <strong>A_h</strong>?. When would we know that <strong>A_h</strong> is no longer safe to use? We could have also repointed <strong>A_h</strong> at something else, leaving the original allocation there but no longer accessible. Allocated memory that is no longer accessible is known as a <strong>memory leak</strong>.</p>
-<p>For these reasons it is best practice to use Fortran pointers only when they are needed, and try to write your code so that dynamic memory allocation/deallocation is performed only in a specific part of your code.</p>
+<p>For these reasons it is best practice to use Fortran pointers only when they are needed, and try to write your code so that dynamic memory allocation/deallocation is performed only in a specific part of your code. Furthermore, when pointers aren't required we can use the <strong>nullify</strong> function to set them to null.</p>
+<div class="highlight"><pre><span></span><span class="c">! Now set those pointers to null for safety</span>
+<span class="w">    </span><span class="k">nullify</span><span class="p">(</span><span class="n">A_h</span><span class="p">,</span><span class="w"> </span><span class="n">B_h</span><span class="p">,</span><span class="w"> </span><span class="n">C_h</span><span class="p">)</span>
+</pre></div>
 </div>
 </div>
 </div>
@@ -8883,7 +8945,7 @@ $$</p>
 <span class="w">        </span>
 <span class="w">    </span><span class="k">end interface</span>
 </pre></div>
-<p>Every function or subroutine defined in the interface has the same number of arguments as the corresponding C function in <a href="c_functions.cpp">c_functions.cpp</a>. The <code>bind(C)</code> statment means use C linkage to bind to a C function of the same name. In the <code>bind</code> statement you can also put <code>name=other_fun</code> to bind the Fortran function to a C function with another name like <code>other_fun</code>, as in the hypthetical example below.</p>
+<p>Every function or subroutine defined in the interface has the same number of arguments as the corresponding C function in <a href="c_functions.cpp">c_functions.cpp</a>. The <code>bind(C)</code> statment means use C linkage to bind to a C function of the same name. In the <code>bind</code> statement you can also put <code>name=other_fun</code> to bind the Fortran function to a C function with another name like <code>other_fun</code>, as in the hypothetical example below.</p>
 <div class="highlight"><pre><span></span><span class="c">! C function to free memory </span>
 <span class="w">        </span><span class="k">subroutine </span><span class="n">c_free</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="k">bind</span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="o">=</span><span class="n">other_fun</span><span class="p">)</span>
 <span class="w">            </span><span class="k">use </span><span class="nb">iso_c_binding</span>
@@ -8968,18 +9030,18 @@ $$</p>
 <ol start="2">
 <li>Then compile the module library tensorlib.f90</li>
 </ol>
-<div class="highlight"><pre><span></span>fortran<span class="w"> </span>-c<span class="w"> </span>tensor_lib.f90<span class="w"> </span>-o<span class="w"> </span>tensor_lib.o
+<div class="highlight"><pre><span></span>gfortran<span class="w"> </span>-c<span class="w"> </span>tensor_lib_c.f90<span class="w"> </span>-o<span class="w"> </span>tensor_lib_c.o
 </pre></div>
 <p>This step creates the module file <code>tensor_lib.mod</code>, which <strong>needs</strong> to be in the include path when compiling tensoradd_cfun.</p>
 <ol start="3">
 <li>Compile <code>tensoradd_cfun</code></li>
 </ol>
-<div class="highlight"><pre><span></span>fortran<span class="w"> </span>-c<span class="w"> </span>tensoradd_cfun.f90<span class="w"> </span>-o<span class="w"> </span>tensoradd_cfun.o
+<div class="highlight"><pre><span></span>gfortran<span class="w"> </span>-c<span class="w"> </span>tensoradd_cfun.f90<span class="w"> </span>-o<span class="w"> </span>tensoradd_cfun.o
 </pre></div>
 <ol start="4">
 <li>Link the object files to create <code>tensoradd_cfun</code></li>
 </ol>
-<div class="highlight"><pre><span></span>fortran<span class="w"> </span>*.o<span class="w"> </span>-o<span class="w"> </span>tensoradd_cfun
+<div class="highlight"><pre><span></span>gfortran<span class="w"> </span>*.o<span class="w"> </span>-o<span class="w"> </span>tensoradd_cfun
 ./tensoradd_cfun
 </pre></div>
 </div>
@@ -9017,33 +9079,27 @@ $$</p>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre><span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_cfun</span>
+<pre><span class="ansi-magenta-intense-fg ansi-bold">Scanning dependencies of target tensoradd_cfun</span>
 [100%] Built target tensoradd_cfun
 [  2%] Built target tensoradd_simple
+<span class="ansi-magenta-intense-fg ansi-bold">Scanning dependencies of target tensoradd_allocatable</span>
 [  5%] Built target tensoradd_allocatable
+<span class="ansi-magenta-intense-fg ansi-bold">Scanning dependencies of target tensoradd_pointer</span>
 [  7%] Built target tensoradd_pointer
+<span class="ansi-magenta-intense-fg ansi-bold">Scanning dependencies of target tensoradd_function</span>
 [ 10%] Built target tensoradd_function
-<span class="ansi-magenta-intense-fg ansi-bold">Scanning dependencies of target tensoradd_module</span>
-<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_module</span>
 [ 15%] Built target tensoradd_module
+<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_cfun</span>
 [ 20%] Built target tensoradd_cfun
-<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_hip_cptr</span>
 [ 26%] Built target tensoradd_hip_cptr
-<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_hip_fptr</span>
 [ 32%] Built target tensoradd_hip_fptr
-<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_hip_oo</span>
 [ 40%] Built target tensoradd_hip_oo
-<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target tensoradd_hip_fptr_managed</span>
 [ 46%] Built target tensoradd_hip_fptr_managed
 [ 49%] Built target chessboard_CPU_answer
 [ 51%] Built target chessboard_CPU
-<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target chessboard_GPU</span>
 [ 56%] Built target chessboard_GPU
-<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target chessboard_GPU_answer</span>
 [ 62%] Built target chessboard_GPU_answer
-<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target chessboard_mm</span>
 [ 67%] Built target chessboard_mm
-<span class="ansi-magenta-intense-fg ansi-bold">Consolidate compiler generated dependencies of target chessboard_mm_answer</span>
 [ 72%] Built target chessboard_mm_answer
 [ 77%] Built target paged_mem
 [ 82%] Built target pinned_mem
@@ -9053,7 +9109,11 @@ $$</p>
 [100%] Built target memcpy_bench
 <span class="ansi-cyan-fg">Install the project...</span>
 -- Install configuration: "DEBUG"
+-- Installing: /home/toby/Pelagos/Projects/Hipfort_Course/install/bin/tensoradd_allocatable
+-- Installing: /home/toby/Pelagos/Projects/Hipfort_Course/install/bin/tensoradd_pointer
+-- Installing: /home/toby/Pelagos/Projects/Hipfort_Course/install/bin/tensoradd_function
 -- Installing: /home/toby/Pelagos/Projects/Hipfort_Course/install/bin/tensoradd_module
+-- Installing: /home/toby/Pelagos/Projects/Hipfort_Course/install/bin/tensoradd_cfun
  Tensor addition passed validation.
 </pre>
 </div>
