@@ -7527,12 +7527,12 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Software-environment">Software environment<a class="anchor-link" href="#Software-environment">¶</a></h2><p>Any Fortran source file that incorporates other software through the <code>use</code> statement <strong>must</strong> be built with the same Fortran compiler as those other sources. It is then usually required to build Fortran software and interfaces with the <strong>same compiler</strong>. Building software with hipFORT requires the following software installed and ready to go:</p>
+<h2 id="Software-environment">Software environment<a class="anchor-link" href="#Software-environment">¶</a></h2><p>Any Fortran source file that depends on other software through the <code>use</code> statement <strong>must</strong> be built with the <strong>same Fortran compiler</strong> as the dependencies. Building software with hipFORT requires the following software installed and ready to go:</p>
 <ul>
-<li>A GFortran compiler that is newer than 7.5.0. GFortran appears to be the only one that works at the moment, but this may change in future.</li>
-<li>The ROCM stack installed. See <a href="https://rocm.docs.amd.com/en/latest/">here</a> for latest installation info.<ul>
-<li>If you have an integrated graphics card from AMD you still might be able to use HIP. With my Radeon 680M i've had a good experience if I <strong>don't</strong> install the <code>amdgpu-dkms</code> package and just use the open source compute driver in the Linux kernel.</li>
-<li>If hipFORT is installed with the package manager during the installation of ROCM, you might need to remove it. Every unique Fortran compiler that you wish to use to build your software must have a corresponding installation of hipFORT built with the same compiler.</li>
+<li>The officially supported compiler is GFortran with a version newer than 7.5.0. Both GFortran and the Cray compiler have been used at Pawsey to install hipFORT.</li>
+<li>The ROCM stack. See <a href="https://rocm.docs.amd.com/en/latest/">here</a> for latest installation info.<ul>
+<li>If you have an integrated graphics card from AMD you still might be able to use HIP. I have a usable experience with my integrated Radeon 680M if I <strong>don't</strong> install the <code>amdgpu-dkms</code> package, and just use the open source <code>amdgpu</code> kernel module in the Linux kernel.</li>
+<li>If hipFORT is installed with ROCm, you might need to remove it. Every unique Fortran compiler that you wish to use to build your software must have a corresponding installation of hipFORT built with the same compiler.</li>
 </ul>
 </li>
 <li>Any other software that your application depends on.</li>
@@ -7549,8 +7549,8 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Basic-compilation-with-hipfc">Basic compilation with hipfc<a class="anchor-link" href="#Basic-compilation-with-hipfc">¶</a></h2><p>Once <code>hipFORT</code> is installed the compiler wrapper <code>hipfc</code> compiler wrapper can be used to compile Fortran sources. It supports the <code>-hipfort-compiler</code> option to select what Fortran compiler to use on the backend. Hipfc also supports C and C++ sources, and passes those sources to <code>hipcc</code> for compilation.</p>
-<h3 id="Compile-for-AMD">Compile for AMD<a class="anchor-link" href="#Compile-for-AMD">¶</a></h3><p>The example below compiles mixed Fortran and HIP sources with an AMD graphics card. Notice that I'm passing both <code>C++</code> and <code>Fortran</code> sources to the compiler wrapper <code>hipfc</code>.</p>
+<h2 id="Basic-compilation-with-hipfc">Basic compilation with hipfc<a class="anchor-link" href="#Basic-compilation-with-hipfc">¶</a></h2><p>Once <code>hipFORT</code> is installed and made available on your <code>PATH</code>, the compiler wrapper <code>hipfc</code> compiler wrapper can be used to compile Fortran sources. You can set a <code>-hipfort-compiler</code> compiler flag or the environment variable <code>HIPFORT_COMPILER</code> to select what Fortran compiler to use on the backend. Hipfc also supports C and C++ sources, and passes those sources to <code>hipcc</code> for compilation.</p>
+<h3 id="Compile-for-AMD-platforms">Compile for AMD platforms<a class="anchor-link" href="#Compile-for-AMD-platforms">¶</a></h3><p>The example below compiles mixed Fortran and HIP sources with an <strong>AMD graphics card</strong>. Notice that I'm passing both <code>C++</code> and <code>Fortran</code> sources to the compiler wrapper <code>hipfc</code>.</p>
 <div class="highlight"><pre><span></span>hipfc<span class="w"> </span>hip_utils.f90<span class="w"> </span>math_utils.f90<span class="w"> </span>tensoradd_hip_fptr.f90<span class="w"> </span>kernel_code.cpp<span class="w"> </span>-o<span class="w"> </span>tensoradd.exe
 </pre></div>
 <p>Compilation in this way usually chooses the architecture for whatever AMD graphics card you are using. You can be specific on which GPU architecture to compile for using the <code>--offload-arch</code> compiler flag. For an MI250X GPU this would look like:</p>
@@ -7559,7 +7559,7 @@ a.anchor-link {
 <h4 id="Compile-for-debugging">Compile for debugging<a class="anchor-link" href="#Compile-for-debugging">¶</a></h4><p>The <a href="https://rocm.docs.amd.com/projects/ROCgdb/en/latest/ROCgdb/gdb/doc/gdb/Compilation.html">Rocgdb documentation</a> recommends using the <code>-g</code> flag for debugging and the <code>-ggdb</code> if the underlying compiler supports it.</p>
 <div class="highlight"><pre><span></span>hipfc<span class="w"> </span>-ggdb<span class="w"> </span>--offload-arch<span class="o">=</span>gfx90a<span class="w"> </span>hip_utils.f90<span class="w"> </span>math_utils.f90<span class="w"> </span>tensoradd_hip_fptr.f90<span class="w"> </span>kernel_code.cpp<span class="w"> </span>-o<span class="w"> </span>tensoradd.exe
 </pre></div>
-<h3 id="Compile-for-NVIDIA">Compile for NVIDIA<a class="anchor-link" href="#Compile-for-NVIDIA">¶</a></h3><p>For compilation of sources using <code>hipfc</code> with an NVIDIA graphics card you need to set the environment variable <code>HIP_PLATFORM=nvidia</code>, and then you <strong>also need</strong> to choose the NVIDIA graphics card architecture via the <code>--offload-arch</code> compiler flag. For the same sources this works for my RTX 3060 GPU.</p>
+<h3 id="Compile-for-NVIDIA-platforms">Compile for NVIDIA platforms<a class="anchor-link" href="#Compile-for-NVIDIA-platforms">¶</a></h3><p>For compilation of sources using <code>hipfc</code> with an NVIDIA graphics card you need to set the environment variable <code>HIP_PLATFORM=nvidia</code>, and then you <strong>also need</strong> to choose the NVIDIA graphics card architecture via the <code>--offload-arch</code> compiler flag. For the same sources this works for my RTX 3060 GPU.</p>
 </div>
 </div>
 </div>
@@ -7606,7 +7606,7 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Compile-hipFORT-apps-with-CMake">Compile hipFORT apps with CMake<a class="anchor-link" href="#Compile-hipFORT-apps-with-CMake">¶</a></h2><p>HIP language support was formally introduced in CMake, version 3.21. This means you can set HIP as the language for kernel sources and the compiler will choose the necessary flags. Until version 3.28 of CMake the AMD backend was the only one that was supported by the HIP language. Since HIP on NVIDIA is just a thin wrapper over CUDA, an approach that seems to <strong>work well</strong> is to treat device code as the <strong>HIP language</strong> when using an AMD backend, and treat the <strong>same source files</strong> as the <strong>CUDA language</strong> when using an NVIDIA backend. Then one can define some backend-specific macros that are used by the compiler to route function calls to the right library.</p>
-<p>In the main <a href="../CMakeLists.txt"></a>CMakeLists.txt text file is a list of CMake directives that support compiling hipFORT applications for both AMD and NVIDIA backends. In this section we explore each line of the CMake file.</p>
+<p>The main <a href="../../CMakeLists.txt"></a>CMakeLists.txt text file is a list of CMake directives that support compiling hipFORT applications for both AMD and NVIDIA backends. It is in the top level directory of a source tree. In this section we explore each line of <code>CMakeLists.txt</code>.</p>
 </div>
 </div>
 </div>
@@ -7617,12 +7617,21 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Set-ROCM_PATH">Set ROCM_PATH<a class="anchor-link" href="#Set-ROCM_PATH">¶</a></h3><p>This bit of CMAKE code in <a href="../CMakeLists.txt"></a>CMakeLists.txt will set the <code>ROCM_PATH</code> variable, which is helpful for CMake to find hip.</p>
+<h3 id="Set-ROCM_PATH">Set ROCM_PATH<a class="anchor-link" href="#Set-ROCM_PATH">¶</a></h3><p>The environment variable <code>ROCM_PATH</code> is helpful for CMake to find hip. It needs to be set to the location where ROCm is installed. If it is not available this bit of CMAKE code in <a href="../CMakeLists.txt"></a>CMakeLists.txt will set the <code>ROCM_PATH</code> variable to <code>/opt/rocm</code>, the usual install location for ROCm.</p>
 <div class="highlight"><pre><span></span><span class="nb">if</span><span class="p">(</span><span class="s">NOT</span><span class="w"> </span><span class="s">DEFINED</span><span class="w"> </span><span class="s">ROCM_PATH</span><span class="p">)</span>
 <span class="w">    </span><span class="nb">if</span><span class="p">(</span><span class="s">NOT</span><span class="w"> </span><span class="s">DEFINED</span><span class="w"> </span><span class="s">ENV{ROCM_PATH}</span><span class="p">)</span>
 <span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">ROCM_PATH</span><span class="w"> </span><span class="s2">"/opt/rocm/"</span><span class="w"> </span><span class="s">CACHE</span><span class="w"> </span><span class="s">PATH</span><span class="w"> </span><span class="s2">"Path to which ROCm has been installed"</span><span class="p">)</span>
 <span class="w">    </span><span class="nb">else</span><span class="p">()</span>
 <span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">ROCM_PATH</span><span class="w"> </span><span class="o">$ENV{</span><span class="nv">ROCM_PATH</span><span class="o">}</span><span class="w"> </span><span class="s">CACHE</span><span class="w"> </span><span class="s">PATH</span><span class="w"> </span><span class="s2">"Path to which ROCm has been installed"</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">endif</span><span class="p">()</span>
+<span class="nb">endif</span><span class="p">()</span>
+</pre></div>
+<p>Likewise, the environment variable <code>HIPFORT_ROOT</code> must be set to the location where <code>hipFORT</code> is installed. This code attempts to failover to the same location as ROCm if <code>HIPFORT_ROOT</code> is not defined.</p>
+<div class="highlight"><pre><span></span><span class="nb">if</span><span class="p">(</span><span class="s">NOT</span><span class="w"> </span><span class="s">DEFINED</span><span class="w"> </span><span class="s">HIPFORT_ROOT</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">if</span><span class="p">(</span><span class="s">NOT</span><span class="w"> </span><span class="s">DEFINED</span><span class="w"> </span><span class="s">ENV{HIPFORT_ROOT}</span><span class="p">)</span>
+<span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">HIPFORT_ROOT</span><span class="w"> </span><span class="s2">"/opt/rocm/"</span><span class="w"> </span><span class="s">CACHE</span><span class="w"> </span><span class="s">PATH</span><span class="w"> </span><span class="s2">"Path to which Hipfort has been installed"</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">else</span><span class="p">()</span>
+<span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">HIPFORT_ROOT</span><span class="w"> </span><span class="o">$ENV{</span><span class="nv">HIPFORT_ROOT</span><span class="o">}</span><span class="w"> </span><span class="s">CACHE</span><span class="w"> </span><span class="s">PATH</span><span class="w"> </span><span class="s2">"Path to which Hipfort has been installed"</span><span class="p">)</span>
 <span class="w">    </span><span class="nb">endif</span><span class="p">()</span>
 <span class="nb">endif</span><span class="p">()</span>
 </pre></div>
@@ -7636,7 +7645,7 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Define-the-project">Define the project<a class="anchor-link" href="#Define-the-project">¶</a></h3><p>Here we define the host language to use for the project. The sources are going to be in <code>C++</code> and <code>Fortran</code>, therefore in the main <a href="../CMakeLists.txt"></a>CMakeLists.txt file we add the <code>CXX</code> and <code>Fortran</code> languages for the build system to support. In later steps we would also like to find the CUDA toolkit, and this seems to need the <code>C</code> language.</p>
+<h3 id="Define-the-project">Define the project<a class="anchor-link" href="#Define-the-project">¶</a></h3><p>Here we define the host language to use for the project. The sources are going to be in <code>C++</code> and <code>Fortran</code>, therefore in the main <a href="../../CMakeLists.txt"></a>CMakeLists.txt file we add the <code>CXX</code> and <code>Fortran</code> languages for the build system to support. In later steps we would also like to find the CUDA toolkit, and this seems to need the <code>C</code> language.</p>
 <div class="highlight"><pre><span></span><span class="nb">project</span><span class="p">(</span><span class="s">hipfort_course</span><span class="w"> </span><span class="s">VERSION</span><span class="w"> </span><span class="s">1.0.0</span>
 <span class="w">    </span><span class="s">DESCRIPTION</span><span class="w"> </span><span class="s2">"Example codes to accompany a course in hipFORT"</span>
 <span class="w">    </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">C</span><span class="w"> </span><span class="s">CXX</span><span class="w"> </span><span class="s">Fortran</span>
@@ -7652,11 +7661,21 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Compiler-specific-flags">Compiler specific flags<a class="anchor-link" href="#Compiler-specific-flags">¶</a></h3><p>There are very few compilers that work with hipFORT at the moment. The following section sets the Fortran compiler flags for GFortran for different build types.</p>
+<h3 id="Compiler-specific-flags">Compiler specific flags<a class="anchor-link" href="#Compiler-specific-flags">¶</a></h3><p>There are very few compilers that work with hipFORT at the moment. The following section sets the Fortran compiler flags for GFortran for the different build types <code>DEBUG</code>, <code>PROFILE</code>, <code>COVERAGE</code>, and <code>RELEASE</code>.</p>
 <div class="highlight"><pre><span></span><span class="nb">if</span><span class="p">(</span><span class="w"> </span><span class="s2">"${CMAKE_Fortran_COMPILER_ID}"</span><span class="w"> </span><span class="s">STREQUAL</span><span class="w"> </span><span class="s2">"GNU"</span><span class="w"> </span><span class="p">)</span>
-<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_Fortran_FLAGS</span><span class="w"> </span><span class="s2">"-cpp -ffree-line-length-512"</span><span class="w"> </span><span class="p">)</span>
+<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_Fortran_FLAGS</span><span class="w"> </span><span class="s2">"-cpp -ffree-line-length-512 -fPIC -Wno-missing-include-dirs"</span><span class="w"> </span><span class="p">)</span>
 <span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_Fortran_FLAGS_DEBUG</span><span class="w"> </span><span class="s2">"-g -O1 -C -Wall -fbounds-check -fbacktrace -ffpe-trap=invalid,zero,overflow"</span><span class="w"> </span><span class="p">)</span>
-<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_EXE_LINKER_FLAGS</span><span class="w"> </span><span class="s2">"${CMAKE_EXE_LINKER_FLAGS} -lgfortran"</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_EXE_LINKER_FLAGS</span><span class="w"> </span><span class="s2">"${CMAKE_EXE_LINKER_FLAGS} -lgfortran -static-libstdc++"</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_Fortran_FLAGS_COVERAGE</span><span class="w"> </span><span class="s2">"${CMAKE_Fortran_FLAGS_DEBUG} --coverage"</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_Fortran_FLAGS_PROFILE</span><span class="w"> </span><span class="s2">"-pg -O3"</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_Fortran_FLAGS_RELEASE</span><span class="w"> </span><span class="s2">"-O3 -g"</span><span class="w"> </span><span class="p">)</span>
+<span class="nb">endif</span><span class="p">()</span>
+</pre></div>
+<p>When Cray Fortran is the compiler we use the following CMAKE compiler flags:</p>
+<div class="highlight"><pre><span></span><span class="nb">if</span><span class="p">(</span><span class="w"> </span><span class="s2">"${CMAKE_Fortran_COMPILER_ID}"</span><span class="w"> </span><span class="s">STREQUAL</span><span class="w"> </span><span class="s2">"Cray"</span><span class="w"> </span><span class="p">)</span>
+<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_Fortran_FLAGS</span><span class="w"> </span><span class="s2">"-eZ -eT -ef -ffree -fPIC"</span><span class="w"> </span><span class="p">)</span>
+<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_Fortran_FLAGS_DEBUG</span><span class="w"> </span><span class="s2">"-g -O1 -h bounds"</span><span class="w"> </span><span class="p">)</span>
+<span class="w">    </span><span class="c">#set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgfortran")</span>
 <span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_Fortran_FLAGS_COVERAGE</span><span class="w"> </span><span class="s2">"${CMAKE_Fortran_FLAGS_DEBUG} --coverage"</span><span class="p">)</span>
 <span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_Fortran_FLAGS_PROFILE</span><span class="w"> </span><span class="s2">"-pg -O3"</span><span class="p">)</span>
 <span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="w"> </span><span class="s">CMAKE_Fortran_FLAGS_RELEASE</span><span class="w"> </span><span class="s2">"-O3 -g"</span><span class="w"> </span><span class="p">)</span>
@@ -7672,10 +7691,10 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Find-the-hip-package">Find the hip package<a class="anchor-link" href="#Find-the-hip-package">¶</a></h3><p>Regardless of the backend in use, we need to locate where <code>hip</code> is installed. The <code>find_package</code> CMAKE directive instructs the build system to find the <code>hip</code> library. For this to work it usually means having the <code>hipconfig</code> and <code>hipcc</code> commands available from your path.</p>
+<h3 id="Find-the-hip-package">Find the hip package<a class="anchor-link" href="#Find-the-hip-package">¶</a></h3><p>Regardless of the backend in use, we need to locate where <code>hip</code> is installed. The <code>find_package</code> CMAKE directive instructs the build system to find the <code>hip</code> library. For this to work it usually means having the <code>hipconfig</code> and <code>hipcc</code> commands available in your <code>PATH</code>.</p>
 <div class="highlight"><pre><span></span><span class="nb">find_package</span><span class="p">(</span><span class="s">hip</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 </pre></div>
-<p>If HIP is found then the variable <code>hip_FOUND</code> will be set to TRUE.</p>
+<p>If HIP is found then the CMake variable <code>hip_FOUND</code> will be set to TRUE.</p>
 </div>
 </div>
 </div>
@@ -7686,13 +7705,29 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="NVIDIA-specific-CMake-directives">NVIDIA-specific CMake directives<a class="anchor-link" href="#NVIDIA-specific-CMake-directives">¶</a></h3><p>In the <a href="../CMakeLists.txt"></a>CMakeLists.txt file the <code>HIP_PLATFORM</code> environment variable is examined to see if it is equal to <code>nvidia</code>. If so, we enable the <code>CUDA</code> language and search for the CUDA toolkit.</p>
-<div class="highlight"><pre><span></span><span class="nb">if</span><span class="w"> </span><span class="p">((</span><span class="s">DEFINED</span><span class="w"> </span><span class="s">ENV{HIP_PLATFORM}</span><span class="p">)</span><span class="w"> </span><span class="s">AND</span><span class="w"> </span><span class="p">(</span><span class="o">$ENV{</span><span class="nv">HIP_PLATFORM</span><span class="o">}</span><span class="w"> </span><span class="s">STREQUAL</span><span class="w"> </span><span class="s">nvidia</span><span class="p">))</span>
+<h3 id="NVIDIA-specific-CMake-directives">NVIDIA-specific CMake directives<a class="anchor-link" href="#NVIDIA-specific-CMake-directives">¶</a></h3><p>In the <a href="../../CMakeLists.txt"></a>CMakeLists.txt file the <code>HIP_PLATFORM</code> environment variable is examined to see if it is equal to <code>nvidia</code>. If it is, we enable the <code>CUDA</code> language and search for the CUDA toolkit. Otherwise we default to assuming that the software will be built for AMD.</p>
+<div class="highlight"><pre><span></span><span class="c"># Choose to use compilation for NVIDIA or AMD</span>
+<span class="nb">if</span><span class="w"> </span><span class="p">(</span><span class="s2">"$ENV{HIP_PLATFORM}"</span><span class="w"> </span><span class="s">STREQUAL</span><span class="w"> </span><span class="s2">"nvidia"</span><span class="p">)</span>
+
 <span class="w">    </span><span class="nb">message</span><span class="p">(</span><span class="s2">"Performing compilation for an NVIDIA backend."</span><span class="p">)</span>
 
 <span class="w">    </span><span class="c"># Set GPU architectures</span>
-<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CUDA_ARCHITECTURES</span><span class="w"> </span><span class="o">$ENV{</span><span class="nv">GPU_ARCH</span><span class="o">}</span><span class="p">)</span>
-<span class="w">    </span>
+<span class="w">    </span><span class="nb">if</span><span class="w"> </span><span class="p">(</span><span class="s">DEFINED</span><span class="w"> </span><span class="s">ENV{GPU_ARCH}</span><span class="p">)</span>
+<span class="w">        </span><span class="c"># Read GPU_ARCH environment variable into a CMake variable</span>
+<span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">gpu_arch_list</span><span class="w"> </span><span class="o">$ENV{</span><span class="nv">GPU_ARCH</span><span class="o">}</span><span class="p">)</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="c"># Set NVIDIA architectures to compile for</span>
+<span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CUDA_ARCHITECTURES</span><span class="w"> </span><span class="o">${</span><span class="nv">gpu_arch_list</span><span class="o">}</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c"># Add compiler flags if hipfc is used</span>
+<span class="w">        </span><span class="nb">if</span><span class="p">(</span><span class="s">CMAKE_Fortran_COMPILER</span><span class="w"> </span><span class="s">MATCHES</span><span class="w"> </span><span class="s2">"hipfc$"</span><span class="p">)</span>
+<span class="w">            </span><span class="nb">foreach</span><span class="p">(</span><span class="s">arch</span><span class="w"> </span><span class="s">IN</span><span class="w"> </span><span class="s">LISTS</span><span class="w"> </span><span class="s">gpu_arch_list</span><span class="p">)</span>
+<span class="w">            	</span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_Fortran_FLAGS</span><span class="w"> </span><span class="s2">"${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}"</span><span class="p">)</span>
+<span class="w">            </span><span class="nb">endforeach</span><span class="p">()</span>
+<span class="w">        </span><span class="nb">endif</span><span class="p">()</span>
+<span class="w">    </span><span class="nb">endif</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c"># Enable the CUDA language</span>
 <span class="w">    </span><span class="nb">enable_language</span><span class="p">(</span><span class="s">CUDA</span><span class="p">)</span>
 <span class="w">    </span>
 <span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="s">CUDA_SEPARABLE_COMPILATION</span><span class="w"> </span><span class="s">ON</span><span class="p">)</span>
@@ -7704,16 +7739,34 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 <span class="w">    </span><span class="c"># Set the kernel language for device code</span>
 <span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="s">kernel_lang</span><span class="w"> </span><span class="s">CUDA</span><span class="p">)</span>
 </pre></div>
-<p>Setting <code>CMAKE_CUDA_ARCHITECTURES</code> first is helpful when enabling the CUDA language for older versions of the toolkit. It is a CMake variable to contain a list of GPU architectures to compile for. In the case of NVIDIA cards each entry is a number for the compute capability. For example, to compile for compute capabilities 8.6 and 7.5 we set an environment variable <code>GPU_ARCH=86;75</code>. Then the following line of code brings this in to the <code>CMAKE_CUDA_ARCHITECTURES</code> CMake variable.</p>
-<p>The <code>CUDA_SEPARABLE_COMPILATION_ON</code> flag enables source files containing device code to be compiled separately. We set the  CMake variable <code>kernel_lang</code> to <code>CUDA</code> to treat the language in kernel sources as CUDA.</p>
-<div class="highlight"><pre><span></span><span class="c"># Set the kernel language for device code</span>
-<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="s">kernel_lang</span><span class="w"> </span><span class="s">CUDA</span><span class="p">)</span>
+<p>The CMake variable <code>CMAKE_CUDA_ARCHITECTURES</code> is designed to contain a semicolon-separated list of NVIDIA GPU architectures to compile for. In the case of NVIDIA cards, each entry is a number describing the compute capability. For example, to compile for compute capabilities 8.6 and 7.5 we set an environment variable <code>GPU_ARCH=86;75</code>. If <code>hipfc</code> is the Fortran compiler then we also need to set the <code>--offload-arch</code> flag. The following lines of code sets <code>CMAKE_CUDA_ARCHITECTURES</code> and adds the compiler flags for hipfc.</p>
+<div class="highlight"><pre><span></span><span class="c"># Set GPU architectures</span>
+<span class="w">    </span><span class="nb">if</span><span class="w"> </span><span class="p">(</span><span class="s">DEFINED</span><span class="w"> </span><span class="s">ENV{GPU_ARCH}</span><span class="p">)</span>
+<span class="w">        </span><span class="c"># Read GPU_ARCH environment variable into a CMake variable</span>
+<span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">gpu_arch_list</span><span class="w"> </span><span class="o">$ENV{</span><span class="nv">GPU_ARCH</span><span class="o">}</span><span class="p">)</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="c"># Set NVIDIA architectures to compile for</span>
+<span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CUDA_ARCHITECTURES</span><span class="w"> </span><span class="o">${</span><span class="nv">gpu_arch_list</span><span class="o">}</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c"># Add compiler flags if hipfc is used</span>
+<span class="w">        </span><span class="nb">if</span><span class="p">(</span><span class="s">CMAKE_Fortran_COMPILER</span><span class="w"> </span><span class="s">MATCHES</span><span class="w"> </span><span class="s2">"hipfc$"</span><span class="p">)</span>
+<span class="w">            </span><span class="nb">foreach</span><span class="p">(</span><span class="s">arch</span><span class="w"> </span><span class="s">IN</span><span class="w"> </span><span class="s">LISTS</span><span class="w"> </span><span class="s">gpu_arch_list</span><span class="p">)</span>
+<span class="w">            	</span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_Fortran_FLAGS</span><span class="w"> </span><span class="s2">"${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}"</span><span class="p">)</span>
+<span class="w">            </span><span class="nb">endforeach</span><span class="p">()</span>
+<span class="w">        </span><span class="nb">endif</span><span class="p">()</span>
+<span class="w">    </span><span class="nb">endif</span><span class="p">()</span>
 </pre></div>
-<p>For each architecture found we add the compiler flag <code>--offload-arch=sm_${arch}</code> to <code>CMAKE_Fortran_FLAGS</code>.</p>
-<div class="highlight"><pre><span></span><span class="c"># Add arch information to hipfc compiler flags as well</span>
-<span class="w">    </span><span class="nb">foreach</span><span class="p">(</span><span class="s">arch</span><span class="w"> </span><span class="o">$ENV{</span><span class="nv">GPU_ARCH</span><span class="o">}</span><span class="p">)</span>
-<span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_Fortran_FLAGS</span><span class="w"> </span><span class="s2">"${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}"</span><span class="p">)</span>
-<span class="w">    </span><span class="nb">endforeach</span><span class="p">()</span>
+<p>Then we enable the CUDA language with:</p>
+<div class="highlight"><pre><span></span><span class="c"># Enable the CUDA language</span>
+<span class="nb">enable_language</span><span class="p">(</span><span class="s">CUDA</span><span class="p">)</span>
+</pre></div>
+<p>The <code>CUDA_SEPARABLE_COMPILATION_ON</code> flag enables source files containing device code to be compiled separately.</p>
+<div class="highlight"><pre><span></span><span class="c"># Set separable compilation on</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">CUDA_SEPARABLE_COMPILATION</span><span class="w"> </span><span class="s">ON</span><span class="p">)</span>
+</pre></div>
+<p>We set the  CMake variable <code>kernel_lang</code> to <code>CUDA</code> to treat the language in kernel sources as CUDA.</p>
+<div class="highlight"><pre><span></span><span class="c"># Set the kernel language for device code</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">kernel_lang</span><span class="w"> </span><span class="s">CUDA</span><span class="p">)</span>
 </pre></div>
 <p>Next, we set compiler flags for CUDA device code.</p>
 <div class="highlight"><pre><span></span><span class="c"># Set compiler flags</span>
@@ -7733,9 +7786,11 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 <span class="w">    </span><span class="nb">find_library</span><span class="p">(</span><span class="s">HIPFORT_LIBRARIES</span><span class="w"> </span><span class="s">NAMES</span><span class="w"> </span><span class="s">libhipfort-nvptx.a</span><span class="w"> </span><span class="s">HINTS</span><span class="w"> </span><span class="s">ENV</span><span class="w"> </span><span class="s">HIPFORT_ROOT</span><span class="w"> </span><span class="s">PATH_SUFFIXES</span><span class="w"> </span><span class="s">lib/</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 <span class="w">    </span><span class="nb">find_path</span><span class="p">(</span><span class="s">HIPFORT_INCLUDE_DIRS</span><span class="w"> </span><span class="s">hipfort.mod</span><span class="w"> </span><span class="s">HINTS</span><span class="w"> </span><span class="s">ENV</span><span class="w"> </span><span class="s">HIPFORT_ROOT</span><span class="w"> </span><span class="s">PATH_SUFFIXES</span><span class="w"> </span><span class="s">include/hipfort/nvptx/</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 </pre></div>
-<p>At the end of this section we create a CMake variable called <code>kernel_libs</code> which specifies the libraries that kernel code must link to. We link to the CUDA libraries and the file (<code>libhipfort-nvptx.a</code>) that is in <code>HIPFORT_LIBRARIES</code> and add <code>HIPFORT_INCLUDE_DIRS</code> to the include path.</p>
+<p>At the end of this section we create a CMake variable called <code>kernel_libs</code> which specifies the libraries that kernel code must link to. We link first to the file (<code>libhipfort-nvptx.a</code>) that is in <code>HIPFORT_LIBRARIES</code>, then we link to the CUDA libraries. It is important to link to the CUDA libraries last in <code>kernel_libs</code> so calls in the hipFORT libary can resolve correctly.</p>
 <div class="highlight"><pre><span></span><span class="nb">set</span><span class="p">(</span><span class="s">kernel_libs</span><span class="w"> </span><span class="s">CUDA::cudart</span><span class="w"> </span><span class="s">CUDA::cuda_driver</span><span class="w"> </span><span class="o">${</span><span class="nv">HIPFORT_LIBRARIES</span><span class="o">}</span><span class="p">)</span>
-<span class="nb">include_directories</span><span class="p">(</span><span class="o">${</span><span class="nv">HIPFORT_INCLUDE_DIRS</span><span class="o">}</span><span class="p">)</span>
+</pre></div>
+<p>Then we add <code>HIPFORT_INCLUDE_DIRS</code> to the include path.</p>
+<div class="highlight"><pre><span></span><span class="nb">include_directories</span><span class="p">(</span><span class="o">${</span><span class="nv">HIPFORT_INCLUDE_DIRS</span><span class="o">}</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7757,14 +7812,22 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 
 <span class="w">    </span><span class="c"># Set language for device code</span>
 <span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="s">kernel_lang</span><span class="w"> </span><span class="s">HIP</span><span class="p">)</span>
-
-<span class="w">    </span><span class="c"># Set the GPU architecture</span>
-<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_HIP_ARCHITECTURES,</span><span class="w"> </span><span class="o">$ENV{</span><span class="nv">GPU_ARCH</span><span class="o">}</span><span class="p">)</span>
 <span class="w">    </span>
-<span class="w">    </span><span class="c"># Add arch information to hipfc Fortran compiler flags as well</span>
-<span class="w">    </span><span class="nb">foreach</span><span class="p">(</span><span class="s">arch</span><span class="w"> </span><span class="o">$ENV{</span><span class="nv">GPU_ARCH</span><span class="o">}</span><span class="p">)</span>
-<span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_Fortran_FLAGS</span><span class="w"> </span><span class="s2">"${CMAKE_Fortran_FLAGS} --offload-arch=${arch}"</span><span class="p">)</span>
-<span class="w">    </span><span class="nb">endforeach</span><span class="p">()</span>
+<span class="w">    </span><span class="c"># Set GPU architectures</span>
+<span class="w">    </span><span class="nb">if</span><span class="w"> </span><span class="p">(</span><span class="s">DEFINED</span><span class="w"> </span><span class="s">ENV{GPU_ARCH}</span><span class="p">)</span>
+<span class="w">        </span><span class="c"># Read GPU_ARCH environment variable into a CMake variable</span>
+<span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">gpu_arch_list</span><span class="w"> </span><span class="o">$ENV{</span><span class="nv">GPU_ARCH</span><span class="o">}</span><span class="p">)</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="c"># Set NVIDIA architectures to compile for</span>
+<span class="w">        </span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_HIP_ARCHITECTURES</span><span class="w"> </span><span class="o">${</span><span class="nv">gpu_arch_list</span><span class="o">}</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c"># Add compiler flags if hipfc is used</span>
+<span class="w">        </span><span class="nb">if</span><span class="p">(</span><span class="s">CMAKE_Fortran_COMPILER</span><span class="w"> </span><span class="s">MATCHES</span><span class="w"> </span><span class="s2">"hipfc$"</span><span class="p">)</span>
+<span class="w">            </span><span class="nb">foreach</span><span class="p">(</span><span class="s">arch</span><span class="w"> </span><span class="s">IN</span><span class="w"> </span><span class="s">LISTS</span><span class="w"> </span><span class="s">gpu_arch_list</span><span class="p">)</span>
+<span class="w">            	</span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_Fortran_FLAGS</span><span class="w"> </span><span class="s2">"${CMAKE_Fortran_FLAGS} --offload-arch=${arch}"</span><span class="p">)</span>
+<span class="w">            </span><span class="nb">endforeach</span><span class="p">()</span>
+<span class="w">        </span><span class="nb">endif</span><span class="p">()</span>
+<span class="w">    </span><span class="nb">endif</span><span class="p">()</span>
 
 <span class="w">    </span><span class="c"># Set HIP flags</span>
 <span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_HIP_FLAGS</span><span class="w"> </span><span class="s2">"${CMAKE_HIP_FLAGS} -g"</span><span class="p">)</span>
@@ -7774,12 +7837,12 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 
 <span class="w">    </span><span class="c"># Locate the hipfort library</span>
 <span class="w">    </span><span class="nb">find_library</span><span class="p">(</span><span class="s">HIPFORT_LIBRARIES</span><span class="w"> </span><span class="s">NAMES</span><span class="w"> </span><span class="s">libhipfort-amdgcn.a</span><span class="w"> </span><span class="s">HINTS</span><span class="w"> </span><span class="s">ENV</span><span class="w"> </span><span class="s">HIPFORT_ROOT</span><span class="w"> </span><span class="s">PATH_SUFFIXES</span><span class="w"> </span><span class="s">lib/</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
-<span class="w">    </span><span class="nb">find_path</span><span class="p">(</span><span class="s">HIPFORT_INCLUDE_DIRS</span><span class="w"> </span><span class="s">hipfort.mod</span><span class="w"> </span><span class="s">HINTS</span><span class="w"> </span><span class="s">ENV</span><span class="w"> </span><span class="s">HIPFORT_ROOT</span><span class="w"> </span><span class="s">PATH_SUFFIXES</span><span class="w"> </span><span class="s">include/hipfort/amdgcn/</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">find_path</span><span class="p">(</span><span class="s">HIPFORT_INCLUDE_DIRS</span><span class="w"> </span><span class="s">NAMES</span><span class="w"> </span><span class="s">hipfort.mod</span><span class="w"> </span><span class="s">HIPFORT.mod</span><span class="w"> </span><span class="s">HINTS</span><span class="w"> </span><span class="s">ENV</span><span class="w"> </span><span class="s">HIPFORT_ROOT</span><span class="w"> </span><span class="s">PATH_SUFFIXES</span><span class="w"> </span><span class="s">include/hipfort/amdgcn/</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 
 <span class="w">    </span><span class="c">## Set libraries to link to for device code</span>
-<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="s">kernel_libs</span><span class="w"> </span><span class="s">hip::device</span><span class="w"> </span><span class="o">${</span><span class="nv">HIPFORT_LIBRARIES</span><span class="o">}</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">set</span><span class="p">(</span><span class="s">kernel_libs</span><span class="w"> </span><span class="o">${</span><span class="nv">HIPFORT_LIBRARIES</span><span class="o">}</span><span class="w"> </span><span class="s">hip::device</span><span class="p">)</span>
 <span class="w">    </span><span class="nb">include_directories</span><span class="p">(</span><span class="o">${</span><span class="nv">HIPFORT_INCLUDE_DIRS</span><span class="o">}</span><span class="p">)</span>
-
+<span class="w">    </span>
 <span class="nb">endif</span><span class="p">()</span>
 </pre></div>
 <p>Setting CMake variables for an AMD backend is similar to that of the CUDA section above. Acceptable values for the environment variable <code>GPU_ARCH</code> are a semicolon-separated list of architectures,  e.g. <code>gfx906;gfx90a</code>.</p>
@@ -7794,12 +7857,16 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="Subdirectories">Subdirectories<a class="anchor-link" href="#Subdirectories">¶</a></h3><p>In <a href="../CMakeLists.txt"></a>CMakeLists.txt we add subdirectories using the <code>add_subdirectory</code> command. Each subdirectory has it's own CMakeLists.txt file that describes how each target in that directory should be compiled and linked.</p>
-<div class="highlight"><pre><span></span><span class="c"># Example Codes</span>
-<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">CMAKE_SOURCE_DIR</span><span class="o">}</span><span class="s">/L1_Fortran_Refresher</span><span class="p">)</span>
-<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">CMAKE_SOURCE_DIR</span><span class="o">}</span><span class="s">/L5_Hipfort_Examples</span><span class="p">)</span>
-<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">CMAKE_SOURCE_DIR</span><span class="o">}</span><span class="s">/Exercises/E1_Chessboard_CPU</span><span class="p">)</span>
-<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">CMAKE_SOURCE_DIR</span><span class="o">}</span><span class="s">/Exercises/E2_Chessboard_GPU</span><span class="p">)</span>
-<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">CMAKE_SOURCE_DIR</span><span class="o">}</span><span class="s">/L6_Memory_Management/memcpy_benchmark</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="nb">set</span><span class="p">(</span><span class="s">COURSE_MATERIAL_DIR</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_SOURCE_DIR</span><span class="o">}</span><span class="s">/course_material</span><span class="p">)</span>
+
+<span class="c"># Example Codes</span>
+<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">COURSE_MATERIAL_DIR</span><span class="o">}</span><span class="s">/L1_Fortran_Refresher</span><span class="p">)</span>
+<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">COURSE_MATERIAL_DIR</span><span class="o">}</span><span class="s">/L5_hipFORT_Examples</span><span class="p">)</span>
+<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">COURSE_MATERIAL_DIR</span><span class="o">}</span><span class="s">/Exercises/E1_Chessboard_CPU</span><span class="p">)</span>
+<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">COURSE_MATERIAL_DIR</span><span class="o">}</span><span class="s">/Exercises/E2_Chessboard_GPU</span><span class="p">)</span>
+<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">COURSE_MATERIAL_DIR</span><span class="o">}</span><span class="s">/Exercises/E3_Managed_Memory</span><span class="p">)</span>
+<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">COURSE_MATERIAL_DIR</span><span class="o">}</span><span class="s">/L6_Memory_Management</span><span class="p">)</span>
+<span class="nb">add_subdirectory</span><span class="p">(</span><span class="o">${</span><span class="nv">COURSE_MATERIAL_DIR</span><span class="o">}</span><span class="s">/L6_Memory_Management/memcpy_benchmark</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7812,12 +7879,12 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="Set-the-language-for-targets">Set the language for targets<a class="anchor-link" href="#Set-the-language-for-targets">¶</a></h3><p>CMake ordinarily uses the file extension to choose which language to use when setting up sources for compilation. Files with the <code>.hip</code> extension will be treated as <code>HIP</code> sources, and compiled with ROCM's internal <code>clang++</code> compiler. Likewise, files with the <code>.cu</code> extension will be treated as <code>CUDA</code> sources and compiled with NVIDIA's internal compiler.</p>
-<p>You can change this behaviour and set the language for a particular source file by using <code>set_source_files_properties</code>. In the example below we set the HIP language for a list of kernel sources called <code>KERNEL_FILES</code>.</p>
+<p>You can change this behaviour and set the language for a particular source file by using <code>set_source_files_properties</code>. In <a href="../L5_hipFORT_Examples/CMakeLists.txt"></a>L5_hipFORT_Examples/CMakeLists.txt below we set the language for a list of kernel sources called <code>KERNEL_FILES</code>.</p>
 <div class="highlight"><pre><span></span><span class="c"># Set the language for any kernel files</span>
 <span class="nb">set</span><span class="p">(</span><span class="s">KERNEL_FILES</span>
 <span class="w">    </span><span class="o">${</span><span class="nv">CMAKE_CURRENT_SOURCE_DIR</span><span class="o">}</span><span class="s">/kernel_code.cpp</span>
 <span class="p">)</span>
-<span class="nb">set_source_files_properties</span><span class="p">(</span><span class="o">${</span><span class="nv">KERNEL_FILES</span><span class="o">}</span><span class="w"> </span><span class="s">PROPERTIES</span><span class="w"> </span><span class="s">LANGUAGE</span><span class="w"> </span><span class="s">HIP</span><span class="p">)</span>
+<span class="nb">set_source_files_properties</span><span class="p">(</span><span class="o">${</span><span class="nv">KERNEL_FILES</span><span class="o">}</span><span class="w"> </span><span class="s">PROPERTIES</span><span class="w"> </span><span class="s">LANGUAGE</span><span class="w"> </span><span class="o">${</span><span class="nv">kernel_lang</span><span class="o">}</span><span class="p">)</span>
 </pre></div>
 <p>Since we wish to swap out the HIP language for CUDA in a cross-platform scenario we use the <code>kernel_lang</code> variable that was set in  <a href="../CMakeLists.txt"></a>CMakeLists.txt. For example, in the AMD-specific CMake section we would have set <code>kernel_lang</code> to <code>HIP</code>.</p>
 <div class="highlight"><pre><span></span><span class="c"># Set language for kernel code</span>
@@ -7840,13 +7907,13 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Set-the-libraries-for-targets">Set the libraries for targets<a class="anchor-link" href="#Set-the-libraries-for-targets">¶</a></h3><p>The <code>find_package(hip)</code> directive in  <a href="../CMakeLists.txt"></a>CMakeLists.txt creates two CMake targets <code>hip::host</code> and <code>hip::device</code> that you can use to link to when using an AMD backend. The <code>hip::host</code> target is just for code that only uses HIP library calls and can be compiled with your chosen C++ compiler, whereas the <code>hip::device</code> target provides additional functionality. In <a href="../CMakeLists.txt"></a>CMakeLists.txt we define a CMake variable called <code>kernel_libs</code> to contain which kernel library target to link to.</p>
+<h3 id="Set-the-libraries-for-targets">Set the libraries for targets<a class="anchor-link" href="#Set-the-libraries-for-targets">¶</a></h3><p>The <code>find_package(hip)</code> directive in the main <a href="../../CMakeLists.txt"></a>CMakeLists.txt creates two CMake targets <code>hip::host</code> and <code>hip::device</code> that you can use to link to when using an AMD backend. The <code>hip::host</code> target is just for code that only uses HIP library calls and can be compiled with your chosen C++ compiler, whereas the <code>hip::device</code> target provides additional functionality. In <a href="../../CMakeLists.txt"></a>CMakeLists.txt recall we defined a CMake variable called <code>kernel_libs</code> to contain which kernel library target to link to. For AMD this was:</p>
 <div class="highlight"><pre><span></span><span class="c"># Set libraries for kernel code</span>
-<span class="nb">set</span><span class="p">(</span><span class="s">kernel_libs</span><span class="w"> </span><span class="s">hip::device</span><span class="w"> </span><span class="s">kernel_libs</span><span class="w"> </span><span class="o">${</span><span class="nv">HIPFORT_LIBRARIES</span><span class="o">}</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">kernel_libs</span><span class="w"> </span><span class="o">${</span><span class="nv">HIPFORT_LIBRARIES</span><span class="o">}</span><span class="w"> </span><span class="s">hip::device</span><span class="p">)</span>
 </pre></div>
-<p>For an NVIDIA backend we have instead set <code>kernel_libs</code> to</p>
+<p>and for NVIDIA we instead set <code>kernel_libs</code> to:</p>
 <div class="highlight"><pre><span></span><span class="c">## Set libraries to link to for device code</span>
-<span class="nb">set</span><span class="p">(</span><span class="s">kernel_libs</span><span class="w"> </span><span class="s">CUDA::cudart</span><span class="w"> </span><span class="s">CUDA::cuda_driver</span><span class="w"> </span><span class="o">${</span><span class="nv">HIPFORT_LIBRARIES</span><span class="o">}</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">kernel_libs</span><span class="w"> </span><span class="o">${</span><span class="nv">HIPFORT_LIBRARIES</span><span class="o">}</span><span class="w"> </span><span class="s">CUDA::cudart</span><span class="w"> </span><span class="s">CUDA::cuda_driver</span><span class="p">)</span>
 </pre></div>
 <p>Within a target you can link to <code>${kernel_libs}</code> like this example in <a href="../L5_hipFORT_Examples/CMakeLists.txt"></a>L5_hipFORT_Examples/CMakeLists.txt</p>
 <div class="highlight"><pre><span></span><span class="c"># Link in other libraries</span>
@@ -7862,12 +7929,12 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Set-the-linker-for-targets">Set the linker for targets<a class="anchor-link" href="#Set-the-linker-for-targets">¶</a></h3><p>Ordinarily, for C++ applications it would be a good choice to use <code>${kernel_lang}</code> as the linker language to use. However for Fortran applications the Fortran compiler is a better choice for the linker. Hipfort applications in particular need to be linked with the <code>hipfc</code> compiler. In <a href="../Hipfort_Examples/CMakeLists.txt"></a>Hipfort_Examples/CMakeLists.txt we set Fortran as the linker language:</p>
+<h3 id="Set-the-linker-for-targets">Set the linker for targets<a class="anchor-link" href="#Set-the-linker-for-targets">¶</a></h3><p>Ordinarily, for C++ applications it would be a good choice to use <code>${kernel_lang}</code> as the linker language to use. However when linking Fortran applications the Fortran compiler is a better choice for the linker. We set Fortran as the linker language using this CMake directive on a target:</p>
 <div class="highlight"><pre><span></span><span class="nb">set_target_properties</span><span class="p">(</span><span class="s">tensoradd_hip_cptr</span>
 <span class="w">    </span><span class="s">PROPERTIES</span><span class="w"> </span><span class="s">LINKER_LANGUAGE</span><span class="w"> </span><span class="s">Fortran</span>
 <span class="p">)</span>
 </pre></div>
-<p>This means that <code>hipfc</code> is used as the linker if it is also set as the Fortran compiler. You can set <code>hipfc</code> as the Fortran compiler by setting <code>FC=hipfc</code> in the cmake build flags, or setting the environment variable <code>FC=hipfc</code> in the <code>env</code> environment variable script.</p>
+<p>You can set which Fortran compiler to use by setting the <code>FC</code> environment variable in the <code>env</code> environment variable script.</p>
 </div>
 </div>
 </div>
