@@ -42,24 +42,36 @@ if( "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "Cray" )
     set( CMAKE_Fortran_FLAGS_RELEASE "-O3 -g" )
 endif()
 
-message("Fortran compiler id is " ${CMAKE_Fortran_COMPILER_ID})
-
 # ------ dependencies ------ #
 
 # HIP
 find_package(hip REQUIRED)
 
-# Choose to use either an NVIDIA package or a HIP package
-if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
+# Choose to use compilation for NVIDIA or AMD
+if ("$ENV{HIP_PLATFORM}" STREQUAL "nvidia")
     
     message("Performing compilation for an NVIDIA backend.")
 
-    # Set GPU architectures before enabling CUDA
-    set(CMAKE_CUDA_ARCHITECTURES $ENV{GPU_ARCH})
+    # Set GPU architectures
+    if (DEFINED ENV{GPU_ARCH})
+        # Read GPU_ARCH environment variable into a CMake variable
+        set(gpu_arch_list $ENV{GPU_ARCH})
+        
+        # Set NVIDIA architectures to compile for
+        set(CMAKE_CUDA_ARCHITECTURES ${gpu_arch_list})
+
+        # Add compiler flags if hipfc is used
+        if(CMAKE_Fortran_COMPILER MATCHES "hipfc$")
+            foreach(arch IN LISTS gpu_arch_list)
+            	set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}")
+            endforeach()
+        endif()
+    endif()
 
     # Enable the CUDA language
     enable_language(CUDA)
-    
+
+    # Set separable compilation on
     set(CUDA_SEPARABLE_COMPILATION ON)
         
     ## Find the CUDA toolkit, 
@@ -68,11 +80,6 @@ if ((DEFINED ENV{HIP_PLATFORM}) AND ($ENV{HIP_PLATFORM} STREQUAL nvidia))
 
     # Set the kernel language for device code
     set(kernel_lang CUDA)
-
-    # Add arch information to hipfc compiler flags as well
-    if(CMAKE_FORTRAN_COMPILER MATCHES "hipfc$")
-    	set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=sm_${arch}")
-    endif()
 
     # Set compiler flags
     set(CMAKE_CUDA_FLAGS "-g -Xcompiler -fPIC")
@@ -104,13 +111,21 @@ else()
 
     # Set language for device code
     set(kernel_lang HIP)
-
-    # Set the GPU architecture
-    set(CMAKE_HIP_ARCHITECTURES, $ENV{GPU_ARCH})
     
-    # Add arch information to hipfc Fortran compiler flags as well
-    if(CMAKE_FORTRAN_COMPILER MATCHES "hipfc$")
-    	set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=${arch}")
+    # Set GPU architectures
+    if (DEFINED ENV{GPU_ARCH})
+        # Read GPU_ARCH environment variable into a CMake variable
+        set(gpu_arch_list $ENV{GPU_ARCH})
+        
+        # Set NVIDIA architectures to compile for
+        set(CMAKE_HIP_ARCHITECTURES ${gpu_arch_list})
+
+        # Add compiler flags if hipfc is used
+        if(CMAKE_Fortran_COMPILER MATCHES "hipfc$")
+            foreach(arch IN LISTS gpu_arch_list)
+            	set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --offload-arch=${arch}")
+            endforeach()
+        endif()
     endif()
 
     # Set HIP flags
@@ -133,8 +148,8 @@ endif()
 ##get_cmake_property(_variableNames VARIABLES)
 ##list (SORT _variableNames)
 ##foreach (_variableName ${_variableNames})
-#    message(STATUS "${_variableName}=${${_variableName}}")
-#endforeach()
+##    message(STATUS "${_variableName}=${${_variableName}}")
+##endforeach()
 
 set(COURSE_MATERIAL_DIR ${CMAKE_SOURCE_DIR}/course_material)
 
