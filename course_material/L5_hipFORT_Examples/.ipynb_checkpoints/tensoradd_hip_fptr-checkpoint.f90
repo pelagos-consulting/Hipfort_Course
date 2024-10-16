@@ -10,6 +10,9 @@ program tensoradd
     ! C interopability 
     use iso_c_binding
 
+    ! Use the kinds module to make available the float_type kind
+    use kinds
+
     ! HIP modules
     use hipfort
     use hipfort_check
@@ -54,10 +57,10 @@ program tensoradd
     logical :: success
 
     ! Fortran pointers to memory allocations on the host
-    real(kind=c_float), dimension(:,:), pointer :: A_h, B_h, C_h
+    real(float_type), dimension(:,:), pointer :: A_h, B_h, C_h
 
     ! Fortran pointers to memory allocations on the device
-    real(kind=c_float), dimension(:,:), pointer :: A_d, B_d, C_d
+    real(float_type), dimension(:,:), pointer :: A_d, B_d, C_d
 
     ! Find and set the device. Use device 0 by default
     call init_device(0)   

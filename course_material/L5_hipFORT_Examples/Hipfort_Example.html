@@ -7605,7 +7605,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Fortran-interface-to-kernel-launch-function">Fortran interface to kernel launch function<a class="anchor-link" href="#Fortran-interface-to-kernel-launch-function">¶</a></h2><p>HipFORT doesn't yet have a way to launch kernels, however passing C-pointers from Fortran to C/C++ functions is straightforward, and from C/C++ code we can launch kernels. In the file <a href="kernel_code.cpp">kernel_code.cpp</a> is a function called <code>launch_kernel_hip</code> that does the job of launching kernels. It has the following signature:</p>
+<h2 id="Fortran-interface-to-kernel-launch-function">Fortran interface to kernel launch function<a class="anchor-link" href="#Fortran-interface-to-kernel-launch-function">¶</a></h2><p>HipFORT doesn't yet have a way to launch kernels, however passing C-pointers from Fortran to C/C++ functions is straightforward, and from C/C++ code we can launch kernels. In the file <a href="kernel_code.cpp">kernel_code.cpp</a> is a C  function called <code>launch_kernel_hip</code> that does the job of launching kernels. It has the following signature:</p>
 <div class="highlight"><pre><span></span><span class="n">void</span><span class="w"> </span><span class="n">launch_kernel_hip</span><span class="p">(</span>
 <span class="w">            </span><span class="n">float_type</span><span class="o">*</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"> </span>
 <span class="w">            </span><span class="n">float_type</span><span class="o">*</span><span class="w"> </span><span class="n">B</span><span class="p">,</span>
@@ -7613,10 +7613,14 @@ $$</p>
 <span class="w">            </span><span class="nb">int </span><span class="n">M</span><span class="p">,</span>
 <span class="w">            </span><span class="nb">int </span><span class="n">N</span><span class="p">)</span><span class="w"> </span><span class="err">{</span>
 </pre></div>
-<p>and we have type defined <code>float_type</code> as <code>float</code> earlier in the file.</p>
-<div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">float_type</span><span class="p">;</span>
+<p>and we have type defined <code>float_type</code> as <code>float</code> in <a href="../src/kinds.h"></a>../src/kinds.h</p>
+<div class="highlight"><pre><span></span><span class="cp">#ifdef USE_C_DOUBLE</span>
+<span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">float_type</span><span class="p">;</span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">float_type</span><span class="p">;</span>
+<span class="cp">#endif</span>
 </pre></div>
-<p>This will determine the element type of the tensors. The element type need to be <strong>consistent across Fortran and C</strong> as it determines how many bytes each element uses. In Fortran the <code>iso_c_binding</code> module provides a <code>c_float</code> kind that we can use for creating arrays of type real. This provides a measure of <strong>consistency</strong> between Fortran an C, but not necessarily consistency in the number of bytes used across platforms. The <code>iso_fortran_env</code> module has <code>real32</code> and <code>real64</code> kinds for creating arrays of 32-bit and 64-bit floating point numbers.</p>
+<p>This will determine the element type of the tensors when accessed from C. The element type need to be <strong>consistent across Fortran and C</strong> as it determines how many bytes each element uses. In Fortran the <code>iso_c_binding</code> module provides a <code>c_float</code> kind that we can use for creating arrays of type real. This provides a measure of <strong>consistency</strong> between Fortran an C, but not necessarily consistency in the number of bytes used across platforms. The <code>iso_fortran_env</code> module has <code>real32</code> and <code>real64</code> kinds for creating arrays of 32-bit and 64-bit floating point numbers.</p>
 <p>A complete solution for ensuring consistency might involve macros.</p>
 <p>In order to call this function from Fortran we define an <code>interface</code> to the function within the programs of <a href="tensoradd_hip_cptr.f90">tensoradd_hip_cptr.f90</a> and <a href="tensoradd_hip_fptr.f90">tensoradd_hip_fptr.f90</a> as follows:</p>
 <div class="highlight"><pre><span></span><span class="k">interface</span>

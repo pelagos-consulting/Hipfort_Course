@@ -9,6 +9,9 @@ program tensoradd
     ! C interopability 
     use iso_c_binding
 
+    ! Use the kinds module to make available the float_type kind
+    use kinds
+
     ! GPU functionality 
     use hip_utils, only : init_device, reset_device
 
@@ -52,7 +55,7 @@ program tensoradd
     logical :: success
 
     ! Fortran pointers to memory allocations on the host
-    real(kind=c_float), dimension(:,:), pointer :: A_h, B_h, C_h
+    real(float_type), dimension(:,:), pointer :: A_h, B_h, C_h
 
     ! Tensors on the GPU
     type(tensor_gpu) :: A_d, B_d, C_d
@@ -66,9 +69,9 @@ program tensoradd
     ! Allocate memory for tensors, 
     ! see tensor_hip.f90 for 
     ! definition of generic procedures 
-    call A_d%malloc(sizeof(A_h))
-    call B_d%malloc(sizeof(B_h))
-    call C_d%malloc(sizeof(C_h))
+    call A_d%malloc(int(sizeof(A_h), c_size_t))
+    call B_d%malloc(int(sizeof(B_h), c_size_t))
+    call C_d%malloc(int(sizeof(C_h), c_size_t))
 
     ! Fill host allocations with random numbers using the
     ! Fortran intrinsic function "random_number"
