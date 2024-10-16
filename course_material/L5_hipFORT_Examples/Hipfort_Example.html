@@ -7599,7 +7599,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=44821c62-8e74-4b72-aba0-b15b85f4fb6c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f89a29da-1a64-4328-b92b-264cbfa91512">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7613,15 +7613,6 @@ $$</p>
 <span class="w">            </span><span class="nb">int </span><span class="n">M</span><span class="p">,</span>
 <span class="w">            </span><span class="nb">int </span><span class="n">N</span><span class="p">)</span><span class="w"> </span><span class="err">{</span>
 </pre></div>
-<p>and we have type defined <code>float_type</code> as <code>float</code> in <a href="../src/kinds.h"></a>../src/kinds.h</p>
-<div class="highlight"><pre><span></span><span class="cp">#ifdef USE_C_DOUBLE</span>
-<span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">float_type</span><span class="p">;</span>
-<span class="cp">#else</span>
-<span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">float_type</span><span class="p">;</span>
-<span class="cp">#endif</span>
-</pre></div>
-<p>This will determine the element type of the tensors when accessed from C. The element type need to be <strong>consistent across Fortran and C</strong> as it determines how many bytes each element uses. In Fortran the <code>iso_c_binding</code> module provides a <code>c_float</code> kind that we can use for creating arrays of type real. This provides a measure of <strong>consistency</strong> between Fortran an C, but not necessarily consistency in the number of bytes used across platforms. The <code>iso_fortran_env</code> module has <code>real32</code> and <code>real64</code> kinds for creating arrays of 32-bit and 64-bit floating point numbers.</p>
-<p>A complete solution for ensuring consistency might involve macros.</p>
 <p>In order to call this function from Fortran we define an <code>interface</code> to the function within the programs of <a href="tensoradd_hip_cptr.f90">tensoradd_hip_cptr.f90</a> and <a href="tensoradd_hip_fptr.f90">tensoradd_hip_fptr.f90</a> as follows:</p>
 <div class="highlight"><pre><span></span><span class="k">interface</span>
 <span class="w">        </span><span class="c">! A C function with void return type</span>
@@ -7639,6 +7630,47 @@ $$</p>
 <span class="k">    end interface</span>
 </pre></div>
 <p>Note the presence of the <code>value</code> option for the input arguments. This is so we pass arguments by <code>value</code> instead of by <strong>reference</strong> (the default). If we didn't have the value keyword the C function would receive a reference (or pointer to the variables) instead of a copy of the variables. In the case of <code>launch_kernel_hip</code> without the <code>value</code> keyword in the interface then A would be of type <code>void**</code> instead of <code>void*</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=00c9ae1b-6ec0-426b-9db6-10fba3b83292">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Strategies-for-maintaining-consistency-in-precision">Strategies for maintaining consistency in precision<a class="anchor-link" href="#Strategies-for-maintaining-consistency-in-precision">¶</a></h2><p>In the file <a href="kernel_code.cpp">kernel_code.cpp</a> you might have noticed the use of <code>float_type</code>. This is a typedef that determines the data type of elements within the tensors. It is set to <code>double</code> in <a href="../src/kinds.h"></a>../src/kinds.h if the macro <code>USE_C_DOUBLE</code> is defined. Otherwise it is type-defined as <code>float</code>.</p>
+<div class="highlight"><pre><span></span><span class="cp">#ifdef USE_C_DOUBLE</span>
+<span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">float_type</span><span class="p">;</span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">float_type</span><span class="p">;</span>
+<span class="cp">#endif</span>
+</pre></div>
+<p>We include <code>kinds.h</code> from <a href="kernel_code.cpp">kernel_code.cpp</a> to make this type available.</p>
+<div class="highlight"><pre><span></span><span class="c1">// Include this to make float_type available</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">"kinds.h"</span>
+</pre></div>
+<p>Element types must <strong>be consistent</strong> when arrays are accessed from both Fortran and C/C++. In Fortran the <code>iso_c_binding</code> module provides  <code>c_float</code> and <code>c_double</code> kinds that are equivalent to their C types.  The <code>iso_fortran_env</code> module has <code>real32</code> and <code>real64</code> kinds for creating reals of 32-bit and 64-bit floats. These correspond to the C types <code>float</code> and <code>double</code> for IEEE-754 compliant floating point implementations.</p>
+<p>In <a href="../src/kinds.f90"></a>../src/kinds.f90 we employ a similar method to declare <code>float_type</code> as a kind within the <code>kinds</code> module. We use associate <code>float_type</code> with <code>c_double</code> if <code>USE_C_DOUBLE</code> is defined, and with <code>c_float</code> otherwise.</p>
+<div class="highlight"><pre><span></span><span class="cp">#ifdef USE_C_DOUBLE</span>
+<span class="w">   </span><span class="c">! Set float_type as c_double from iso_c_binding module</span>
+<span class="w">   </span><span class="k">use</span><span class="p">,</span><span class="w"> </span><span class="k">intrinsic</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">iso_c_binding</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">float_type</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="kt">c_double</span>
+<span class="cp">#else</span>
+<span class="w">   </span><span class="c">! Set float_type as c_float from iso_c_binding module</span>
+<span class="w">   </span><span class="k">use</span><span class="p">,</span><span class="w"> </span><span class="k">intrinsic</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="nb">iso_c_binding</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">float_type</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="kt">c_float</span>
+<span class="cp">#endif</span>
+</pre></div>
+<p>In <a href="tensoradd_hip_cptr.f90">tensoradd_hip_cptr.f90</a> we can use the <code>kinds</code> module and create real variables of kind <code>float_type</code>.</p>
+<div class="highlight"><pre><span></span><span class="c">! Use the kinds module to make available the float_type kind</span>
+<span class="w">    </span><span class="k">use </span><span class="n">kinds</span>
+
+<span class="w">    </span><span class="p">...</span>
+
+<span class="w">    </span><span class="c">! Fortran pointers to memory allocations on the host</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="n">float_type</span><span class="p">),</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:,:),</span><span class="w"> </span><span class="k">pointer</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">A_h</span><span class="p">,</span><span class="w"> </span><span class="n">B_h</span><span class="p">,</span><span class="w"> </span><span class="n">C_h</span>
+</pre></div>
+<p>Now we can be sure that <code>float_type</code> corresponds to a floating point number of a consistent precision, even when compiler flags set the default precision of <code>reals</code> to something else. One less source of bugs!</p>
 </div>
 </div>
 </div>
