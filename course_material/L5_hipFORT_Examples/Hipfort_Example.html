@@ -7516,10 +7516,10 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="A-complete-Hipfort-application">A complete Hipfort application<a class="anchor-link" href="#A-complete-Hipfort-application">¶</a></h1><p>In the <strong>Fortran Refresher</strong> section we covered the essentials of the Fortran language and how to use <code>subroutines</code>, <code>functions</code>, <code>pointers</code>, <code>modules</code> as well as how to call C code from Fortran. If this is unfamiliar, then it might be useful to review the material in that section first.</p>
-<p>From <strong>GPU Computing Fundamentals</strong> section, every accelerated application has the same basic design:</p>
+<h1 id="A-complete-Hipfort-application">A complete Hipfort application<a class="anchor-link" href="#A-complete-Hipfort-application">¶</a></h1><p>In the <a href="../L1_Fortran_Refresher/Fortran.html"></a>Fortran Refresher lesson <a href="../L1_Fortran_Refresher/Fortran.ipynb"></a>(ipynb) we covered the essentials of the Fortran language and how to use <code>subroutines</code>, <code>functions</code>, <code>pointers</code>, <code>modules</code> as well as how to call C code from Fortran. If these topics are unfamiliar to you, then it might be useful to review the material in that section first!</p>
+<p>From the <a href="../L2_GPU_Computing_Fundamentals/Fundamentals.html"></a>GPU Computing Fundamentals <a href="../L2_GPU_Computing_Fundamentals/Fundamentals.ipynb"></a>(ipynb) section, every accelerated application has the same basic design:</p>
 <ol>
-<li>At program launch compute devices are discovered and initialized.</li>
+<li>At program launch, compute devices are discovered and initialized.</li>
 <li>Memory spaces are allocated on the compute device.</li>
 <li>Kernels are prepared.</li>
 <li>Memory is copied from the host to the compute device.</li>
@@ -7531,7 +7531,7 @@ a.anchor-link {
 <li>Deallocate memory,</li>
 <li>Release resources and exit.</li>
 </ol>
-<h2 id="Tensor-addition-math">Tensor addition math<a class="anchor-link" href="#Tensor-addition-math">¶</a></h2><p>In this section we are going to walk through each of these steps as part of a complete example with Hipfort, using 2D tensor addition as the basic algorithm. For 2D tensors <strong>A</strong>, <strong>B</strong>, and <strong>C</strong>, each of size (M,N), the following relationship holds true at each index (i,j) in the tensors.</p>
+<h2 id="Tensor-addition-math">Tensor addition math<a class="anchor-link" href="#Tensor-addition-math">¶</a></h2><p>In this section we are going to walk through each of these steps as part of a complete example with hipFORT, using 2D tensor addition as the basic algorithm. For 2D tensors <strong>A</strong>, <strong>B</strong>, and <strong>C</strong>, each of size (M,N), the following relationship holds true at each index (i,j) in the tensors.</p>
 <p>$$
 A(i,j)+B(i,j)=C(i,j)
 $$</p>
@@ -7546,7 +7546,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Example-applications">Example applications<a class="anchor-link" href="#Example-applications">¶</a></h2><p>In HIP we need a way to get a handle on the memory allocations that are on the compute device. Hipfort can use either a C pointer (<code>type(c_ptr)</code>) or a Fortran <code>pointer</code> as a handle to the memory allocations on the GPU. The methods of working with each type are subtly different though. In the applications</p>
+<h2 id="Example-applications">Example applications<a class="anchor-link" href="#Example-applications">¶</a></h2><p>In HIP we need a way to get a handle on the memory allocations that are on the compute device. HipFORT can use either a <code>C</code> pointer of Fortran type <code>c_ptr</code> or a Fortran pointer as a handle to the memory allocations on the GPU. The methods of working with each type are subtly different though. In the applications</p>
 <ul>
 <li><a href="tensoradd_hip_cptr.f90">tensoradd_hip_cptr.f90</a></li>
 <li><a href="tensoradd_hip_fptr.f90">tensoradd_hip_fptr.f90</a></li>
@@ -7562,12 +7562,12 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Use-the-Hipfort-API">Use the Hipfort API<a class="anchor-link" href="#Use-the-Hipfort-API">¶</a></h2><p>Access to all Hipfort functions is via the <code>hipfort</code> and <code>hipfort_check</code> modules. We bring those modules in along with others at the beginning of the program.</p>
+<h2 id="Use-the-hipFORT-API">Use the hipFORT API<a class="anchor-link" href="#Use-the-hipFORT-API">¶</a></h2><p>Access to all hipFORT functions is via the <code>hipfort</code> and <code>hipfort_check</code> modules. We bring those modules in along with others at the beginning of the program.</p>
 <div class="highlight"><pre><span></span><span class="c">! HIP modules</span>
 <span class="w">    </span><span class="k">use </span><span class="n">hipfort</span>
 <span class="w">    </span><span class="k">use </span><span class="n">hipfort_check</span>
 </pre></div>
-<h2 id="Check-HIP-API-calls">Check HIP API calls<a class="anchor-link" href="#Check-HIP-API-calls">¶</a></h2><p>Hipfort functions usually have a <strong>return type</strong> that we can check to make sure everything worked ok. If these checks are <strong>not performed</strong> some functions will continue even though there has been a <strong>silent failure</strong>.  It is therefore <strong>best practice</strong> to <strong>always</strong> the check the return type from HIP calls. The <code>hipfort_check</code> module defines a subroutine called <code>hipcheck</code> that we can use to wrap around a HIP API call. It then checks the return type and exits the program if there has been an error. For example we wrap a <code>hipmalloc</code> call with hipcheck as follows:</p>
+<h2 id="Check-HIP-API-calls">Check HIP API calls<a class="anchor-link" href="#Check-HIP-API-calls">¶</a></h2><p>HipFORT functions usually have a <strong>return type</strong> that we can check to make sure everything worked ok. If these checks are <strong>not performed</strong> some functions will return even though there has been a <strong>silent failure</strong>.  It is therefore <strong>best practice</strong> to <strong>always</strong> the check the return type from hipFORT calls. The <code>hipfort_check</code> module defines a subroutine called <code>hipcheck</code> that we can use to wrap around a hipFORT API call. It then checks the return type and exits the program if there has been an error. For example we wrap <code>hipcheck</code> around a <code>hipmalloc</code> call as follows:</p>
 <pre><code>call hipcheck(hipmalloc(A_d, M, N))
 </code></pre>
 </div>
@@ -7580,7 +7580,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Code-validation">Code validation<a class="anchor-link" href="#Code-validation">¶</a></h2><p>It is important to make sure that the output of the compuation is accurate for every element in the output. A wrong answer can be computed very quickly but it is of no use! In the file <a href="math_utils.f90">math_utils.f90</a> is a function called <code>check_tensor_addition_2D</code> that iterates over every point in the output tensor $C(i,j)$ and checks to see each point is within an error margin of $A(i,j)+B(i,j)$. The function has the following signature, where <strong>A</strong>, <strong>B</strong>, and <strong>C</strong> are arrays on the host. It has the following signature:</p>
+<h2 id="Code-validation">Code validation<a class="anchor-link" href="#Code-validation">¶</a></h2><p>It is important to make sure that the output of the compuation is accurate for every element in the output. Wrong answers can be computed very quickly but they are of no value! In the <strong>src</strong> folder is a file called <a href="../src/math_utils.f90"></a>math_utils.f90. It contains a module called <code>math_utils</code> that is intended to contain functions for working with tensors on the CPU. Within the module is a function called <code>check_tensor_addition_2D</code> that iterates over every point in a passed-in tensor $C(i,j)$ and checks to see each point is within an error margin of $A(i,j)+B(i,j)$. The function has the following signature, where <strong>A</strong>, <strong>B</strong>, and <strong>C</strong> are arrays on the host:</p>
 <div class="highlight"><pre><span></span><span class="k">function </span><span class="n">check_tensor_addition_2D</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">,</span><span class="w"> </span><span class="n">C</span><span class="p">,</span><span class="w"> </span><span class="n">eps_mult</span><span class="p">)</span><span class="w"> </span><span class="k">result</span><span class="p">(</span><span class="n">success</span><span class="p">)</span>
 <span class="w">            </span><span class="c">!! Function to check the outcome of tensor addition</span>
 <span class="w">            </span><span class="c">!! only check the host arrays</span>
@@ -7591,7 +7591,7 @@ $$</p>
 <span class="w">                </span><span class="c">!! Epsilon multiplier, how many floating point spacings</span>
 <span class="w">                </span><span class="c">!! can the computed answer be from our benchmark answer</span>
 </pre></div>
-<p>and we import it as the function <code>check</code> within the two programs</p>
+<p>Within the tensoradd programs we import <code>check_tensor_addition_2D</code> and rename it as the function <code>check</code></p>
 <div class="highlight"><pre><span></span><span class="c">! Maths check</span>
 <span class="w">    </span><span class="k">use </span><span class="n">math_utils</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">check</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">check_tensor_addition_2D</span>
 </pre></div>
@@ -7605,7 +7605,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Fortran-interface-to-kernel-launch-function">Fortran interface to kernel launch function<a class="anchor-link" href="#Fortran-interface-to-kernel-launch-function">¶</a></h2><p>Hipfort doesn't yet have a way to launch kernels, however passing pointers from Fortran to C/C++ functions is straightforward, and from C/C++ code we can launch kernels. In the file <a href="kernel_code.cpp">kernel_code.cpp</a> is a function called <code>launch_kernel_hip</code> that does the job of launching kernels. It has the following signature:</p>
+<h2 id="Fortran-interface-to-kernel-launch-function">Fortran interface to kernel launch function<a class="anchor-link" href="#Fortran-interface-to-kernel-launch-function">¶</a></h2><p>HipFORT doesn't yet have a way to launch kernels, however passing C-pointers from Fortran to C/C++ functions is straightforward, and from C/C++ code we can launch kernels. In the file <a href="kernel_code.cpp">kernel_code.cpp</a> is a function called <code>launch_kernel_hip</code> that does the job of launching kernels. It has the following signature:</p>
 <div class="highlight"><pre><span></span><span class="n">void</span><span class="w"> </span><span class="n">launch_kernel_hip</span><span class="p">(</span>
 <span class="w">            </span><span class="n">float_type</span><span class="o">*</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"> </span>
 <span class="w">            </span><span class="n">float_type</span><span class="o">*</span><span class="w"> </span><span class="n">B</span><span class="p">,</span>
@@ -7616,6 +7616,8 @@ $$</p>
 <p>and we have type defined <code>float_type</code> as <code>float</code> earlier in the file.</p>
 <div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">float_type</span><span class="p">;</span>
 </pre></div>
+<p>This will determine the element type of the tensors. The element type need to be <strong>consistent across Fortran and C</strong> as it determines how many bytes each element uses. In Fortran the <code>iso_c_binding</code> module provides a <code>c_float</code> kind that we can use for creating arrays of type real. This provides a measure of <strong>consistency</strong> between Fortran an C, but not necessarily consistency in the number of bytes used across platforms. The <code>iso_fortran_env</code> module has <code>real32</code> and <code>real64</code> kinds for creating arrays of 32-bit and 64-bit floating point numbers.</p>
+<p>A complete solution for ensuring consistency might involve macros.</p>
 <p>In order to call this function from Fortran we define an <code>interface</code> to the function within the programs of <a href="tensoradd_hip_cptr.f90">tensoradd_hip_cptr.f90</a> and <a href="tensoradd_hip_fptr.f90">tensoradd_hip_fptr.f90</a> as follows:</p>
 <div class="highlight"><pre><span></span><span class="k">interface</span>
 <span class="w">        </span><span class="c">! A C function with void return type</span>

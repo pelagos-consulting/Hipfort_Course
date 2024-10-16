@@ -151,9 +151,14 @@ endif()
 ##    message(STATUS "${_variableName}=${${_variableName}}")
 ##endforeach()
 
+# Set the place to put all built Fortran module files
+set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/mod)
+
+# Set the location of the course material
 set(COURSE_MATERIAL_DIR ${CMAKE_SOURCE_DIR}/course_material)
 
-# Example Codes
+# Directories
+add_subdirectory(${COURSE_MATERIAL_DIR}/src)
 add_subdirectory(${COURSE_MATERIAL_DIR}/L1_Fortran_Refresher)
 add_subdirectory(${COURSE_MATERIAL_DIR}/L5_hipFORT_Examples)
 add_subdirectory(${COURSE_MATERIAL_DIR}/Exercises/E1_Chessboard_CPU)

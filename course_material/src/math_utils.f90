@@ -1,7 +1,7 @@
 module math_utils
 
-    use iso_c_binding
-    use iso_fortran_env
+    ! Import this make available the "float_type" kind 
+    use kinds
 
     implicit none
 
@@ -11,7 +11,7 @@ module math_utils
             !! Function to check the outcome of tensor addition
             !! only check the host arrays
 
-            real(kind=c_float), dimension(:,:), intent(in), pointer :: A, B, C
+            real(float_type), dimension(:,:), intent(in), pointer :: A, B, C
         
             real, intent(in) :: eps_mult
                 !! Epsilon multiplier, how many floating point spacings
@@ -21,7 +21,7 @@ module math_utils
             integer :: M, N
 
             ! Scratch variables
-            real(kind=c_float) :: scratch, upper, lower
+            real(float_type) :: scratch, upper, lower
 
             ! Loop indices and error code
             integer  :: i, j

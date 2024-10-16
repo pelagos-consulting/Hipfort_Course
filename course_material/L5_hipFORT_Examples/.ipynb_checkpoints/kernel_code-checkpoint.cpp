@@ -7,7 +7,8 @@
 #include <cassert>
 #include <hip/hip_runtime.h>
 
-typedef float float_type;
+// Include this to make float_type available
+#include "kinds.h"
 
 void hipCheck(hipError_t error_code, std::string error_msg) {
     // Function to check a HIP return code
@@ -40,7 +41,10 @@ __global__ void tensoradd_2D (
         int N) {
 
     // Any dynamically allocated memory is available here
-    extern __shared__ float_type shared[];
+    extern __shared__ char shared[];
+
+    // Can use shared memory like this
+    //float_type* shared_A = (float_type*)&shared[0];
 
     // We adopt column-major indexing for this example
     

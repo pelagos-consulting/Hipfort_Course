@@ -9,6 +9,9 @@ module tensor_hip
     ! Use the ISO Fortran environment module
     use iso_fortran_env
 
+    ! Use the kinds module to bring in the float_type kind 
+    use kinds
+
     ! Use the Hipfort modules
     use hipfort
     use hipfort_check

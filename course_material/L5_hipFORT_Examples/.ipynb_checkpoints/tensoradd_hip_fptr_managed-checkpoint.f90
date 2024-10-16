@@ -1,6 +1,6 @@
 program tensoradd
     !! Program to compute 2D tensor addition
-    !! Using C pointers type(c_ptr) as the handle 
+    !! Using Fortran pointers as the handle 
     !! for device allocations
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
@@ -9,9 +9,6 @@ program tensoradd
 
     ! C interopability 
     use iso_c_binding
-
-    ! Use the kinds module to make available the float_type kind
-    use kinds
 
     ! HIP modules
     use hipfort
@@ -50,71 +47,65 @@ program tensoradd
 
     ! Epsilon multiplier
     ! How many floating point spacings
-    ! Should the computed solution be from the answer
+    ! should the computed solution be from the answer
     real :: eps_mult = 2.0
 
     ! Outcome of the check
     logical :: success
 
     ! Fortran pointers to memory allocations on the host
-    real(float_type), dimension(:,:), pointer :: A_h, B_h, C_h
+    real(kind=c_float), dimension(:,:), pointer :: A, B, C
 
-    ! C Pointers to memory allocations on the device
-    type(c_ptr) :: A_d, B_d, C_d
 
     ! Find and set the device. Use device 0 by default
     call init_device(0)   
 
-    ! Allocate memory on host 
-    allocate(A_h(M,N), B_h(M, N), C_h(M,N))
+    ! Allocate managed memory that is accessible across host and device
+    call hipCheck(hipMallocManaged(A, M, N, hipMemAttachGlobal))
+    call hipCheck(hipMallocManaged(B, M, N, hipMemAttachGlobal))
+    call hipCheck(hipMallocmanaged(C, M, N, hipMemAttachGlobal))
 
-    ! Allocate tensors on the device
-    call hipcheck(hipmalloc(A_d, int(sizeof(A_h), c_size_t)))
-    call hipcheck(hipmalloc(B_d, int(sizeof(B_h), c_size_t)))
-    call hipcheck(hipmalloc(C_d, int(sizeof(C_h), c_size_t)))
+    ! Set coarse grained coherence for all variables
+    call hipCheck(hipMemAdvise(c_loc(A), int(sizeof(A), c_size_t), hipMemAdviseSetCoarseGrain,0))
+    call hipCheck(hipMemAdvise(c_loc(B), int(sizeof(B), c_size_t), hipMemAdviseSetCoarseGrain,0))
+    call hipCheck(hipMemAdvise(c_loc(C), int(sizeof(C), c_size_t), hipMemAdviseSetCoarseGrain,0))
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
-    call random_number(A_h)
-    call random_number(B_h)
+    call random_number(A)
+    call random_number(B)
 
-    ! Copy memory from the host to the device 
-    call hipcheck(hipmemcpy(A_d, c_loc(A_h), int(sizeof(A_h), c_size_t), hipmemcpyhosttodevice))
-    call hipcheck(hipmemcpy(B_d, c_loc(B_h), int(sizeof(B_h), c_size_t), hipmemcpyhosttodevice))
+    ! Pre-fetch A and B to the device
+    ! Copy memory from the host to the device
+    ! Note that size for the copy is in elements, not bytes
+    call hipCheck(hipMemPrefetchAsync(c_loc(A),int(sizeof(A),c_size_t),0,c_null_ptr))
+    call hipCheck(hipMemPrefetchAsync(c_loc(B),int(sizeof(B),c_size_t),0,c_null_ptr))
 
     ! Call the C function that launches the kernel
     call launch_kernel_hip( &
-        A_d, &
-        B_d, &
-        C_d, &
+        c_loc(A), &
+        c_loc(B), &
+        c_loc(C), &
         int(M, c_int), &
         int(N, c_int) &
     )
 
-    ! Copy memory from the device to the host
-    call hipcheck(hipmemcpy(c_loc(C_h), C_d, int(sizeof(C_h),c_size_t), hipmemcpydevicetohost))
+    ! Block the CPU (host) from progressing until the hip kernel finishes
+    call hipcheck(hipDeviceSynchronize())
 
     ! Check the answer
-    success = check(A_h, B_h, C_h, eps_mult)
+    success = check(A, B, C, eps_mult)
 
     ! Release resources
 
-    ! Free host arrays
-    deallocate(A_h, B_h, C_h)
-
-    ! Free allocations on the device
-    call hipcheck(hipfree(A_d))
-    call hipcheck(hipfree(B_d))
-    call hipcheck(hipfree(C_d))
+    ! Free allocations
+    call hipcheck(hipfree(A))
+    call hipcheck(hipfree(B))
+    call hipcheck(hipfree(C))
 
     ! It is best practice to nullify all pointers 
     ! once we are done with them 
-    nullify(A_h, B_h, C_h)
-
-    ! Set C pointers to null as well
-    A_d = c_null_ptr
-    B_d = c_null_ptr
-    C_d = c_null_ptr
+    nullify(A, B, C)
 
     ! Make sure all resources on the selected device are released
     call reset_device
