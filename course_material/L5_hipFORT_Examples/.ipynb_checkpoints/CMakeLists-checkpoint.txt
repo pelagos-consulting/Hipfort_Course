@@ -47,7 +47,6 @@ add_executable (tensoradd_hip_oo
     $<TARGET_OBJECTS:common_lib>
     )
 # Link in other libraries
-##target_link_libraries(tensoradd_hip_oo ${kernel_libs} $<TARGET_OBJECTS:kinds_lib>)
 target_link_libraries(tensoradd_hip_oo ${kernel_libs})
 
 

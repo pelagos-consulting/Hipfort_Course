@@ -35,13 +35,13 @@ module tensor_hip
         
             ! Upload procedures
             procedure :: copy_from_host_cptr
-            procedure :: copy_from_host_c_float_1
-            procedure :: copy_from_host_c_float_2
+            procedure :: copy_from_host_float_type_1
+            procedure :: copy_from_host_float_type_2
             
             ! Download procedures
             procedure :: copy_to_host_cptr
-            procedure :: copy_to_host_c_float_1
-            procedure :: copy_to_host_c_float_2
+            procedure :: copy_to_host_float_type_1
+            procedure :: copy_to_host_float_type_2
             
             ! Allocation and de-allocation procedures
             procedure :: malloc
@@ -49,11 +49,11 @@ module tensor_hip
             
             ! Generic procedures for different types of data
             generic :: copy_from => copy_from_host_cptr, &
-                copy_from_host_c_float_1, &
-                copy_from_host_c_float_2 !, can specify more comma-separated functions here
+                copy_from_host_float_type_1, &
+                copy_from_host_float_type_2 !, can specify more comma-separated functions here
             generic :: copy_to => copy_to_host_cptr, &
-                copy_to_host_c_float_1, &
-                copy_to_host_c_float_2 !, can specify more comma-separated functions here
+                copy_to_host_float_type_1, &
+                copy_to_host_float_type_2 !, can specify more comma-separated functions here
             
             ! Final is a cleanup function when the object goes out of scope
             final :: destructor
@@ -190,40 +190,40 @@ contains
 
     ! Generic procedures for copy_from, and copy_to
 
-    subroutine copy_from_host_c_float_1(this, host_fptr)
-        !! Copy from a 1D Fortran pointer c_floats
+    subroutine copy_from_host_float_type_1(this, host_fptr)
+        !! Copy from a 1D Fortran pointer float_types
         use iso_c_binding
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
-        real(kind=c_float), dimension(:), intent(in), pointer :: host_fptr
+        real(kind=float_type), dimension(:), intent(in), pointer :: host_fptr
         call this%copy_from(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
-    end subroutine copy_from_host_c_float_1
+    end subroutine copy_from_host_float_type_1
 
-    subroutine copy_to_host_c_float_1(this, host_fptr)
-        !! Copy to a 1D Fortran pointer to c_floats
+    subroutine copy_to_host_float_type_1(this, host_fptr)
+        !! Copy to a 1D Fortran pointer to float_types
         use iso_c_binding
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
-        real(kind=c_float), dimension(:), intent(inout), pointer :: host_fptr
+        real(kind=float_type), dimension(:), intent(inout), pointer :: host_fptr
         call this%copy_to(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
-    end subroutine copy_to_host_c_float_1
+    end subroutine copy_to_host_float_type_1
 
-    subroutine copy_from_host_c_float_2(this, host_fptr)
-        !! Copy from a 2D Fortran pointer to c_floats
+    subroutine copy_from_host_float_type_2(this, host_fptr)
+        !! Copy from a 2D Fortran pointer to float_types
         use iso_c_binding
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
-        real(kind=c_float), dimension(:,:), intent(in), pointer :: host_fptr
+        real(kind=float_type), dimension(:,:), intent(in), pointer :: host_fptr
         call this%copy_from(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
-    end subroutine copy_from_host_c_float_2
+    end subroutine copy_from_host_float_type_2
 
-    subroutine copy_to_host_c_float_2(this, host_fptr)
-        !! Copy to a 2D Fortran pointer to c_floats
+    subroutine copy_to_host_float_type_2(this, host_fptr)
+        !! Copy to a 2D Fortran pointer to float_types
         use iso_c_binding
         ! Use class(tensor) for `this` so it also can also be any derived type
         class(tensor), intent(inout) :: this
-        real(kind=c_float), dimension(:,:), intent(inout), pointer :: host_fptr
+        real(kind=float_type), dimension(:,:), intent(inout), pointer :: host_fptr
         call this%copy_to(c_loc(host_fptr), int(sizeof(host_fptr), c_size_t))
-    end subroutine copy_to_host_c_float_2
+    end subroutine copy_to_host_float_type_2
 
 end module tensor_hip
