@@ -69,14 +69,14 @@ program tensoradd
     allocate(A_h(M,N), B_h(M, N), C_h(M,N))
 
     ! Allocate memory on the device
-    call hipcheck(hipmalloc(A_d, M, N))
-    call hipcheck(hipmalloc(B_d, M, N))
-    call hipcheck(hipmalloc(C_d, M, N))
+    call hipcheck(hipMalloc(A_d, M, N))
+    call hipcheck(hipMalloc(B_d, M, N))
+    call hipcheck(hipMalloc(C_d, M, N))
 
     ! Could have also done this for the allocate instead
-    !call hipcheck(hipmalloc_r4_2_c_size_t(A_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-    !call hipcheck(hipmalloc_r4_2_c_size_t(B_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-    !call hipcheck(hipmalloc_r4_2_c_size_t(C_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+    !call hipcheck(hipMalloc_r4_2_c_size_t(A_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+    !call hipcheck(hipMalloc_r4_2_c_size_t(B_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+    !call hipcheck(hipMalloc_r4_2_c_size_t(C_d, int(M_in, c_size_t), int(N_in, c_size_t)))
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
@@ -85,14 +85,14 @@ program tensoradd
 
     ! Copy memory from the host to the device
     ! Note that size for the copy is in elements, not bytes
-    call hipcheck(hipmemcpy(A_d, A_h, size(A_h), hipmemcpyhosttodevice))
-    call hipcheck(hipmemcpy(B_d, B_h, size(B_h), hipmemcpyhosttodevice))
+    call hipcheck(hipMemcpy(A_d, A_h, size(A_h), hipMemcpyHostToDevice))
+    call hipcheck(hipMemcpy(B_d, B_h, size(B_h), hipMemcpyHosttoDevice))
 
     ! Could also have done this for the copy instead
-    !call hipcheck(hipmemcpy_r4_2_c_size_t(A_d, A_h, &
-    !    int(size(A_h), c_size_t), hipmemcpyhosttodevice))
-    !call hipcheck(hipmemcpy_r4_2_c_size_t(B_d, B_h, &
-    !    int(size(B_h), c_size_t), hipmemcpyhosttodevice))
+    !call hipcheck(hipMemcpy_r4_2_c_size_t(A_d, A_h, &
+    !    int(size(A_h), c_size_t), hipMemcpyhosttodevice))
+    !call hipcheck(hipMemcpy_r4_2_c_size_t(B_d, B_h, &
+    !    int(size(B_h), c_size_t), hipMemcpyhosttodevice))
 
     ! Call the C function that launches the kernel
     call launch_kernel_hip( &
@@ -104,11 +104,11 @@ program tensoradd
     )
 
     ! Copy from the device result back to the host
-    call hipcheck(hipmemcpy(C_h, C_d, size(C_d), hipmemcpydevicetohost))
+    call hipcheck(hipMemcpy(C_h, C_d, size(C_d), hipMemcpyDeviceToHost))
 
     ! Could have also done this instead for the copy
-    !call hipcheck(hipmemcpy_r4_2_c_size_t(C_h, C_d, &
-    !    int(size(C_d), c_size_t), hipmemcpydevicetohost))
+    !call hipcheck(hipMemcpy_r4_2_c_size_t(C_h, C_d, &
+    !    int(size(C_d), c_size_t), hipMemcpydevicetohost))
 
     ! Check the answer
     success = check(A_h, B_h, C_h, eps_mult)
@@ -119,9 +119,9 @@ program tensoradd
     deallocate(A_h, B_h, C_h)
 
     ! Free allocations on the device
-    call hipcheck(hipfree(A_d))
-    call hipcheck(hipfree(B_d))
-    call hipcheck(hipfree(C_d))
+    call hipcheck(hipFree(A_d))
+    call hipcheck(hipFree(B_d))
+    call hipcheck(hipFree(C_d))
 
     ! It is best practice to nullify all pointers 
     ! once we are done with them 

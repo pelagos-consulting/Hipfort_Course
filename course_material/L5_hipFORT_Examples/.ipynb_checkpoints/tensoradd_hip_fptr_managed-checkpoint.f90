@@ -101,9 +101,9 @@ program tensoradd
     ! Release resources
 
     ! Free allocations
-    call hipcheck(hipfree(A))
-    call hipcheck(hipfree(B))
-    call hipcheck(hipfree(C))
+    call hipcheck(hipFree(A))
+    call hipcheck(hipFree(B))
+    call hipcheck(hipFree(C))
 
     ! It is best practice to nullify all pointers 
     ! once we are done with them 
