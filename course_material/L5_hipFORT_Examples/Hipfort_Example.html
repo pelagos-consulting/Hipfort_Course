@@ -8344,7 +8344,7 @@ $$</p>
 <span class="w">        </span><span class="k">end if</span>
 
 <span class="w">        </span><span class="c">! Now allocate memory for the tensor on the GPU</span>
-<span class="w">        </span><span class="k">call </span><span class="n">hipCheck</span><span class="p">(</span><span class="n">hipmalloc</span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">mem</span><span class="p">,</span><span class="w"> </span><span class="n">nbytes</span><span class="p">))</span>
+<span class="w">        </span><span class="k">call </span><span class="n">hipCheck</span><span class="p">(</span><span class="n">hipMalloc</span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">mem</span><span class="p">,</span><span class="w"> </span><span class="n">nbytes</span><span class="p">))</span>
 
 <span class="w">        </span><span class="c">! Set the allocated flag</span>
 <span class="w">        </span><span class="n">this</span><span class="p">%</span><span class="n">allocd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
@@ -8365,7 +8365,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Access-to-type-members-and-procedures">Access to type members and procedures<a class="anchor-link" href="#Access-to-type-members-and-procedures">¶</a></h4><p>Access to any members and procedures of the type is through the <code>%</code> operator. For exampl within the <code>malloc</code> procedure we check the <code>allocd</code> variable and run the <code>free</code> procedure as follows:</p>
+<h4 id="Access-to-type-members-and-procedures">Access to type members and procedures<a class="anchor-link" href="#Access-to-type-members-and-procedures">¶</a></h4><p>Access to any members and procedures of the type is through the <code>%</code> operator. For example within the <code>malloc</code> procedure we check the <code>allocd</code> variable and run the <code>free</code> procedure as follows:</p>
 <div class="highlight"><pre><span></span><span class="c">! Check to make sure we are not already allocated</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">allocd</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
 <span class="k">        call </span><span class="n">this</span><span class="p">%</span><span class="n">free</span>
@@ -8381,7 +8381,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Final-procedure">Final procedure<a class="anchor-link" href="#Final-procedure">¶</a></h4><p>The <code>final</code> procedure (which we name as <code>destructor</code>) needs to have <code>this</code> as an argument of <code>type(tensor)</code> to signify that it <strong>must</strong> be an instance of the <code>tensor</code> class. In this subroutine we just call the <code>free</code> procedure to free memory when a tensor goes out of scope. This is a way to ensure that the memory allocation on the compute device is always released on exit.</p>
+<h4 id="Final-procedure">Final procedure<a class="anchor-link" href="#Final-procedure">¶</a></h4><p>The <code>final</code> procedure (which we name as <code>destructor</code>) needs to have <code>this</code> as an argument of <code>type(tensor)</code> to signify that it <strong>must</strong> be specific instance of the <code>tensor</code> class. In this subroutine we just call the <code>free</code> procedure to free memory when a tensor goes out of scope. This is a way to ensure that the memory allocation on the compute device is always released on exit.</p>
 <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">destructor</span><span class="p">(</span><span class="n">this</span><span class="p">)</span>
 <span class="w">    </span><span class="c">!! Destructor, `this` must be of type(tensor) because it is valid only for instances</span>
 <span class="w">    </span><span class="c">!! of this type</span>
@@ -8399,7 +8399,7 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Using-the-tensor-type">Using the tensor type<a class="anchor-link" href="#Using-the-tensor-type">¶</a></h3><p>In the source file <a href="tensoradd_hip_oo.f90">tensoradd_hip_oo.f90</a> we use the <code>tensor</code> type to work with memory allocations on the GPU in a way that has enhanced memory safety and less chance of bugs being introduced.</p>
+<h3 id="Using-the-tensor-type">Using the tensor type<a class="anchor-link" href="#Using-the-tensor-type">¶</a></h3><p>In the source file <a href="tensoradd_hip_oo.f90">tensoradd_hip_oo.f90</a> we use the <code>tensor</code> type to work with memory allocations on the GPU in a way that has enhanced memory safety and fewer chances of bugs being introduced.</p>
 </div>
 </div>
 </div>
@@ -8442,9 +8442,9 @@ $$</p>
 <div class="highlight"><pre><span></span><span class="c">! Allocate memory for tensors, </span>
 <span class="w">    </span><span class="c">! see tensor_hip.f90 for </span>
 <span class="w">    </span><span class="c">! definition of generic procedures </span>
-<span class="w">    </span><span class="k">call </span><span class="n">A_d</span><span class="p">%</span><span class="n">malloc</span><span class="p">(</span><span class="n">sizeof</span><span class="p">(</span><span class="n">A_h</span><span class="p">))</span>
-<span class="w">    </span><span class="k">call </span><span class="n">B_d</span><span class="p">%</span><span class="n">malloc</span><span class="p">(</span><span class="n">sizeof</span><span class="p">(</span><span class="n">B_h</span><span class="p">))</span>
-<span class="w">    </span><span class="k">call </span><span class="n">C_d</span><span class="p">%</span><span class="n">malloc</span><span class="p">(</span><span class="n">sizeof</span><span class="p">(</span><span class="n">C_h</span><span class="p">))</span>
+<span class="w">    </span><span class="k">call </span><span class="n">A_d</span><span class="p">%</span><span class="n">malloc</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sizeof</span><span class="p">(</span><span class="n">A_h</span><span class="p">),</span><span class="w"> </span><span class="kt">c_size_t</span><span class="p">))</span>
+<span class="w">    </span><span class="k">call </span><span class="n">B_d</span><span class="p">%</span><span class="n">malloc</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sizeof</span><span class="p">(</span><span class="n">B_h</span><span class="p">),</span><span class="w"> </span><span class="kt">c_size_t</span><span class="p">))</span>
+<span class="w">    </span><span class="k">call </span><span class="n">C_d</span><span class="p">%</span><span class="n">malloc</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sizeof</span><span class="p">(</span><span class="n">C_h</span><span class="p">),</span><span class="w"> </span><span class="kt">c_size_t</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -8504,7 +8504,19 @@ $$</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Resource-cleanup">Resource cleanup<a class="anchor-link" href="#Resource-cleanup">¶</a></h4><p>When it comes time to clean up the memory we call the <code>free</code> procedure. This is not strictly necessary however, as the destructor is automatically called when the tensors go out of scope.</p>
+<h4 id="Resource-cleanup">Resource cleanup<a class="anchor-link" href="#Resource-cleanup">¶</a></h4><p>When it comes time to clean up the memory we call the <code>free</code> procedure.</p>
+<div class="highlight"><pre><span></span><span class="c">! Free tensors on the device</span>
+<span class="w">    </span><span class="c">! this step is not necessary because </span>
+<span class="w">    </span><span class="c">! the tensor type has a destructor</span>
+<span class="w">    </span><span class="c">! that is called when the tensor is out of scope</span>
+<span class="w">    </span><span class="k">call </span><span class="n">A_d</span><span class="p">%</span><span class="n">free</span>
+<span class="w">    </span><span class="k">call </span><span class="n">B_d</span><span class="p">%</span><span class="n">free</span>
+<span class="w">    </span><span class="k">call </span><span class="n">C_d</span><span class="p">%</span><span class="n">free</span>
+</pre></div>
+<p>This step is not strictly necessary, as the destructor is automatically called when the tensors go out of scope. Then at cleanup we reset compute devices as per normal.</p>
+<div class="highlight"><pre><span></span><span class="c">! Make sure all resources on the device are released</span>
+<span class="w">    </span><span class="k">call </span><span class="n">reset_device</span>
+</pre></div>
 </div>
 </div>
 </div>
