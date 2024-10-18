@@ -8087,7 +8087,7 @@ a.anchor-link {
 <p>To move data on and off a GPU like the MI200, we primarily use the System Direct Memory Access (SDMA) engine. The SDMA engine handles blocks of memory and sends them to the off-device interconnect, whether it’s GPU-CPU or GPU-GPU. Each Graphics Core Die (GCD) has its own SDMA engine for these transfers.</p>
 <p>An important thing to note is that SDMA engines work independently from the GPU’s computing tasks. This means that transferring data doesn’t interfere with the GPU’s computing performance, though it can affect memory bandwidth slightly. These engines are optimized for PCIe-4.0 x16, which can handle up to 32 GB/s of data transfer.</p>
 <p>One standout feature of the MI250X platform is its Infinity Fabric™ interconnect, which connects the host and device. This interconnect performs better than standard PCIe-4.0, offering roughly 50% more bandwidth. However, the SDMA engine doesn’t run at this higher speed, so it can’t fully utilize the faster interconnect’s bandwidth.</p>
-<p>To overcome this bandwidth limitation, you can bypass the SDMA engine and use a “blit” kernel, a type of copy kernel that utilizes the GPU’s compute units. However, this approach uses up compute resources, which might not always be ideal; for example, if you are overlapping compute and data movement through asynchronous operations. To enable blit kernels, you can set the environment variable <code>HSA_ENABLE_SDMA=0</code>, which disables the SDMA engine. On systems where the GPU uses a PCIe interconnect rather than an Infinity Fabric interconnect, blit kernels won't impact bandwidth but will still consume compute resources. This choice between SDMA and blit kernels is also relevant for MPI data transfers and GPU-GPU transfers. For more information see this <a href="https://gpuopen.com/learn/amd-lab-notes/amd-lab-notes-mi200-memory-space-overview/">AMD GPUOpen blog post</a>.</p>
+<p>To overcome this bandwidth limitation, you can bypass the SDMA engine and use a “blit” kernel, a type of copy kernel that utilizes the GPU’s compute units. However, this approach uses up compute resources, which might not always be ideal; for example, if you are overlapping compute and data movement through asynchronous operations. To enable blit kernels, you can set the environment variable <code>HSA_ENABLE_SDMA=0</code>, which disables the SDMA engine. On systems where the GPU uses a PCIe interconnect rather than an Infinity Fabric interconnect, blit kernels won't impact bandwidth but will still consume compute resources. This choice between SDMA and blit (memory copy) kernels is also relevant for MPI data transfers and GPU-GPU transfers. For more information see this <a href="https://gpuopen.com/learn/amd-lab-notes/amd-lab-notes-mi200-memory-space-overview/">AMD GPUOpen blog post</a>.</p>
 </div>
 </div>
 </div>
@@ -8098,8 +8098,9 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Automatic-memory-management-with-managed-memory">Automatic memory management with managed memory<a class="anchor-link" href="#Automatic-memory-management-with-managed-memory">¶</a></h3><p>Up until this point, we have handled host and device memory using manual memory management techniques. Essentially, we have allocated distinct pointers for host and device memory. To ensure the correct data is available in host or device memory, we used <code>hipMemcpy</code> to copy data between the host and device. In what follows, we will look at <strong>managed memory</strong>, which provides the means to use a <strong>single pointer</strong> that is addressable on the host and device. Although this may sound similar to pinned memory, managed memory offers the ability to prefetch data to the device or provide hints to the runtime about how data will be accessed so that kernel performance is optimal.</p>
-<p>Managed memory refers to universally addressable, or unified memory available on the MI200 and MI300 series of GPUs. A key benefit of managed memory is that it can help improve programmer productivity by allowing you to use a <strong>single pointer</strong> for the same memory space. This allows you to take a more incremental approach towards GPU acceleration, whereby you can have host and device kernels that operate on the <strong>same pointer</strong> without having to manually control data movement between the two memory spaces. Performance related to data movement can be improved by prefetching data and by providing hints about data migration. Additionally, managed memory allows you to work on problems wherein the amount of data exceeds the memory capacity of your target GPU. You can effectively use the combined total amount of memory on host and device.</p>
+<h3 id="Automatic-memory-management-with-managed-memory">Automatic memory management with managed memory<a class="anchor-link" href="#Automatic-memory-management-with-managed-memory">¶</a></h3><p>Up to this point we have handled host and device memory using manual memory management techniques. Essentially this means all host and device allocations are accessed through distinct pointers. To copy memory between host and device allocations we used <code>hipMemcpy</code>. In this section, we will look at <strong>managed memory</strong>, which provides the means to use a <strong>single pointer</strong> that is accessible from both host and device. Although this may sound similar to pinned memory, managed memory offers the ability to prefetch data to the device or provide hints to the runtime about how data will be accessed so that kernel performance is <strong>optimal</strong>.</p>
+<p>Managed memory refers to universally addressable, or unified memory available on the MI200 and MI300 series of GPUs. The runtime is responsible for <strong>managing</strong> memory movement between host and device when access to the memory is required from threads in either resource.</p>
+<p>A key benefit of managed memory is that it can help improve programmer productivity by allowing you to use a <strong>single pointer</strong> for the same memory space. This allows you to take a more incremental approach towards GPU acceleration, whereby you can have host and device kernels that operate on the <strong>same pointer</strong> without having to manually control data movement between the two memory spaces. Performance related to data movement <strong>can be improved</strong> by prefetching data and by providing hints about data migration. Additionally, managed memory allows you to work on problems wherein the amount of data exceeds the memory capacity of your target GPU. You can effectively use the <strong>combined total amount</strong> of memory on host and device.</p>
 </div>
 </div>
 </div>
@@ -8110,27 +8111,37 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Verifying-your-GPU-supports-managed-memory">Verifying your GPU supports managed memory<a class="anchor-link" href="#Verifying-your-GPU-supports-managed-memory">¶</a></h4><p>When writing HIPFort applications that use managed memory, it is wise to check that the target GPU supports this feature. This can be done with the <code>hipDeviceGetAttribute</code> method. You may recall that this method accepts three arguments</p>
-<ol>
-<li><code>type(c_ptr) :: val</code> - A pointer to a value to return</li>
-<li><code>integer :: attr</code> - The attribute to query</li>
-<li><code>integer :: deviceId</code> - Which device to query for information</li>
-</ol>
-<p>To determine if managed memory is supported in a cross-platform manner we can check the <code>managedmemory</code> field of the <code>hipdeviceprop_t</code> type that is filled with a call to <code>hipgetdeviceproperties</code> for example in <a href="../src/hip_utils.f90">hip_utils.f90</a> we use the following code to determine if managed memory is supported on a compute device.</p>
-<div class="highlight"><pre><span></span><span class="c">! Structure to store GPU properties</span>
-<span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="n">hipdeviceprop_t</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">prop</span>
+<h4 id="Verify-that-your-GPU-supports-managed-memory">Verify that your GPU supports managed memory<a class="anchor-link" href="#Verify-that-your-GPU-supports-managed-memory">¶</a></h4><p>When writing HIPFort applications that use managed memory, it is wise to check that the target GPU supports the managed memory feature. In Fortran this can be done in a portable way by checking the <code>managedmemory</code> field of the <code>hipdeviceprop_t</code> type that is filled with a call to <code>hipGetDeviceProperties</code>. For example in the <code>supports_managed_memory</code> function within <a href="../src/hip_utils.f90">hip_utils.f90</a> we use the following code to determine if managed memory is supported on a compute device.</p>
+<div class="highlight"><pre><span></span><span class="k">use </span><span class="n">hipfort</span>
+<span class="w">        </span><span class="k">use </span><span class="n">hipfort_check</span>
+<span class="w">        </span><span class="k">use </span><span class="nb">iso_c_binding</span>
 
-<span class="w">    </span><span class="c">! Get device properties</span>
-<span class="w">    </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipgetdeviceproperties</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span><span class="w"> </span><span class="n">dev_id</span><span class="p">))</span><span class="w">        </span>
+<span class="w">        </span><span class="c">!! check if the device `dev_id` supports managed memory</span>
 
-<span class="w">    </span><span class="c">! Default answer</span>
-<span class="w">    </span><span class="n">supports_managed_memory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span><span class="w"> </span>
+<span class="w">        </span><span class="c">! The id of the device to use</span>
+<span class="w">        </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dev_id</span>
 
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">prop</span><span class="p">%</span><span class="n">managedmemory</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
-<span class="k">        </span><span class="n">supports_managed_memory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span><span class="w"> </span><span class="c">! convert to logical and output</span>
-<span class="w">    </span><span class="k">endif</span>
+<span class="w">        </span><span class="kt">logical</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">decision</span>
+
+<span class="w">        </span><span class="c">! Structure to store GPU properties</span>
+<span class="w">        </span><span class="k">type</span><span class="p">(</span><span class="n">hipdeviceprop_t</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">prop</span>
+
+<span class="w">        </span><span class="c">! Get device properties</span>
+<span class="w">        </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipgetdeviceproperties</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span><span class="w"> </span><span class="n">dev_id</span><span class="p">))</span><span class="w">        </span>
+
+<span class="w">        </span><span class="c">! Check if managed memory is supported on dev_id</span>
+<span class="w">        </span><span class="c">! this method is not cross-platform</span>
+<span class="w">        </span><span class="c">!call hipcheck(hipDeviceGetAttribute(c_loc(supported), &amp;</span>
+<span class="w">        </span><span class="c">!    hipDeviceAttributeManagedMemory,dev_id)) </span>
+
+<span class="w">        </span><span class="c">! Default answer</span>
+<span class="w">        </span><span class="n">decision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span><span class="w"> </span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">prop</span><span class="p">%</span><span class="n">managedmemory</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">            </span><span class="n">decision</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span><span class="w"> </span><span class="c">! convert to logical and output</span>
+<span class="w">        </span><span class="k">endif</span>
 </pre></div>
-<p>In the event that managed memory is not supported, you can <strong>still use</strong> the managed memory API. However, all memory allocations will revert to pinned memory allocations, but the behavior of other managed memory API calls can be unpredictable and the performance of GPU kernels may not be acceptable.</p>
+<p>In the event that managed memory is not supported, you can <strong>still use</strong> the managed memory API as it will fall back to using pinned memory allocations on AMD GPUs. However in that instance the behavior of other managed memory API calls can be unpredictable and the performance of GPU kernels may not be acceptable. On NVIDIA GPUs, managed memory is supported on all architectures after Kepler.</p>
 </div>
 </div>
 </div>
