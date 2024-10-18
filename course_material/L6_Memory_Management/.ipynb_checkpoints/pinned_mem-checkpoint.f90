@@ -18,10 +18,10 @@ program pinned_mem
   ! Allocate pinned host memory
 
   ! Latest API
-  ! call hipcheck(hipHostMalloc(f_host, int(M*N*sizeof(real_element), c_size_t), hipHostMallocDefault))
+  call hipcheck(hipHostMalloc(f_host, int(M*N*sizeof(real_element), c_size_t), hipHostMallocDefault))
 
   ! Deprecated but still portable API
-  call hipcheck(hipMallocHost(f_host, int(M*N*sizeof(real_element), c_size_t)))
+  !call hipcheck(hipMallocHost(f_host, int(M*N*sizeof(real_element), c_size_t)))
   
   ! Map pinned host memory into the memory space of the GPU
   call hipcheck(hipHostGetDevicePointer(f_device, f_host, 0))

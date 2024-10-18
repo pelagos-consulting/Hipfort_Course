@@ -59,6 +59,9 @@ program tensoradd
     ! Fortran pointers to memory allocations on the host
     real(float_type), dimension(:,:), pointer :: A_h, B_h, C_h
 
+    ! Using allocatable arrays like this may result in an error!
+    !real(float_type), dimension(:,:), allocatable, target :: A_h, B_h, C_h
+
     ! C Pointers to memory allocations on the device
     type(c_ptr) :: A_d, B_d, C_d
 
@@ -79,8 +82,8 @@ program tensoradd
     call random_number(B_h)
 
     ! Copy memory from the host to the device 
-    call hipcheck(hipMemcpy(A_d, c_loc(A_h), int(sizeof(A_h), c_size_t), hipMemcpyhosttodevice))
-    call hipcheck(hipMemcpy(B_d, c_loc(B_h), int(sizeof(B_h), c_size_t), hipMemcpyhosttodevice))
+    call hipcheck(hipMemcpy(A_d, c_loc(A_h), int(sizeof(A_h), c_size_t), hipMemcpyHostToDevice))
+    call hipcheck(hipMemcpy(B_d, c_loc(B_h), int(sizeof(B_h), c_size_t), hipMemcpyHostToDevice))
 
     ! Call the C function that launches the kernel
     call launch_kernel_hip( &
@@ -92,7 +95,7 @@ program tensoradd
     )
 
     ! Copy memory from the device to the host
-    call hipcheck(hipMemcpy(c_loc(C_h), C_d, int(sizeof(C_h),c_size_t), hipMemcpydevicetohost))
+    call hipcheck(hipMemcpy(c_loc(C_h), C_d, int(sizeof(C_h), c_size_t), hipMemcpyDeviceToHost))
 
     ! Check the answer
     success = check(A_h, B_h, C_h, eps_mult)

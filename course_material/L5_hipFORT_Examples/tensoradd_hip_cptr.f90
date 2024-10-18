@@ -59,6 +59,9 @@ program tensoradd
     ! Fortran pointers to memory allocations on the host
     real(float_type), dimension(:,:), pointer :: A_h, B_h, C_h
 
+    ! Using allocatable arrays like this may result in an error!
+    !real(float_type), dimension(:,:), allocatable, target :: A_h, B_h, C_h
+
     ! C Pointers to memory allocations on the device
     type(c_ptr) :: A_d, B_d, C_d
 
@@ -92,7 +95,7 @@ program tensoradd
     )
 
     ! Copy memory from the device to the host
-    call hipcheck(hipMemcpy(c_loc(C_h), C_d, int(sizeof(C_h),c_size_t), hipMemcpyDeviceToHost))
+    call hipcheck(hipMemcpy(c_loc(C_h), C_d, int(sizeof(C_h), c_size_t), hipMemcpyDeviceToHost))
 
     ! Check the answer
     success = check(A_h, B_h, C_h, eps_mult)

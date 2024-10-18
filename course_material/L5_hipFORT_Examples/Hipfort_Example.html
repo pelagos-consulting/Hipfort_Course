@@ -7642,9 +7642,9 @@ $$</p>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Strategies-for-maintaining-consistency-in-precision">Strategies for maintaining consistency in precision<a class="anchor-link" href="#Strategies-for-maintaining-consistency-in-precision">¶</a></h2><p>In the file <a href="kernel_code.cpp">kernel_code.cpp</a> you might have noticed the use of <code>float_type</code>. This is a typedef that determines the data type of elements within the tensors. It is set to <code>double</code> in <a href="../src/kinds.h"></a>../src/kinds.h if the macro <code>USE_C_DOUBLE</code> is defined. Otherwise it is type-defined as <code>float</code>.</p>
 <div class="highlight"><pre><span></span><span class="cp">#ifdef USE_C_DOUBLE</span>
-<span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">float_type</span><span class="p">;</span>
-<span class="cp">#else</span>
 <span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">float_type</span><span class="p">;</span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">float_type</span><span class="p">;</span>
 <span class="cp">#endif</span>
 </pre></div>
 <p>We include <code>kinds.h</code> from <a href="kernel_code.cpp">kernel_code.cpp</a> to make this type available.</p>

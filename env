@@ -42,7 +42,7 @@ then
     #export GPU_ARCH="gfx1035"
 
     export HIPFORT_COMPILER=$(which gfortran)
-    export FC=$(which hipfc)
+    export FC=$(which gfortran)
     export CC=$(which gcc)
     export CXX=$(which g++)
 

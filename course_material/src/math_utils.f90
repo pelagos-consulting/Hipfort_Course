@@ -11,6 +11,7 @@ module math_utils
             !! Function to check the outcome of tensor addition
             !! only check the host arrays
 
+            !real(float_type), dimension(:,:), allocatable, intent(in), target :: A, B, C
             real(float_type), dimension(:,:), intent(in), pointer :: A, B, C
         
             real, intent(in) :: eps_mult
