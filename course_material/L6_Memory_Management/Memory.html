@@ -7772,7 +7772,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h5 id="Summary-of-global-memory-allocations-on-the-device">Summary of global memory allocations on the device<a class="anchor-link" href="#Summary-of-global-memory-allocations-on-the-device">¶</a></h5><p>To summarize, we have learned how to allocate and deallocate memory on the device device using the <code>hipMalloc</code> and <code>hipFree</code> functions, respectively. We have shown how you can use either <code>type(c_ptr)</code> and Fortran <code>pointer</code> types for managing either host or device data. In practice, you will most likely find that host data is managed using Fortran <code>pointer</code>, rather than <code>type(c_ptr)</code>. Whether you use one or the other for the device data depends on your preference or the needs or design criteria of your application. There is no significant difference in performance from this choice. When using Fortran pointers for the device data, however, you have seen that you can use the optional <code>mold</code> or <code>source</code> arguments in <code>hipMalloc</code>. These optional arguments are a convenience and can save you from having to write boiler-plate code for calculating array sizes, shapes, or number of bytes. We now turn our attention to two different types of host memory.</p>
+<h5 id="Summary-of-(ordinary)-allocations-in-Global-device-memory">Summary of (ordinary) allocations in Global device memory<a class="anchor-link" href="#Summary-of-(ordinary)-allocations-in-Global-device-memory">¶</a></h5><p>To summarize, we have learned how to allocate and deallocate memory on the device device using the <code>hipMalloc</code> and <code>hipFree</code> functions, respectively. We have shown how you can use either <code>type(c_ptr)</code> and Fortran <code>pointer</code> types for managing either host or device data. In practice, you will most likely find that host data is managed using Fortran <code>pointer</code>, rather than <code>type(c_ptr)</code>. Whether you use one or the other for the device data depends on your preference or the needs or design criteria of your application. There is no significant difference in performance from this choice. When using Fortran pointers for the device data, however, you have seen that you can use the optional <code>mold</code> or <code>source</code> arguments in <code>hipMalloc</code>. These optional arguments are a convenience and can save you from having to write boiler-plate code for calculating array sizes, shapes, or number of bytes. We now turn our attention to two different types of host memory.</p>
 </div>
 </div>
 </div>
@@ -7783,7 +7783,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Pinned-memory-vs-paged-memory">Pinned memory vs paged memory<a class="anchor-link" href="#Pinned-memory-vs-paged-memory">¶</a></h4><p>By default, using the <code>allocate</code> intrinsic for host data results in <strong>pageable</strong> memory. <strong>Pageable memory</strong> refers to a concept in computer memory management where portions of a program's or system's memory can be temporarily transferred between the main memory (RAM) and secondary storage (usually a hard disk or SSD). This transfer is typically done in the form of pages, which are fixed-size blocks of memory.</p>
+<h4 id="Pinned-vs-paged-memory-on-the-host">Pinned vs paged memory on the host<a class="anchor-link" href="#Pinned-vs-paged-memory-on-the-host">¶</a></h4><p>By default, using the <code>allocate</code> intrinsic for host arrays results in <strong>pageable</strong> memory. <strong>Pageable memory</strong> refers to a concept in computer memory management where portions of a program's or system's memory can be temporarily transferred between the main memory (RAM) and secondary storage (usually a hard disk or SSD). This transfer is typically done in the form of pages, which are fixed-size blocks of memory.</p>
 <p>In pageable memory systems, not all pages of a program or system need to reside in the physical RAM at all times. Instead, the operating system can swap pages in and out of RAM as needed. This allows more programs to be loaded into memory than can fit simultaneously, and the operating system can prioritize which pages are actively used and keep them in RAM while swapping less frequently used pages to secondary storage.</p>
 <p>This paging mechanism helps optimize the use of available memory, allowing for efficient multitasking and the execution of larger programs that might not fit entirely in RAM. However, the process of swapping pages in and out of RAM can introduce some overhead, as data must be transferred between the faster RAM and the slower secondary storage.</p>
 <p><strong>Pinned memory</strong> is a concept in computer memory management where a specific region of memory is prevented from being swapped or moved by the operating system. Unlike pageable memory, which can be moved between RAM and secondary storage, pinned memory remains fixed in physical memory (RAM). In a GPU programming context, <strong>pinned memory</strong> (or page-locked memory, or non-pageable memory) is host memory that can be mapped into the address space of all GPUs. Then both host and device access the <strong>same memory allocation</strong> through separate pointers.</p>
@@ -7801,8 +7801,11 @@ a.anchor-link {
 </li>
 </ul>
 <p>It's important to note that while pinned memory can offer performance benefits in certain situations, it comes with trade-offs. Often, the total amount of pinned memory available may be limited by the system. Therefore, it's recommended to use pinned memory judiciously based on the specific requirements and characteristics of your GPU-accelerated application. In practice, you can find the amount of available page locked (pinned) memory (on Linux operating systems), using <code>ulimit -a </code>, and looking for <code>max locked memory</code> or <code>mlock</code></p>
-<h5 id="Allocate-pinned-memory-with-HIPFort">Allocate pinned memory with HIPFort<a class="anchor-link" href="#Allocate-pinned-memory-with-HIPFort">¶</a></h5><p>In HIPFort, you can allocate pinned memory using the <code>hipHostMalloc</code> function. Like <code>hipMalloc</code>, this function takes in the device pointer (either Fortran <code>pointer</code> or <code>type(c_ptr)</code>) as well as the <code>size</code> (in bytes), the <code>mold</code>, or the <code>source</code>, in addition to a flag that specifies the properties of the allocated memory. Any host memory that is allocated with <code>hipHostMalloc</code> must be deallocated using <code>hipHostFree</code>.</p>
+<h5 id="Allocate-pinned-memory-on-the-host-with-HIPFort">Allocate pinned memory on the host with HIPFort<a class="anchor-link" href="#Allocate-pinned-memory-on-the-host-with-HIPFort">¶</a></h5><p>Pinned memory on the host created and destroyed with either the deprecated (but cross platform) <code>hipMallocHost/hipFreeHost</code> pair of functions, or the newer (but AMD-only) <code>hipHostMalloc/hipHostFree</code> pair.</p>
+<p>The deprecated <code>hipMallocHost</code> function seems to only accept a C pointer as an input argument.</p>
+<p>In HIPFort on AMD systems, you can allocate pinned memory using the <code>hipHostMalloc</code> function in a similar way <code>hipMalloc</code>. For Fortran pointers you specify the number of elements in each dimension and have the option of using <code>mold</code> or <code>source</code>. For C pointers the size of the allocation needs to be in <strong>bytes</strong>. A demonstration of allocation and de-allocation of pinned memory is in <a href="pinned_mem.f90">pinned_mem.f90</a>.</p>
 <div class="highlight"><pre><span></span><span class="k">use </span><span class="n">hipfort</span>
+<span class="w">  </span><span class="k">use </span><span class="n">hipfort_hiphostregister</span>
 <span class="w">  </span><span class="k">use </span><span class="n">hipfort_check</span>
 <span class="w">  </span><span class="k">use </span><span class="nb">iso_c_binding</span>
 <span class="nb">  </span>
@@ -7811,20 +7814,42 @@ a.anchor-link {
 <span class="k">  </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">N</span><span class="o">=</span><span class="mi">1000</span>
 <span class="w">  </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">M</span><span class="o">=</span><span class="mi">5000</span>
 
-<span class="w">  </span><span class="kt">real</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">real_element</span>
+<span class="w">  </span><span class="kt">real</span><span class="p">(</span><span class="kt">c_float</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">real_element</span>
 
-<span class="w">  </span><span class="c">! Pointer for memory on the host</span>
-<span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f_host</span>
+<span class="w">  </span><span class="c">! Define C pointers</span>
+<span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f_host_cptr</span>
+<span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f_device</span>
+
+<span class="w">  </span><span class="c">! Try using a Fortran pointer</span>
+<span class="w">  </span><span class="kt">real</span><span class="p">(</span><span class="kt">c_float</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:,:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f_host_fptr</span>
 <span class="w">  </span>
 <span class="w">  </span><span class="c">! Allocate pinned host memory</span>
 
-<span class="w">  </span><span class="c">! Latest API</span>
-<span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipHostMalloc</span><span class="p">(</span><span class="n">f_host</span><span class="p">,</span><span class="w"> </span><span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="n">N</span><span class="o">*</span><span class="n">sizeof</span><span class="p">(</span><span class="n">real_element</span><span class="p">),</span><span class="w"> </span><span class="kt">c_size_t</span><span class="p">),</span><span class="w"> </span><span class="n">hipHostMallocDefault</span><span class="p">))</span>
+<span class="w">  </span><span class="c">! Latest API with C pointer</span>
+<span class="w">  </span><span class="c">!call hipcheck(hipHostMalloc(f_host_cptr, int(M*N*sizeof(real_element), c_size_t), hipHostMallocDefault))</span>
+
+<span class="w">  </span><span class="c">! Latest API with Fortran pointer</span>
+<span class="w">  </span><span class="c">! call hipcheck(hipHostMalloc(f_host_fptr, M, N, hipHostMallocDefault))</span>
+
+<span class="w">  </span><span class="c">! Deprecated but still portable API to CUDA</span>
+<span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipMallocHost</span><span class="p">(</span><span class="n">f_host_cptr</span><span class="p">,</span><span class="w"> </span><span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="n">N</span><span class="o">*</span><span class="n">sizeof</span><span class="p">(</span><span class="n">real_element</span><span class="p">),</span><span class="w"> </span><span class="kt">c_size_t</span><span class="p">)))</span>
 <span class="w">  </span>
-<span class="w">  </span><span class="c">! Latest API</span>
-<span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipHostFree</span><span class="p">(</span><span class="n">f_host</span><span class="p">))</span>
+<span class="w">  </span><span class="c">! Map pinned host memory into the memory space of the GPU</span>
+<span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipHostGetDevicePointer</span><span class="p">(</span><span class="n">f_device</span><span class="p">,</span><span class="w"> </span><span class="n">f_host_cptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
+
+<span class="w">  </span><span class="c">! can now pass f_device to a kernel launch function</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c">! Latest API with C and Fortran</span>
+<span class="w">  </span><span class="c">!call hipcheck(hipHostFree(f_host_cptr))</span>
+<span class="w">  </span><span class="c">!call hipcheck(hipHostFree(f_host_fptr))</span>
+
+<span class="w">  </span><span class="c">! Deprecated but still portable API </span>
+<span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipFreeHost</span><span class="p">(</span><span class="n">f_host_cptr</span><span class="p">))</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c">! hipFree does not need to be called, but f_device must no longer be used.</span>
+<span class="w">  </span><span class="n">f_device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">c_null_ptr</span>
 </pre></div>
-<p>In this example, we've set the pinned memory allocation flag to <code>hipHostMallocDefault</code>, but there are a few options that you can choose from. Below is a list of available options and what they mean.</p>
+<p>The newer API function <code>hipMallocHost</code> accepts an additional flag to describe the nature of the allocation. In this example, we've set the pinned memory allocation flag to <code>hipHostMallocDefault</code>, but there are a few options that you can choose from. Below is a list of available options and what they mean.</p>
 <table>
 <thead>
 <tr>
@@ -7868,75 +7893,27 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=449a4990-cec6-4602-a3c8-1d1ffd2f9eff">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h5 id="Portable-pinned-memory-allocation-with-a-deprecated-API">Portable pinned memory allocation with a deprecated API<a class="anchor-link" href="#Portable-pinned-memory-allocation-with-a-deprecated-API">¶</a></h5><p>The <code>hipHostMalloc</code> is the recommended Hipfort function to use, however it is not yet portable on NVIDIA platforms. At the time of writing we still must use the deprecated function pair <code>hipMallocHost</code> and <code>hipFreeHost</code>.</p>
-<div class="highlight"><pre><span></span><span class="k">use </span><span class="n">hipfort</span>
-<span class="w">  </span><span class="k">use </span><span class="n">hipfort_check</span>
-<span class="w">  </span><span class="k">use </span><span class="nb">iso_c_binding</span>
-<span class="nb">  </span>
-<span class="nb">  </span><span class="k">implicit none</span>
-<span class="k">  </span>
-<span class="k">  </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">N</span><span class="o">=</span><span class="mi">1000</span>
-<span class="w">  </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">M</span><span class="o">=</span><span class="mi">5000</span>
-
-<span class="w">  </span><span class="kt">real</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">real_element</span>
-
-<span class="w">  </span><span class="c">! storage for memory on the host</span>
-<span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f_host</span>
-
-<span class="w">  </span><span class="c">! Allocate pinned host memory using the</span>
-<span class="w">  </span><span class="c">! deprecated but still portable API</span>
-<span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipMallocHost</span><span class="p">(</span><span class="n">f_host</span><span class="p">,</span><span class="w"> </span><span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="n">N</span><span class="o">*</span><span class="n">sizeof</span><span class="p">(</span><span class="n">real_element</span><span class="p">),</span><span class="w"> </span><span class="kt">c_size_t</span><span class="p">)))</span>
-
-<span class="w">  </span><span class="c">! Deprecated but still portable API </span>
-<span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipFreeHost</span><span class="p">(</span><span class="n">f_host</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e2479dd8-ba35-4d92-b61a-83d12f7cb54b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h5 id="Mapping-pinned-memory-to-the-GPU-memory-space">Mapping pinned memory to the GPU memory space<a class="anchor-link" href="#Mapping-pinned-memory-to-the-GPU-memory-space">¶</a></h5><p>In order to use pinned host memory from a kernel on the GPU it must be <strong>mapped</strong> into the memory space of the GPU. We use the Hipfort function <code>hiphostgetdevicepointer</code> to perform the mapping.</p>
+<h5 id="Using-pinned-memory-from-a-GPU">Using pinned memory from a GPU<a class="anchor-link" href="#Using-pinned-memory-from-a-GPU">¶</a></h5><p>In order to use pinned host memory from a kernel on the GPU it must be <strong>mapped</strong> into the memory space of the GPU using the function <code>hipHostGetDevicePointer</code>.</p>
+<p>We bring in this extra functionality with <code>use hipfort_hiphostregister</code> and use <code>hipHostGetDevicePointer</code> to perform the mapping.</p>
 <div class="highlight"><pre><span></span><span class="k">use </span><span class="n">hipfort</span>
 <span class="w">  </span><span class="k">use </span><span class="n">hipfort_hiphostregister</span>
-<span class="w">  </span><span class="k">use </span><span class="n">hipfort_check</span>
-<span class="w">  </span><span class="k">use </span><span class="nb">iso_c_binding</span>
-<span class="nb">  </span>
-<span class="nb">  </span><span class="k">implicit none</span>
-<span class="k">  </span>
-<span class="k">  </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">N</span><span class="o">=</span><span class="mi">1000</span>
-<span class="w">  </span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">M</span><span class="o">=</span><span class="mi">5000</span>
 
-<span class="w">  </span><span class="kt">real</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">real_element</span>
+<span class="w">  </span><span class="p">...</span>
 <span class="w">  </span>
 <span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f_host</span>
 <span class="w">  </span><span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f_device</span>
 <span class="w">  </span>
-<span class="w">  </span><span class="c">! Allocate pinned host memory</span>
-
-<span class="w">  </span><span class="c">! Latest API</span>
-<span class="w">  </span><span class="c">! call hipcheck(hipHostMalloc(f_host, int(M*N*sizeof(real_element), c_size_t), hipHostMallocDefault))</span>
-
 <span class="w">  </span><span class="c">! Deprecated but still portable API</span>
 <span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipMallocHost</span><span class="p">(</span><span class="n">f_host</span><span class="p">,</span><span class="w"> </span><span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="n">N</span><span class="o">*</span><span class="n">sizeof</span><span class="p">(</span><span class="n">real_element</span><span class="p">),</span><span class="w"> </span><span class="kt">c_size_t</span><span class="p">)))</span>
 <span class="w">  </span>
 <span class="w">  </span><span class="c">! Map pinned host memory into the memory space of the GPU</span>
 <span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipHostGetDevicePointer</span><span class="p">(</span><span class="n">f_device</span><span class="p">,</span><span class="w"> </span><span class="n">f_host</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
-
-<span class="w">  </span><span class="c">! can now pass f_device to a kernel launch function</span>
-<span class="w">  </span>
-<span class="w">  </span><span class="c">! Latest API</span>
-<span class="w">  </span><span class="c">!call hipcheck(hipHostFree(f_host))</span>
 
 <span class="w">  </span><span class="c">! Deprecated but still portable API </span>
 <span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipFreeHost</span><span class="p">(</span><span class="n">f_host</span><span class="p">))</span>
@@ -7954,11 +7931,11 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Synchronous-copies">Synchronous copies<a class="anchor-link" href="#Synchronous-copies">¶</a></h4><p>When explicitly managing host and device pointers in HIPFort, you will need to copy data between host and device memory. This is done using the <code>hipMemcpy</code> function. The <code>hipMemcpy</code> function has a number of interfaces that are defined so that you can easily work with <code>type(c_ptr)</code> or Fortran <code>pointer</code> types for host and device data.</p>
+<h4 id="Synchronous-memory-copies">Synchronous memory copies<a class="anchor-link" href="#Synchronous-memory-copies">¶</a></h4><p>When explicitly managing host and device pointers in HIPFort, you will need to copy data between host and device memory. This is done using the <code>hipMemcpy</code> function. The <code>hipMemcpy</code> function has a number of interfaces that are defined so that you can easily work with <code>type(c_ptr)</code> or Fortran <code>pointer</code> types for host and device data.</p>
 <p>For example, when both the source and destination pointers are <code>type(c_ptr)</code> you use <code>hipMemcpy</code> like this:</p>
 <div class="highlight"><pre><span></span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hipMemcpy</span><span class="p">(</span><span class="w"> </span><span class="n">destination</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w">  </span><span class="c">! Destination pointer of type(c_ptr)</span>
 <span class="w">                    </span><span class="n">src</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w">          </span><span class="c">! Source pointer of type(c_ptr)</span>
-<span class="w">                    </span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w">         </span><span class="c">! Amount of data to copy in bytes </span>
+<span class="w">                    </span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w">         </span><span class="c">! Amount of data to copy (in bytes) </span>
 <span class="w">                    </span><span class="k">enum</span><span class="w"> </span><span class="p">)</span><span class="w">          </span><span class="c">! Memory copy type</span>
 </pre></div>
 <p>The <code>hipMemcpy</code> function expects the destination pointer (where data is going to), "source pointer" (where data is coming from), the amount of data (in bytes) to copy, and an enumerator that indicates the direction of the memory copy. The enumerator can be one of</p>
@@ -7968,8 +7945,8 @@ a.anchor-link {
 <li><code>hipMemcpyHostToHost</code></li>
 <li><code>hipMemcpyDeviceToDevice</code></li>
 </ul>
-<p>The output of <code>hipMemcpy</code> is an <code>integer(kind(hipsuccess))</code> status code that should be passed through some kind of error checking.</p>
-<p>Alternatively, if both the source and destination pointers are Fortran <code>pointer</code>, you can call <code>hipMemcpy</code> as simply as</p>
+<p>The output of <code>hipMemcpy</code> is an <code>integer</code> of kind <code>hipSuccess</code>. We usually check the output by enclosing the function output as an argument to the subroutine <code>hipcheck</code>.</p>
+<p>If both the source and destination pointers are Fortran <code>pointer</code>, you can call <code>hipMemcpy</code> as simply as</p>
 <div class="highlight"><pre><span></span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hipMemcpy</span><span class="p">(</span><span class="w"> </span><span class="n">destination</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w">  </span><span class="c">! Destination pointer are Fortran `pointer`</span>
 <span class="w">                    </span><span class="n">src</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w">          </span><span class="c">! Source pointer Fortran `pointer`</span>
 <span class="w">                    </span><span class="k">enum</span><span class="w"> </span><span class="p">)</span><span class="w">          </span><span class="c">! Memory copy type</span>
@@ -8029,8 +8006,8 @@ a.anchor-link {
 <span class="w">  </span><span class="k">deallocate</span><span class="p">(</span><span class="n">f_host</span><span class="p">)</span>
 <span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipFree</span><span class="p">(</span><span class="n">f_device</span><span class="p">))</span>
 </pre></div>
-<p>By default, memory movement with <code>hipMemcpy</code> is a <em>blocking</em> call. This means that host code will not execute until the data is completely moved between host and device; <code>hipMemcpy</code> does not simply return when the instructions to move data are dispatched. In some cases however, you may want to overlap data copy with computations using an <em>asynchronous</em> memory copy.</p>
-<h4 id="Asynchronous-copies">Asynchronous copies<a class="anchor-link" href="#Asynchronous-copies">¶</a></h4><p>HIP and HIPFort use <strong>streams</strong> to schedule asynchronous operations. When a stream is not specified, kernel launches and memory operations are carried out on the default stream (stream 0). All instructions on the default stream are blocking calls. However, you can create pointers associated with different execution streams. Instructions issued on different streams are permitted to execute in any order, so long as GPU resources are available to execute them. This can be useful when an application has some amount of task parallelism or has the ability to overlap memory movement between host and device with kernel execution.</p>
+<p>By default, memory movement with <code>hipMemcpy</code> is a <em>blocking</em> call. This means that host code will not execute until the data is completely moved between host and device; <code>hipMemcpy</code> does not simply return when the instructions to move data are dispatched. In some instances you may want to overlap data copy with computations using an <em>asynchronous</em> memory copy.</p>
+<h4 id="Asynchronous-copies-with-pinned-memory">Asynchronous copies with pinned memory<a class="anchor-link" href="#Asynchronous-copies-with-pinned-memory">¶</a></h4><p>HIP and HIPFort use <strong>streams</strong> to schedule asynchronous operations. When a stream is not specified, kernel launches and memory operations are carried out on the default stream (stream 0). All instructions on the default stream are blocking calls. However, you can create pointers associated with different execution streams. Instructions issued on different streams are permitted to execute in any order, so long as GPU resources are available to execute them. This can be useful when an application has some amount of task parallelism or has the ability to overlap memory movement between host and device with kernel execution.</p>
 <p>To perform an asynchronous memory copy, you can use the <code>hipMemcpyAsync</code> function. This function is nearly identical to <code>hipMemcpy</code> except that it also takes in a <code>type(c_ptr)</code> that references a HIP stream as the last argument. It is important to point out that <strong>your host memory must be pinned memory</strong>. If your host memory is pageable, then the memory copy will be synchronous and blocking. The following code to perform an asynchronous copy is in <a href="memcpy_async.f90">memcpy_async.f90</a>.</p>
 <div class="highlight"><pre><span></span><span class="k">use </span><span class="n">hipfort</span>
 <span class="w">  </span><span class="k">use </span><span class="n">hipfort_check</span>
@@ -8099,7 +8076,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="Optimizing-Memory-Transfers-between-CPU-GPU-and-GPU-GPU-(AMD-CDNA2)">Optimizing Memory Transfers between CPU-GPU and GPU-GPU (AMD CDNA2)<a class="anchor-link" href="#Optimizing-Memory-Transfers-between-CPU-GPU-and-GPU-GPU-(AMD-CDNA2)">¶</a></h4><p>When transferring data from a pinned host allocation to a device, HIP usually runs at the limit of the interconnect’s capacity. However, sometimes the interconnect isn't the limiting factor.</p>
+<h4 id="Optimizing-Memory-Transfers-between-CPU-GPU-and-GPU-GPU-(AMD-CDNA2)">Optimizing Memory Transfers between CPU-GPU and GPU-GPU (AMD CDNA2)<a class="anchor-link" href="#Optimizing-Memory-Transfers-between-CPU-GPU-and-GPU-GPU-(AMD-CDNA2)">¶</a></h4><p>When transferring data from a pinned host allocation to a device, HIP usually copies at the limit of the interconnect’s capacity. However, sometimes the interconnect isn't the limiting factor.</p>
 <p>To move data on and off a GPU like the MI200, we primarily use the System Direct Memory Access (SDMA) engine. The SDMA engine handles blocks of memory and sends them to the off-device interconnect, whether it’s GPU-CPU or GPU-GPU. Each Graphics Core Die (GCD) has its own SDMA engine for these transfers.</p>
 <p>An important thing to note is that SDMA engines work independently from the GPU’s computing tasks. This means that transferring data doesn’t interfere with the GPU’s computing performance, though it can affect memory bandwidth slightly. These engines are optimized for PCIe-4.0 x16, which can handle up to 32 GB/s of data transfer.</p>
 <p>One standout feature of the MI250X platform is its Infinity Fabric™ interconnect, which connects the host and device. This interconnect performs better than standard PCIe-4.0, offering roughly 50% more bandwidth. However, the SDMA engine doesn’t run at this higher speed, so it can’t fully utilize the faster interconnect’s bandwidth.</p>
