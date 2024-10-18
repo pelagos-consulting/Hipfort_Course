@@ -8310,10 +8310,10 @@ a.anchor-link {
 <h4 id="Prefetching">Prefetching<a class="anchor-link" href="#Prefetching">¶</a></h4><p>In addition to setting memory coherence and other advice about managed memory usage, data can be prefetched to the target device, including the CPU (host), at any point after managed memory has been allocated. Prefetching helps reduce page faults, which can significantly improve performance. For best possible performance, it is advisable to prefetch data to the appropriate device when you know it is needed for read operations.</p>
 <p>You can prefetch managed memory using the <code>hipMemPrefetchAsync</code> call, which expects the following arguments:</p>
 <ul>
-<li>[in]	dev_ptr	pointer to be prefetched (<code>type(c_ptr)</code>)</li>
-<li>[in]	count	size in bytes for prefetching</li>
-<li>[in]	device	destination device to prefetch to</li>
-<li>[in]	stream	stream to enqueue prefetch operation</li>
+<li>[in]	<strong>dev_ptr</strong>	pointer to be prefetched (<code>c_ptr</code>)</li>
+<li>[in]	<strong>count</strong>	size in bytes for prefetching (<code>c_size_t</code>)</li>
+<li>[in]	<strong>device</strong>	destination device to prefetch to (<code>integer</code>)</li>
+<li>[in]	stream	stream to enqueue prefetch operation (<code>c_ptr</code>)</li>
 </ul>
 <p>Continuing with our example from above, suppose we know that the <code>device_subroutine</code> uses a stream to compute <code>f</code> from <code>x</code>; in other words values of <code>x</code> are read from in order to compute and write values of <code>f</code>. In this case, we could prefetch <code>x</code> prior to the <code>device_subroutine</code> call to the device we are working on.</p>
 <div class="highlight"><pre><span></span><span class="k">use </span><span class="n">hipfort</span>
@@ -8322,10 +8322,11 @@ a.anchor-link {
 <span class="nb">    </span><span class="k">use </span><span class="n">iso_fortran_env</span>
 <span class="w">    </span>
 <span class="w">    </span><span class="k">use </span><span class="n">hip_utils</span>
+<span class="w">    </span><span class="n">kinds</span>
 <span class="w">    </span>
 <span class="w">    </span><span class="k">implicit none</span>
 <span class="k">    </span>
-<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="kt">c_float</span><span class="p">),</span><span class="k">pointer</span><span class="p">,</span><span class="k">dimension</span><span class="p">(:,:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">x</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">float_type</span><span class="p">),</span><span class="w"> </span><span class="k">pointer</span><span class="p">,</span><span class="w"> </span><span class="k">dimension</span><span class="p">(:,:)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">x</span>
 <span class="w">    </span>
 <span class="w">    </span><span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">stream</span>
 
@@ -8375,6 +8376,7 @@ a.anchor-link {
 <span class="w">    </span><span class="k">call </span><span class="n">reset_device</span><span class="p">()</span>
 </pre></div>
 <p>In this example we create a stream using <code>hipStreamCreate</code>, then we use that stream to asynchronously prefetch memory in <code>x</code> across to the GPU with id <code>dev_id</code>. Since the <code>device_subroutine</code> also uses that stream, the kernel will block until the prefetch is complete. If we wanted to make it asynchronous, we would use a different stream. When the <code>device_subroutine</code> is executed, all of the necessary page migration has been completed for <code>x</code> and we should expect no page faults and the best possible performance, approaching that achieved with explicit memory movement.</p>
+<p>A complete example that uses managed memory for 2D tensor addition is found in <a href="tensoradd_hip_managed.f90">tensoradd_hip_managed.f90</a>.</p>
 </div>
 </div>
 </div>
