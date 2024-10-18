@@ -7921,6 +7921,7 @@ a.anchor-link {
 <span class="w">  </span><span class="c">! hipFree does not need to be called, but f_device must no longer be used.</span>
 <span class="w">  </span><span class="n">f_device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">c_null_ptr</span>
 </pre></div>
+<p>In the file <a href="tensoradd_hip_pinned.f90">tensoradd_hip_pinned.f90</a> is a complete example of tensor addition using pinned memory from a GPU.</p>
 </div>
 </div>
 </div>
@@ -8007,8 +8008,14 @@ a.anchor-link {
 <span class="w">  </span><span class="k">call </span><span class="n">hipcheck</span><span class="p">(</span><span class="n">hipFree</span><span class="p">(</span><span class="n">f_device</span><span class="p">))</span>
 </pre></div>
 <p>By default, memory movement with <code>hipMemcpy</code> is a <em>blocking</em> call. This means that host code will not execute until the data is completely moved between host and device; <code>hipMemcpy</code> does not simply return when the instructions to move data are dispatched. In some instances you may want to overlap data copy with computations using an <em>asynchronous</em> memory copy.</p>
-<h4 id="Asynchronous-copies-with-pinned-memory">Asynchronous copies with pinned memory<a class="anchor-link" href="#Asynchronous-copies-with-pinned-memory">¶</a></h4><p>HIP and HIPFort use <strong>streams</strong> to schedule asynchronous operations. When a stream is not specified, kernel launches and memory operations are carried out on the default stream (stream 0). All instructions on the default stream are blocking calls. However, you can create pointers associated with different execution streams. Instructions issued on different streams are permitted to execute in any order, so long as GPU resources are available to execute them. This can be useful when an application has some amount of task parallelism or has the ability to overlap memory movement between host and device with kernel execution.</p>
-<p>To perform an asynchronous memory copy, you can use the <code>hipMemcpyAsync</code> function. This function is nearly identical to <code>hipMemcpy</code> except that it also takes in a <code>type(c_ptr)</code> that references a HIP stream as the last argument. It is important to point out that <strong>your host memory must be pinned memory</strong>. If your host memory is pageable, then the memory copy will be synchronous and blocking. The following code to perform an asynchronous copy is in <a href="memcpy_async.f90">memcpy_async.f90</a>.</p>
+<h4 id="Asynchronous-copies-with-pinned-memory">Asynchronous copies with pinned memory<a class="anchor-link" href="#Asynchronous-copies-with-pinned-memory">¶</a></h4><p>HIP and HIPFort use <strong>streams</strong> to schedule asynchronous operations. When a stream is not specified, kernel launches and memory operations are carried out on the <strong>default</strong> (null) stream (stream 0). All work issued to the default stream waits for work in all other streams to finish, and work issued to the default stream must <strong>complete</strong> before work scheduled to any other stream <strong>begins</strong>.</p>
+<p>When compute and copy operations are performed in different non-null streams, the HIP runtime and the underlying device has the ability to perform compute and copy operations <strong>concurrently</strong> (at the same time). This is only enabled when <strong>three key components</strong> are used.</p>
+<ul>
+<li>A non-null stream</li>
+<li>An asynchronous copy function</li>
+<li>Pinned memory on the host</li>
+</ul>
+<p>In hipFORT we create a stream with the <code>hipStreamCreate</code> function, and associate that with a <code>c_ptr</code>. Then, to perform an asynchronous memory copy with pinned memory you can use the <code>hipMemcpyAsync</code> function. This function is nearly identical to <code>hipMemcpy</code> except that it also takes in a <code>type(c_ptr)</code> that references a HIP stream as the last argument. It is important to stress that your host memory <strong>must be pinned</strong> in order for the call to <code>hipMemcpyAsync</code> to return immediately. If your host memory is pageable, then the memory copy will be <strong>synchronous</strong> and <strong>blocking</strong>. The following code to perform an asynchronous copy is in <a href="memcpy_async.f90">memcpy_async.f90</a>.</p>
 <div class="highlight"><pre><span></span><span class="k">use </span><span class="n">hipfort</span>
 <span class="w">  </span><span class="k">use </span><span class="n">hipfort_check</span>
 <span class="w">  </span><span class="k">use </span><span class="nb">iso_c_binding</span>
@@ -8065,7 +8072,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Asynchronous copies to and from pinned memory will return <strong>immediately</strong> if the host memory is pinned and will take place in the background on a stream. It is then vital to make sure that this process is complete before reading or writing to the memory spaces involved in the copy. Here we use a call to <code>hipStreamSynchronize</code> to make sure the stream is finished with the copy before freeing host and device memory.</p>
+<p>Asynchronous copies to and from pinned memory will return <strong>immediately</strong> if the host memory is pinned and will take place in the background on a stream. It is then <strong>vital</strong> to ensure that this process is complete before reading or writing to the memory spaces involved in the copy. In the example above we use a call to <code>hipStreamSynchronize</code> to make sure the stream is finished with the copy before freeing host and device memory.</p>
 </div>
 </div>
 </div>
