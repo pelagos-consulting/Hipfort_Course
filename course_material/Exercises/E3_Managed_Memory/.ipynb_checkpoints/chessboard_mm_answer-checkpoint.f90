@@ -11,6 +11,9 @@ program chessboard_mm_answer
     ! C interopability 
     use iso_c_binding
 
+    ! Floating point kinds
+    use kinds
+
     ! HIP modules
     use hipfort
     use hipfort_check
@@ -50,6 +53,7 @@ program chessboard_mm_answer
     ! Matrix indices
     integer :: i, j
 
+    ! Fortran pointer to the chessboard
     real(c_float), dimension(:,:), pointer :: B
 
     ! Define what light and dark means

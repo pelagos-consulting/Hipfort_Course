@@ -11,6 +11,9 @@ program chessboard_mm
     ! C interopability 
     use iso_c_binding
 
+    ! Floating point kinds
+    use kinds
+
     ! HIP modules
     use hipfort
     use hipfort_check
@@ -65,7 +68,7 @@ program chessboard_mm
     call init_device(0)   
 
     ! Step 2: Allocate memory for pointer B_d
-    call hipcheck(hipmalloc(B_d, M, N))
+    call hipcheck(hipMalloc(B_d, M, N))
 
     ! Step 3: Call the C function that launches the kernel
     call launch_kernel_hip( &

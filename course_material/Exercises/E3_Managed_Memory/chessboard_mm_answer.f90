@@ -11,6 +11,9 @@ program chessboard_mm_answer
     ! C interopability 
     use iso_c_binding
 
+    ! Floating point kinds
+    use kinds
+
     ! HIP modules
     use hipfort
     use hipfort_check

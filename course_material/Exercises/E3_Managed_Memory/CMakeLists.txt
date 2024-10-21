@@ -9,7 +9,7 @@ set_source_files_properties(${KERNEL_FILES} PROPERTIES LANGUAGE ${kernel_lang})
 add_executable (chessboard_mm
     ${CMAKE_CURRENT_SOURCE_DIR}/chessboard_mm.f90
     ${KERNEL_FILES}
-    ${COURSE_MATERIAL_DIR}/src/hip_utils.f90
+    $<TARGET_OBJECTS:common_lib>
     )
 target_link_libraries(chessboard_mm
                       ${kernel_libs})
@@ -18,14 +18,14 @@ target_link_libraries(chessboard_mm
 set_target_properties(chessboard_mm
     PROPERTIES LINKER_LANGUAGE Fortran
 )
-                      
+target_include_directories(chessboard_GPU PRIVATE ${COURSE_MATERIAL_DIR}/src)                      
 install(TARGETS chessboard_mm DESTINATION bin)
 
 # Chessboard on the GPU, the answer
 add_executable (chessboard_mm_answer
     ${CMAKE_CURRENT_SOURCE_DIR}/chessboard_mm_answer.f90
     ${KERNEL_FILES}
-    ${COURSE_MATERIAL_DIR}/src/hip_utils.f90
+    $<TARGET_OBJECTS:common_lib>
     )
 target_link_libraries(chessboard_mm_answer
                       ${kernel_libs})
@@ -34,7 +34,7 @@ target_link_libraries(chessboard_mm_answer
 set_target_properties(chessboard_mm_answer
     PROPERTIES LINKER_LANGUAGE Fortran
 )
-                      
+target_include_directories(chessboard_GPU PRIVATE ${COURSE_MATERIAL_DIR}/src)                      
 install(TARGETS chessboard_mm_answer DESTINATION bin)
 
 
