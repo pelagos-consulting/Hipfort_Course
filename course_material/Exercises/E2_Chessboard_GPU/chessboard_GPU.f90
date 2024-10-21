@@ -33,6 +33,7 @@ program chessboard
         ! is regarded as a subroutine in Fortran 
         subroutine launch_kernel_hip(B, light, dark, M, N) bind(C)
             use iso_c_binding
+            use kinds
             ! Fortran passes arguments by reference as the default
             ! Arguments must have the "value" option present to pass by value
             ! Otherwise launch_kernel will receive pointers of type void**

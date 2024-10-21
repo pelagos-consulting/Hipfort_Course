@@ -9,8 +9,6 @@
 
 #include "kinds.h"
 
-typedef float float_type;
-
 void hipCheck(hipError_t error_code, std::string error_msg) {
     // Function to check a HIP return code
     // and query the result
