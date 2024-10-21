@@ -18,6 +18,9 @@ program chessboard
     ! device handling 
     use hip_utils, only : init_device, reset_device
 
+    ! Use kinds for consistency in data types
+    use kinds
+
     ! Add this to make sure that all variables must be declared
     ! and the compiler performs no type inferencing based on the 
     ! on the first letter of variable names
