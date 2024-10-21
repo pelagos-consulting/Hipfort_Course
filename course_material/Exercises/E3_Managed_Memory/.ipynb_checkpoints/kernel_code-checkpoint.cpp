@@ -7,7 +7,7 @@
 #include <cassert>
 #include <hip/hip_runtime.h>
 
-typedef float float_type;
+#include "kinds.h"
 
 void hipCheck(hipError_t error_code, std::string error_msg) {
     // Function to check a HIP return code

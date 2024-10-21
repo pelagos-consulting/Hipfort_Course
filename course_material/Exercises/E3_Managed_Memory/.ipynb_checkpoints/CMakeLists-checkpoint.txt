@@ -18,7 +18,7 @@ target_link_libraries(chessboard_mm
 set_target_properties(chessboard_mm
     PROPERTIES LINKER_LANGUAGE Fortran
 )
-target_include_directories(chessboard_GPU PRIVATE ${COURSE_MATERIAL_DIR}/src)                      
+target_include_directories(chessboard_mm PRIVATE ${COURSE_MATERIAL_DIR}/src)                      
 install(TARGETS chessboard_mm DESTINATION bin)
 
 # Chessboard on the GPU, the answer
@@ -34,7 +34,7 @@ target_link_libraries(chessboard_mm_answer
 set_target_properties(chessboard_mm_answer
     PROPERTIES LINKER_LANGUAGE Fortran
 )
-target_include_directories(chessboard_GPU PRIVATE ${COURSE_MATERIAL_DIR}/src)                      
+target_include_directories(chessboard_mm_answer PRIVATE ${COURSE_MATERIAL_DIR}/src)                      
 install(TARGETS chessboard_mm_answer DESTINATION bin)
 
 

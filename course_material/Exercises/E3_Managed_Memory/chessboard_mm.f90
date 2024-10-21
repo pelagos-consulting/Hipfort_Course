@@ -33,6 +33,7 @@ program chessboard_mm
         ! is regarded as a subroutine in Fortran 
         subroutine launch_kernel_hip(B, light, dark, M, N) bind(C)
             use iso_c_binding
+            use kinds
             ! Fortran passes arguments by reference as the default
             ! Arguments must have the "value" option present to pass by value
             ! Otherwise launch_kernel will receive pointers of type void**
@@ -40,7 +41,7 @@ program chessboard_mm
             ! The memory allocation for the chessboard
             type(c_ptr), intent(in), value :: B
             ! Floating point values for light and dark cells
-            real(c_float), intent(in), value :: light, dark
+            real(float_type), intent(in), value :: light, dark
             ! Size of the problem
             integer(c_int), intent(in), value :: M, N
         end subroutine
@@ -54,14 +55,14 @@ program chessboard_mm
     integer :: i, j
 
     ! Declare the chessboard on the host as a static array
-    real(c_float), target :: B_h(M,N)
+    real(float_type), target :: B_h(M,N)
 
     ! Define what light and dark means
-    real(c_float) :: light = 0.0
-    real(c_float) :: dark = 1.0
+    real(float_type) :: light = 0.0
+    real(float_type) :: dark = 1.0
 
     ! Fortran pointer to the chessboard on the device
-    real(c_float), dimension(:,:), pointer :: B_d
+    real(float_type), dimension(:,:), pointer :: B_d
     
     !! Step 1: Find and set the device. 
     !! Use device 0 by default
@@ -80,7 +81,7 @@ program chessboard_mm
     )
 
     ! Step 4: Copy from the device back to the host
-    call hipcheck(hipmemcpy(B_h, B_d, size(B_h), hipmemcpydevicetohost))
+    call hipcheck(hipMemcpy(B_h, B_d, size(B_h), hipMemcpyDeviceToHost))
 
     ! Check the answer by printing it
     do i=1,N
@@ -95,7 +96,7 @@ program chessboard_mm
     ! Release resources
 
     ! Step 5: Free allocation B_d on the device
-    call hipcheck(hipfree(B_d))
+    call hipcheck(hipFree(B_d))
 
     ! Step 6: Reset the GPU to make sure all resources are released
     call reset_device
