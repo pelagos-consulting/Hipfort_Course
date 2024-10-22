@@ -89,6 +89,9 @@ contains
         ! The id of the device to use
         integer, intent(in) :: dev_id
 
+        ! Is this supported?
+        integer(kind=4) :: supported
+
         logical :: decision
 
         ! Structure to store GPU properties
@@ -97,8 +100,9 @@ contains
         ! Get device properties
         call hipcheck(hipgetdeviceproperties(prop, dev_id))        
 
-        ! Check if managed memory is supported on dev_id
+        ! Another way to check if managed memory is supported on dev_id
         ! this method is not cross-platform
+        
         !call hipcheck(hipDeviceGetAttribute(c_loc(supported), &
         !    hipDeviceAttributeManagedMemory,dev_id)) 
 
