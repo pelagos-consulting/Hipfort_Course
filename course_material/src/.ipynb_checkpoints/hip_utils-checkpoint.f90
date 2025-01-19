@@ -79,7 +79,7 @@ contains
         end if
     end subroutine reset_device
 
-    logical function supports_managed_memory(dev_id)
+    function supports_managed_memory(dev_id) result(decision)
         use hipfort
         use hipfort_check
         use iso_c_binding
@@ -89,22 +89,28 @@ contains
         ! The id of the device to use
         integer, intent(in) :: dev_id
 
+        ! Is this supported?
+        integer(kind=4) :: supported
+
+        logical :: decision
+
         ! Structure to store GPU properties
         type(hipdeviceprop_t) :: prop
 
         ! Get device properties
         call hipcheck(hipgetdeviceproperties(prop, dev_id))        
 
-        ! Check if managed memory is supported on dev_id
+        ! Another way to check if managed memory is supported on dev_id
         ! this method is not cross-platform
+        
         !call hipcheck(hipDeviceGetAttribute(c_loc(supported), &
         !    hipDeviceAttributeManagedMemory,dev_id)) 
 
         ! Default answer
-        supports_managed_memory = .false. 
+        decision = .false. 
 
         if (prop%managedmemory /= 0) then
-            supports_managed_memory = .true. ! convert to logical and output
+            decision = .true. ! convert to logical and output
         endif
 
     end function supports_managed_memory

@@ -7764,6 +7764,11 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 <div class="highlight"><pre><span></span><span class="c"># Set separable compilation on</span>
 <span class="nb">set</span><span class="p">(</span><span class="s">CUDA_SEPARABLE_COMPILATION</span><span class="w"> </span><span class="s">ON</span><span class="p">)</span>
 </pre></div>
+<p>Next, we find the CUDA toolkit</p>
+<div class="highlight"><pre><span></span><span class="c">## Find the CUDA toolkit, </span>
+<span class="c">## it must be present if we use HIP_PLATFORM=nvidia </span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">CUDAToolkit</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+</pre></div>
 <p>We set the  CMake variable <code>kernel_lang</code> to <code>CUDA</code> to treat the language in kernel sources as CUDA.</p>
 <div class="highlight"><pre><span></span><span class="c"># Set the kernel language for device code</span>
 <span class="nb">set</span><span class="p">(</span><span class="s">kernel_lang</span><span class="w"> </span><span class="s">CUDA</span><span class="p">)</span>
@@ -7787,7 +7792,7 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 <span class="w">    </span><span class="nb">find_path</span><span class="p">(</span><span class="s">HIPFORT_INCLUDE_DIRS</span><span class="w"> </span><span class="s">hipfort.mod</span><span class="w"> </span><span class="s">HINTS</span><span class="w"> </span><span class="s">ENV</span><span class="w"> </span><span class="s">HIPFORT_ROOT</span><span class="w"> </span><span class="s">PATH_SUFFIXES</span><span class="w"> </span><span class="s">include/hipfort/nvptx/</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 </pre></div>
 <p>At the end of this section we create a CMake variable called <code>kernel_libs</code> which specifies the libraries that kernel code must link to. We link first to the file (<code>libhipfort-nvptx.a</code>) that is in <code>HIPFORT_LIBRARIES</code>, then we link to the CUDA libraries. It is important to link to the CUDA libraries last in <code>kernel_libs</code> so calls in the hipFORT libary can resolve correctly.</p>
-<div class="highlight"><pre><span></span><span class="nb">set</span><span class="p">(</span><span class="s">kernel_libs</span><span class="w"> </span><span class="s">CUDA::cudart</span><span class="w"> </span><span class="s">CUDA::cuda_driver</span><span class="w"> </span><span class="o">${</span><span class="nv">HIPFORT_LIBRARIES</span><span class="o">}</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="nb">set</span><span class="p">(</span><span class="s">kernel_libs</span><span class="w"> </span><span class="o">${</span><span class="nv">HIPFORT_LIBRARIES</span><span class="o">}</span><span class="w"> </span><span class="s">CUDA::cuda_driver</span><span class="w"> </span><span class="s">CUDA::cudart</span><span class="p">)</span>
 </pre></div>
 <p>Then we add <code>HIPFORT_INCLUDE_DIRS</code> to the include path.</p>
 <div class="highlight"><pre><span></span><span class="nb">include_directories</span><span class="p">(</span><span class="o">${</span><span class="nv">HIPFORT_INCLUDE_DIRS</span><span class="o">}</span><span class="p">)</span>
@@ -7805,9 +7810,7 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 <h3 id="AMD-specific-CMake-directives">AMD-specific CMake directives<a class="anchor-link" href="#AMD-specific-CMake-directives">¶</a></h3><p>On an AMD platform the environment variable $HIP_PLATFORM will either be not defined or set to <code>amd</code>. In such cases within <a href="../CMakeLists.txt"></a>CMakeLists.txt we enable the HIP language and set <code>kernel_lang</code> to <code>HIP</code>.</p>
 <div class="highlight"><pre><span></span><span class="nb">else</span><span class="p">()</span>
 
-<span class="w">    </span><span class="nb">message</span><span class="p">(</span><span class="s2">"Performing compilation for an AMD backend."</span><span class="p">)</span>
-<span class="w">    </span>
-<span class="w">    </span><span class="c"># Enable the HIP language</span>
+<span class="w">   </span><span class="c"># Enable the HIP language</span>
 <span class="w">    </span><span class="nb">enable_language</span><span class="p">(</span><span class="s">HIP</span><span class="p">)</span>
 
 <span class="w">    </span><span class="c"># Set language for device code</span>
@@ -7846,6 +7849,20 @@ hipfc<span class="w"> </span>--offload-arch<span class="o">=</span>sm_86<span cl
 <span class="nb">endif</span><span class="p">()</span>
 </pre></div>
 <p>Setting CMake variables for an AMD backend is similar to that of the CUDA section above. Acceptable values for the environment variable <code>GPU_ARCH</code> are a semicolon-separated list of architectures,  e.g. <code>gfx906;gfx90a</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=092b349b-b896-477f-b355-ae6f9162fd4b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="A-place-for-compiled-modules">A place for compiled modules<a class="anchor-link" href="#A-place-for-compiled-modules">¶</a></h3><p>Some pieces of software in <strong>course_material/src</strong> make modules that need to be globally available. We use the <code>CMAKE_Fortran_MODULE_DIRECTORY</code> variable to set a place where all compiled modules are placed.</p>
+<div class="highlight"><pre><span></span><span class="c"># Set the place to put all built Fortran module files</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_Fortran_MODULE_DIRECTORY</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_BINARY_DIR</span><span class="o">}</span><span class="s">/mod</span><span class="p">)</span>
+</pre></div>
 </div>
 </div>
 </div>

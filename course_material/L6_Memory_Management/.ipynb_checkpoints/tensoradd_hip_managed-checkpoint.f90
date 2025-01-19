@@ -65,12 +65,14 @@ program tensoradd
     ! Allocate managed memory that is accessible across host and device
     call hipCheck(hipMallocManaged(A, M, N, hipMemAttachGlobal))
     call hipCheck(hipMallocManaged(B, M, N, hipMemAttachGlobal))
-    call hipCheck(hipMallocmanaged(C, M, N, hipMemAttachGlobal))
+    call hipCheck(hipMallocManaged(C, M, N, hipMemAttachGlobal))
 
-    ! Set coarse grained coherence for all variables
+#ifdef _HIP_PLATFORM_AMD
+    ! Set coarse grained coherence for all variables, this is only available for AMD platforms
     call hipCheck(hipMemAdvise(c_loc(A), int(sizeof(A), c_size_t), hipMemAdviseSetCoarseGrain,0))
     call hipCheck(hipMemAdvise(c_loc(B), int(sizeof(B), c_size_t), hipMemAdviseSetCoarseGrain,0))
     call hipCheck(hipMemAdvise(c_loc(C), int(sizeof(C), c_size_t), hipMemAdviseSetCoarseGrain,0))
+#endif
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
@@ -100,10 +102,10 @@ program tensoradd
 
     ! Release resources
 
-    ! Free allocations
-    call hipcheck(hipfree(A))
-    call hipcheck(hipfree(B))
-    call hipcheck(hipfree(C))
+    ! Free managed memory allocations
+    call hipcheck(hipFree(A))
+    call hipcheck(hipFree(B))
+    call hipcheck(hipFree(C))
 
     ! It is best practice to nullify all pointers 
     ! once we are done with them 

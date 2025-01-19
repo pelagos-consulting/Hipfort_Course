@@ -7,7 +7,7 @@
 #include <cassert>
 #include <hip/hip_runtime.h>
 
-typedef float float_type;
+#include "kinds.h"
 
 void hipCheck(hipError_t error_code, std::string error_msg) {
     // Function to check a HIP return code
@@ -58,7 +58,7 @@ __global__ void fill_chessboard (
     // of the grid
 
     // Uncomment this for the shortcut solution to Step 0.
-    //#include "step0_kernel.h"
+    // #include "step0_kernel.h"
 }
 
 // C function to call the tensoradd_2D kernel

@@ -6,10 +6,11 @@ program managed_mem
     use iso_fortran_env
     
     use hip_utils
+    use kinds
     
     implicit none
     
-    real(c_float),pointer,dimension(:,:) :: f, x
+    real(float_type), pointer, dimension(:,:) :: f, x
     
     type(c_ptr) :: stream
 

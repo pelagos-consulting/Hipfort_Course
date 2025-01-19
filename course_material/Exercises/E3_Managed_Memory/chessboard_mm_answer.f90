@@ -11,6 +11,9 @@ program chessboard_mm_answer
     ! C interopability 
     use iso_c_binding
 
+    ! Floating point kinds
+    use kinds
+
     ! HIP modules
     use hipfort
     use hipfort_check
@@ -30,6 +33,7 @@ program chessboard_mm_answer
         ! is regarded as a subroutine in Fortran 
         subroutine launch_kernel_hip(B, light, dark, M, N) bind(C)
             use iso_c_binding
+            use kinds
             ! Fortran passes arguments by reference as the default
             ! Arguments must have the "value" option present to pass by value
             ! Otherwise launch_kernel will receive pointers of type void**
@@ -37,7 +41,7 @@ program chessboard_mm_answer
             ! The memory allocation for the chessboard
             type(c_ptr), intent(in), value :: B
             ! Floating point values for light and dark cells
-            real(c_float), intent(in), value :: light, dark
+            real(float_type), intent(in), value :: light, dark
             ! Size of the problem
             integer(c_int), intent(in), value :: M, N
         end subroutine
@@ -51,11 +55,11 @@ program chessboard_mm_answer
     integer :: i, j
 
     ! Fortran pointer to the chessboard
-    real(c_float), dimension(:,:), pointer :: B
+    real(float_type), dimension(:,:), pointer :: B
 
     ! Define what light and dark means
-    real(c_float) :: light = 0.0
-    real(c_float) :: dark = 1.0
+    real(float_type) :: light = 0.0
+    real(float_type) :: dark = 1.0
     
     !! Step 1: Find and set the device. 
     !! Use device 0 by default

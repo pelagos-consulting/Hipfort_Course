@@ -59,6 +59,9 @@ program tensoradd
     ! Fortran pointers to memory allocations on the host
     real(float_type), dimension(:,:), pointer :: A_h, B_h, C_h
 
+    ! Using allocatable arrays like this may result in an error!
+    !real(float_type), dimension(:,:), allocatable, target :: A_h, B_h, C_h
+
     ! C Pointers to memory allocations on the device
     type(c_ptr) :: A_d, B_d, C_d
 
@@ -69,9 +72,9 @@ program tensoradd
     allocate(A_h(M,N), B_h(M, N), C_h(M,N))
 
     ! Allocate tensors on the device
-    call hipcheck(hipmalloc(A_d, int(sizeof(A_h), c_size_t)))
-    call hipcheck(hipmalloc(B_d, int(sizeof(B_h), c_size_t)))
-    call hipcheck(hipmalloc(C_d, int(sizeof(C_h), c_size_t)))
+    call hipcheck(hipMalloc(A_d, int(sizeof(A_h), c_size_t)))
+    call hipcheck(hipMalloc(B_d, int(sizeof(B_h), c_size_t)))
+    call hipcheck(hipMalloc(C_d, int(sizeof(C_h), c_size_t)))
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
@@ -79,8 +82,8 @@ program tensoradd
     call random_number(B_h)
 
     ! Copy memory from the host to the device 
-    call hipcheck(hipmemcpy(A_d, c_loc(A_h), int(sizeof(A_h), c_size_t), hipmemcpyhosttodevice))
-    call hipcheck(hipmemcpy(B_d, c_loc(B_h), int(sizeof(B_h), c_size_t), hipmemcpyhosttodevice))
+    call hipcheck(hipMemcpy(A_d, c_loc(A_h), int(sizeof(A_h), c_size_t), hipMemcpyHostToDevice))
+    call hipcheck(hipMemcpy(B_d, c_loc(B_h), int(sizeof(B_h), c_size_t), hipMemcpyHostToDevice))
 
     ! Call the C function that launches the kernel
     call launch_kernel_hip( &
@@ -92,7 +95,7 @@ program tensoradd
     )
 
     ! Copy memory from the device to the host
-    call hipcheck(hipmemcpy(c_loc(C_h), C_d, int(sizeof(C_h),c_size_t), hipmemcpydevicetohost))
+    call hipcheck(hipMemcpy(c_loc(C_h), C_d, int(sizeof(C_h), c_size_t), hipMemcpyDeviceToHost))
 
     ! Check the answer
     success = check(A_h, B_h, C_h, eps_mult)
@@ -103,9 +106,9 @@ program tensoradd
     deallocate(A_h, B_h, C_h)
 
     ! Free allocations on the device
-    call hipcheck(hipfree(A_d))
-    call hipcheck(hipfree(B_d))
-    call hipcheck(hipfree(C_d))
+    call hipcheck(hipFree(A_d))
+    call hipcheck(hipFree(B_d))
+    call hipcheck(hipFree(C_d))
 
     ! It is best practice to nullify all pointers 
     ! once we are done with them 

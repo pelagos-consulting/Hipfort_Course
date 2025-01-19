@@ -1,6 +1,6 @@
 program tensoradd
     !! Program to compute 2D tensor addition
-    !! Using Fortran pointers as the handle 
+    !! Using C pointers type(c_ptr) as the handle 
     !! for device allocations
     !! Written by Dr. Toby Potter and Dr. Joseph Schoonover
 
@@ -15,6 +15,7 @@ program tensoradd
 
     ! HIP modules
     use hipfort
+    use hipfort_hiphostregister
     use hipfort_check
 
     ! device handling 
@@ -50,82 +51,75 @@ program tensoradd
 
     ! Epsilon multiplier
     ! How many floating point spacings
-    ! should the computed solution be from the answer
+    ! Should the computed solution be from the answer
     real :: eps_mult = 2.0
 
     ! Outcome of the check
     logical :: success
 
-    ! Fortran pointers to memory allocations on the host
-    real(float_type), dimension(:,:), pointer :: A_h, B_h, C_h
+    ! C Pointers to pinned memory allocations on the host
+    type(c_ptr) :: A_p, B_p, C_p
 
-    ! Fortran pointers to memory allocations on the device
-    real(float_type), dimension(:,:), pointer :: A_d, B_d, C_d
+    ! C Pointers to pinned memory allocations on the device
+    type(c_ptr) :: A_d, B_d, C_d
+
+    ! Fortran pointers to the host memory allocations 
+    real(float_type), dimension(:,:), pointer :: A_h, B_h, C_h
 
     ! Find and set the device. Use device 0 by default
     call init_device(0)   
 
-    ! Allocate memory on host 
-    allocate(A_h(M,N), B_h(M, N), C_h(M,N))
+    ! Allocate pinned memory on the host
+    call hipcheck(hipMallocHost(A_p, int(M*N*c_sizeof(float_type), c_size_t)))
+    call hipcheck(hipMallocHost(B_p, int(M*N*c_sizeof(float_type), c_size_t)))
+    call hipcheck(hipMallocHost(C_p, int(M*N*c_sizeof(float_type), c_size_t)))
+    
+    ! Associate the Fortran pointers with the pinned host arrays
+    call c_f_pointer(A_p, A_h, [M,N])
+    call c_f_pointer(B_p, B_h, [M,N])
+    call c_f_pointer(C_p, C_h, [M,N])
 
-    ! Allocate memory on the device
-    call hipcheck(hipMalloc(A_d, M, N))
-    call hipcheck(hipMalloc(B_d, M, N))
-    call hipcheck(hipMalloc(C_d, M, N))
-
-    ! Could have also done this for the allocate instead
-    !call hipcheck(hipMalloc_r4_2_c_size_t(A_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-    !call hipcheck(hipMalloc_r4_2_c_size_t(B_d, int(M_in, c_size_t), int(N_in, c_size_t)))
-    !call hipcheck(hipMalloc_r4_2_c_size_t(C_d, int(M_in, c_size_t), int(N_in, c_size_t)))
+    ! Map pinned memory allocations to pointers 
+    ! on the memory space of the GPU
+    call hipcheck(hipHostGetDevicePointer(A_d, A_p, 0))
+    call hipcheck(hipHostGetDevicePointer(B_d, B_p, 0))
+    call hipcheck(hipHostGetDevicePointer(C_d, C_p, 0))
 
     ! Fill arrays with random numbers using the
     ! Fortran intrinsic function "random_number"
     call random_number(A_h)
     call random_number(B_h)
 
-    ! Copy memory from the host to the device
-    ! Note that size for the copy is in elements, not bytes
-    call hipcheck(hipMemcpy(A_d, A_h, size(A_h), hipMemcpyHostToDevice))
-    call hipcheck(hipMemcpy(B_d, B_h, size(B_h), hipMemcpyHosttoDevice))
-
-    ! Could also have done this for the copy instead
-    !call hipcheck(hipMemcpy_r4_2_c_size_t(A_d, A_h, &
-    !    int(size(A_h), c_size_t), hipMemcpyhosttodevice))
-    !call hipcheck(hipMemcpy_r4_2_c_size_t(B_d, B_h, &
-    !    int(size(B_h), c_size_t), hipMemcpyhosttodevice))
-
     ! Call the C function that launches the kernel
     call launch_kernel_hip( &
-        c_loc(A_d), &
-        c_loc(B_d), &
-        c_loc(C_d), &
+        A_d, &
+        B_d, &
+        C_d, &
         int(M, c_int), &
         int(N, c_int) &
     )
 
-    ! Copy from the device result back to the host
-    call hipcheck(hipMemcpy(C_h, C_d, size(C_d), hipMemcpyDeviceToHost))
-
-    ! Could have also done this instead for the copy
-    !call hipcheck(hipMemcpy_r4_2_c_size_t(C_h, C_d, &
-    !    int(size(C_d), c_size_t), hipMemcpydevicetohost))
+    ! Make sure the computation is finished
+    call hipcheck(hipDeviceSynchronize())
 
     ! Check the answer
     success = check(A_h, B_h, C_h, eps_mult)
 
     ! Release resources
 
-    ! Free host arrays
-    deallocate(A_h, B_h, C_h)
-
-    ! Free allocations on the device
-    call hipcheck(hipFree(A_d))
-    call hipcheck(hipFree(B_d))
-    call hipcheck(hipFree(C_d))
+    ! Free pinned memory allocations on the device
+    call hipcheck(hipFreeHost(A_p))
+    call hipcheck(hipFreeHost(B_p))
+    call hipcheck(hipFreeHost(C_p))
 
     ! It is best practice to nullify all pointers 
     ! once we are done with them 
-    nullify(A_h, B_h, C_h, A_d, B_d, C_d)
+    nullify(A_h, B_h, C_h)
+
+    ! Set C pointers to null as well
+    A_d = c_null_ptr
+    B_d = c_null_ptr
+    C_d = c_null_ptr
 
     ! Make sure all resources on the selected device are released
     call reset_device

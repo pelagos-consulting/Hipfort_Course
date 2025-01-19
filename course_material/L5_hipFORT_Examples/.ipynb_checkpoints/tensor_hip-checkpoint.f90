@@ -82,7 +82,7 @@ contains
         end if
 
         ! Now allocate memory for the tensor on the GPU
-        call hipCheck(hipmalloc(this%mem, nbytes))
+        call hipCheck(hipMalloc(this%mem, nbytes))
 
         ! Set the allocated flag
         this%allocd = .true.
@@ -104,7 +104,7 @@ contains
 
         ! Free the memory if necessary
         if (this%allocd) then
-            call hipCheck(hipfree(this%mem))
+            call hipCheck(hipFree(this%mem))
         endif
 
         ! Unset the allocated flag
@@ -150,8 +150,8 @@ contains
         end if
 
         ! Now perform the copy
-        call hipCheck(hipmemcpy(this%mem, host_cptr, &
-                nbytes, hipmemcpyhosttodevice))
+        call hipCheck(hipMemcpy(this%mem, host_cptr, &
+                nbytes, hipMemcpyHostToDevice))
 
     end subroutine copy_from_host_cptr
 
@@ -183,8 +183,8 @@ contains
         end if
 
         ! Now perform the copy
-        call hipCheck(hipmemcpy(host_cptr, this%mem, &
-                this%nbytes, hipmemcpydevicetohost))
+        call hipCheck(hipMemcpy(host_cptr, this%mem, &
+                this%nbytes, hipMemcpyDeviceToHost))
 
     end subroutine copy_to_host_cptr
 

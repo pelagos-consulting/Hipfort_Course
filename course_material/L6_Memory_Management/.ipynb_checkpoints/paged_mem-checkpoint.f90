@@ -13,7 +13,7 @@ program paged_mem
   
   allocate(f_host(1:N,1:M))
   
-  call hipcheck(hipMalloc(f_device, SIZEOF(f_host)))
+  call hipcheck(hipMalloc(f_device, int(sizeof(f_host),c_size_t)))
   
   !...
   
