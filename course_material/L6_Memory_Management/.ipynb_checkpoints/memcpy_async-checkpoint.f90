@@ -32,8 +32,11 @@ program memcpy_async
   ! Create a stream
   call hipcheck(hipStreamCreate(stream))
   
-  ! Initiate and asynchronous memory copy from host to device
+  ! Initiate an asynchronous memory copy from host to device
   call hipcheck(hipMemcpyAsync(f_device, f_host, nbytes, hipMemcpyHostToDevice,stream))
+
+  ! Initiate an asynchronous memory copy from device to host
+  call hipcheck(hipMemcpyAsync(f_host, f_device, nbytes, hipMemcpyDeviceToHost,stream))
 
   ! Wait on the stream to finish
   call hipcheck(hipStreamSynchronize(stream))

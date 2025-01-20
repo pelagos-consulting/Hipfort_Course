@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.21) # HIP language support requires 3.21 or greater
 cmake_policy(VERSION 3.21...3.27)
 
+# Make sure ROCM_PATH is defined
 if(NOT DEFINED ROCM_PATH)
     if(NOT DEFINED ENV{ROCM_PATH})
         set(ROCM_PATH "/opt/rocm/" CACHE PATH "Path to which ROCm has been installed")

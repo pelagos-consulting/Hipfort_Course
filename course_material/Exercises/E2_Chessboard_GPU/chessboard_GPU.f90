@@ -93,6 +93,7 @@ program chessboard
         end do
         ! Print a new line
         print *, ""
+    
     end do
 
     ! Release resources
