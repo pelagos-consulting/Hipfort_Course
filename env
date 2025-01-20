@@ -23,13 +23,27 @@ then
     export CXX=$(which CC)
 
 
-elif [[ $HOSTNAME =~ "noether" ]]
+elif [[ $(hostname) =~ "noether" ]]
 then
 
-    module load gcc/13.2.0 hip/5.7.3 cmake/3.27.9 hipfort/5.7.1
+    module load gcc/12.4.0 rocm cmake
     export HIP_PLATFORM=amd
     export GPU_ARCH=gfx90a
-    export HIPFORT_COMPILER=$(which gfortran)
+    export HIPFORT_COMPILER=$(which amdflang)
+    export FC=$(which amdflang)
+    export CC=$(which amdclang)
+    export CXX=$(which amdclang++)
+
+elif [[ $(hostname) =~ "nicholson" ]]
+then
+
+    module load gcc/12.4.0 rocm cmake
+    export HIP_PLATFORM=amd
+    export GPU_ARCH=gfx942
+    export HIPFORT_COMPILER=$(which amdflang)
+    export FC=$(which amdflang)
+    export CC=$(which amdclang)
+    export CXX=$(which amdclang++)
 
 elif [[ $HOSTNAME =~ "fullcircle" ]]
 then
